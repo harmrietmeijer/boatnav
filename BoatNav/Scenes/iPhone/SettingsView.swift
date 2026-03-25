@@ -6,6 +6,44 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Kaartstijl") {
+                    ForEach(MapStyle.allCases) { style in
+                        HStack {
+                            Image(systemName: style.iconName)
+                                .foregroundStyle(settingsViewModel.mapStyle == style ? .blue : .secondary)
+                                .frame(width: 28)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(style.displayName)
+                                    .font(.body)
+                                Text(style.description)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            if settingsViewModel.mapStyle == style {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.blue)
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                settingsViewModel.mapStyle = style
+                            }
+                        }
+                    }
+                }
+
+                Section("Kaartlagen") {
+                    Toggle("Boeien en bakens", isOn: $settingsViewModel.showBuoys)
+                    Toggle("Brughoogtes", isOn: $settingsViewModel.showBridges)
+                    Toggle("Zeemerken (OpenSeaMap)", isOn: $settingsViewModel.showSeamarks)
+                }
+
                 Section("Navigatie") {
                     HStack {
                         Text("Kruissnelheid")
@@ -21,12 +59,6 @@ struct SettingsView: View {
                     Text(String(format: "%.1f knopen", UnitConversion.kmhToKnots(settingsViewModel.cruisingSpeedKmh)))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                }
-
-                Section("Kaartlagen") {
-                    Toggle("Boeien en bakens", isOn: $settingsViewModel.showBuoys)
-                    Toggle("Brughoogtes", isOn: $settingsViewModel.showBridges)
-                    Toggle("Zeemerken (OpenSeaMap)", isOn: $settingsViewModel.showSeamarks)
                 }
 
                 Section("Over") {

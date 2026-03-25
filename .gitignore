@@ -26,3 +26,5 @@ Package.resolved
 
 # CocoaPods (if ever used)
 Pods/
+*.xcuserstate
+.claude/

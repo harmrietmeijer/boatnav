@@ -12,13 +12,15 @@ enum GeoJSONDecoder {
             guard let point = feature.geometry.asPoint else { return nil }
             let props = feature.properties
 
+            let ialaCategory = props["ialaCategorie"]?.stringValue
             return Buoy(
-                id: props["gml_id"]?.stringValue ?? UUID().uuidString,
-                name: props["naam"]?.stringValue ?? props["object_naam"]?.stringValue,
+                id: props["gml_id"]?.stringValue ?? props["objectid"]?.stringValue ?? UUID().uuidString,
+                name: props["benaming"]?.stringValue ?? props["benamCod"]?.stringValue ?? props["naam"]?.stringValue,
                 coordinate: CLLocationCoordinate2D(latitude: point.1, longitude: point.0),
-                type: Buoy.BuoyType(rawValue: props["type_markering"]?.stringValue ?? "") ?? .unknown,
-                color: props["kleur"]?.stringValue,
-                shape: props["vorm"]?.stringValue
+                type: Buoy.BuoyType(rawValue: ialaCategory ?? props["objSoort"]?.stringValue ?? "") ?? .unknown,
+                color: props["kleurpatr"]?.stringValue ?? props["objKleur"]?.stringValue ?? props["kleur"]?.stringValue,
+                shape: props["objVorm"]?.stringValue ?? props["vorm"]?.stringValue,
+                ialaCategory: ialaCategory
             )
         }
     }
@@ -108,10 +110,10 @@ enum GeoJSONDecoder {
             }
 
             return WaterwaySegment(
-                id: props["gml_id"]?.stringValue ?? UUID().uuidString,
-                name: props["naam"]?.stringValue ?? props["vaarwegnaam"]?.stringValue ?? "Onbekend",
+                id: props["gml_id"]?.stringValue ?? props["vwkId"]?.stringValue ?? UUID().uuidString,
+                name: props["vwgNaam"]?.stringValue ?? props["vrtNaam"]?.stringValue ?? props["naam"]?.stringValue ?? "Onbekend",
                 coordinates: coordinates,
-                cemtClass: props["cemt_klasse"]?.stringValue,
+                cemtClass: props["cemt_klasse"]?.stringValue ?? props["vrtCode"]?.stringValue,
                 length: length
             )
         }
@@ -140,6 +142,10 @@ struct GeoJSONGeometry: Decodable {
     var asPoint: (Double, Double)? {
         if case .point(let coords) = coordinates {
             return (coords[0], coords[1])
+        }
+        // MultiPoint is decoded as lineString — use first point
+        if type == "MultiPoint", case .lineString(let points) = coordinates, let first = points.first, first.count >= 2 {
+            return (first[0], first[1])
         }
         return nil
     }

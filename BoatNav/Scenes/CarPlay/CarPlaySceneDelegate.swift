@@ -103,15 +103,15 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         guard let interfaceController else { return }
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
-        let destinations = appDelegate.navigationViewModel.availableDestinations
+        let favorites = appDelegate.navigationViewModel.favorites
 
-        let items = destinations.map { [weak self] destination -> CPListItem in
+        let items = favorites.map { [weak self] fav -> CPListItem in
             let item = CPListItem(
-                text: destination.name,
-                detailText: destination.description
+                text: fav.name,
+                detailText: fav.description
             )
             item.handler = { _, completion in
-                self?.handleDestinationSelected(destination)
+                self?.handleFavoriteSelected(fav)
                 completion()
             }
             return item
@@ -131,12 +131,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
 extension CarPlaySceneDelegate {
 
-    func handleDestinationSelected(_ destination: Waypoint) {
+    func handleFavoriteSelected(_ fav: FavoriteLocation) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let waypoint = Waypoint(id: fav.id, name: fav.name, description: fav.description, coordinate: fav.coordinate)
 
         Task {
             do {
-                let route = try await appDelegate.navigationViewModel.calculateRoute(to: destination)
+                let route = try await appDelegate.navigationViewModel.calculateRoute(to: waypoint)
                 await MainActor.run {
                     startNavigation(with: route)
                 }

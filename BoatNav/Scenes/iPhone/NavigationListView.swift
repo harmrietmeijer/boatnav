@@ -2,6 +2,10 @@ import SwiftUI
 
 struct NavigationListView: View {
     @EnvironmentObject var navigationViewModel: NavigationViewModel
+    @Binding var selectedTab: Int
+    @State private var showSearchField = false
+    @State private var favoriteName = ""
+    @State private var favoriteDescription = ""
 
     var body: some View {
         NavigationStack {
@@ -9,14 +13,95 @@ struct NavigationListView: View {
                 if navigationViewModel.isNavigating, let route = navigationViewModel.currentRoute {
                     activeNavigationView(route: route)
                 } else {
-                    destinationList
+                    routePlanningView
                 }
             }
             .navigationTitle("Navigatie")
+            .sheet(isPresented: $navigationViewModel.showAddFavoriteSheet) {
+                addFavoriteSheet
+            }
         }
     }
 
-    private var destinationList: some View {
+    private var addFavoriteSheet: some View {
+        NavigationStack {
+            Form {
+                Section("Locatie toevoegen aan favorieten") {
+                    TextField("Naam (bijv. Jachthaven Westergoot)", text: $favoriteName)
+                    TextField("Omschrijving (optioneel)", text: $favoriteDescription)
+                }
+
+                Section("Locatie kiezen") {
+                    if navigationViewModel.destinationSelection != .none {
+                        Button {
+                            guard let coord = navigationViewModel.destinationSelection.coordinate else { return }
+                            navigationViewModel.addFavorite(
+                                name: favoriteName.isEmpty ? navigationViewModel.destinationSelection.displayName : favoriteName,
+                                description: favoriteDescription,
+                                coordinate: coord
+                            )
+                            favoriteName = ""
+                            favoriteDescription = ""
+                            navigationViewModel.showAddFavoriteSheet = false
+                        } label: {
+                            Label("Gebruik huidige bestemming: \(navigationViewModel.destinationSelection.displayName)", systemImage: "flag.fill")
+                        }
+                        .disabled(favoriteName.isEmpty && navigationViewModel.destinationSelection.displayName.isEmpty)
+                    }
+
+                    if navigationViewModel.startSelection != .none,
+                       navigationViewModel.startSelection != .currentLocation {
+                        Button {
+                            guard let coord = navigationViewModel.startSelection.coordinate else { return }
+                            navigationViewModel.addFavorite(
+                                name: favoriteName.isEmpty ? navigationViewModel.startSelection.displayName : favoriteName,
+                                description: favoriteDescription,
+                                coordinate: coord
+                            )
+                            favoriteName = ""
+                            favoriteDescription = ""
+                            navigationViewModel.showAddFavoriteSheet = false
+                        } label: {
+                            Label("Gebruik startlocatie: \(navigationViewModel.startSelection.displayName)", systemImage: "circle.fill")
+                        }
+                        .disabled(favoriteName.isEmpty && navigationViewModel.startSelection.displayName.isEmpty)
+                    }
+
+                    Button {
+                        navigationViewModel.showAddFavoriteSheet = false
+                        navigationViewModel.mapSelectingFor = .destination
+                        navigationViewModel.pendingFavoriteCoordinate = nil
+                        // User picks on map, then comes back
+                        navigationViewModel.startMapSelection(for: .destination)
+                        selectedTab = 0
+                    } label: {
+                        Label("Kies op kaart", systemImage: "mappin.and.ellipse")
+                    }
+                }
+
+                Section {
+                    Text("Tip: selecteer eerst een bestemming via zoeken of de kaart, en voeg die dan toe als favoriet.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("Favoriet toevoegen")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Annuleer") {
+                        favoriteName = ""
+                        favoriteDescription = ""
+                        navigationViewModel.showAddFavoriteSheet = false
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Route Planning
+
+    private var routePlanningView: some View {
         List {
             if let error = navigationViewModel.errorMessage {
                 Section {
@@ -25,31 +110,275 @@ struct NavigationListView: View {
                 }
             }
 
-            Section("Bestemmingen") {
-                ForEach(navigationViewModel.availableDestinations) { destination in
-                    Button {
-                        startNavigation(to: destination)
-                    } label: {
-                        VStack(alignment: .leading) {
-                            Text(destination.name)
-                                .font(.headline)
-                            Text(destination.description)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+            // Start & Destination fields
+            Section("Route plannen") {
+                // Start location
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Start")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    HStack {
+                        Image(systemName: "circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.caption)
+
+                        if navigationViewModel.startSelection == .none {
+                            Text("Kies startlocatie")
+                                .foregroundStyle(.tertiary)
+                        } else {
+                            Text(navigationViewModel.startSelection.displayName)
+                                .lineLimit(1)
+                        }
+
+                        Spacer()
+
+                        Menu {
+                            Button {
+                                navigationViewModel.startSelection = .currentLocation
+                            } label: {
+                                Label("Huidige locatie", systemImage: "location.fill")
+                            }
+
+                            Button {
+                                navigationViewModel.selectingFor = .start
+                                navigationViewModel.searchQuery = ""
+                                navigationViewModel.searchResults = []
+                                showSearchField = true
+                            } label: {
+                                Label("Zoek locatie", systemImage: "magnifyingglass")
+                            }
+
+                            Button {
+                                navigationViewModel.startMapSelection(for: .start)
+                                selectedTab = 0
+                            } label: {
+                                Label("Kies op kaart", systemImage: "mappin.and.ellipse")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .foregroundStyle(.blue)
                         }
                     }
-                    .disabled(navigationViewModel.isLoadingRoute)
+                }
+
+                // Destination
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Bestemming")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    HStack {
+                        Image(systemName: "flag.fill")
+                            .foregroundStyle(.red)
+                            .font(.caption)
+
+                        if navigationViewModel.destinationSelection == .none {
+                            Text("Kies bestemming")
+                                .foregroundStyle(.tertiary)
+                        } else {
+                            Text(navigationViewModel.destinationSelection.displayName)
+                                .lineLimit(1)
+                        }
+
+                        Spacer()
+
+                        Menu {
+                            Button {
+                                navigationViewModel.selectingFor = .destination
+                                navigationViewModel.searchQuery = ""
+                                navigationViewModel.searchResults = []
+                                showSearchField = true
+                            } label: {
+                                Label("Zoek locatie", systemImage: "magnifyingglass")
+                            }
+
+                            Button {
+                                navigationViewModel.startMapSelection(for: .destination)
+                                selectedTab = 0
+                            } label: {
+                                Label("Kies op kaart", systemImage: "mappin.and.ellipse")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                }
+
+                // Search field
+                if showSearchField {
+                    searchField
+                }
+
+                // Calculate button
+                Button {
+                    Task { await navigationViewModel.calculateRoute() }
+                } label: {
+                    HStack {
+                        Spacer()
+                        if navigationViewModel.isLoadingRoute {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Label("Bereken route", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
+                        }
+                        Spacer()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(
+                    navigationViewModel.startSelection == .none
+                    || navigationViewModel.destinationSelection == .none
+                    || navigationViewModel.isLoadingRoute
+                )
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+
+                // Save route button
+                if navigationViewModel.startSelection != .none && navigationViewModel.destinationSelection != .none {
+                    Button {
+                        navigationViewModel.saveCurrentRoute()
+                    } label: {
+                        Label("Route opslaan", systemImage: "bookmark")
+                    }
+                }
+            }
+
+            // Search results
+            if !navigationViewModel.searchResults.isEmpty {
+                Section("Zoekresultaten") {
+                    ForEach(navigationViewModel.searchResults) { result in
+                        Button {
+                            navigationViewModel.selectSearchResult(result)
+                            showSearchField = false
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(result.displayName)
+                                    .font(.subheadline)
+                                Text(result.type)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Favorites
+            Section {
+                if navigationViewModel.favorites.isEmpty {
+                    Text("Nog geen favorieten")
+                        .foregroundStyle(.tertiary)
+                        .font(.subheadline)
+                } else {
+                    ForEach(navigationViewModel.favorites) { fav in
+                        Button {
+                            navigationViewModel.selectFavorite(fav, for: navigationViewModel.selectingFor)
+                        } label: {
+                            HStack {
+                                Image(systemName: "star.fill")
+                                    .foregroundStyle(.yellow)
+                                    .font(.caption)
+                                VStack(alignment: .leading) {
+                                    Text(fav.name)
+                                        .font(.headline)
+                                    if !fav.description.isEmpty {
+                                        Text(fav.description)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .onDelete(perform: navigationViewModel.deleteFavorite)
+                }
+            } header: {
+                HStack {
+                    Text("Favorieten")
+                    Spacer()
+                    Button {
+                        navigationViewModel.showAddFavoriteSheet = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.subheadline)
+                    }
+                }
+            }
+
+            // Saved routes
+            if !navigationViewModel.savedRoutes.isEmpty {
+                Section("Opgeslagen routes") {
+                    ForEach(navigationViewModel.savedRoutes) { route in
+                        HStack {
+                            Button {
+                                navigationViewModel.loadSavedRoute(route)
+                            } label: {
+                                VStack(alignment: .leading) {
+                                    Text(route.name)
+                                        .font(.subheadline)
+                                    Text(route.createdAt, style: .date)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            Spacer()
+
+                            Button(role: .destructive) {
+                                if let idx = navigationViewModel.savedRoutes.firstIndex(where: { $0.id == route.id }) {
+                                    navigationViewModel.deleteSavedRoute(at: IndexSet(integer: idx))
+                                }
+                            } label: {
+                                Image(systemName: "trash")
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .onDelete(perform: navigationViewModel.deleteSavedRoute)
                 }
             }
         }
-        .overlay {
-            if navigationViewModel.isLoadingRoute {
-                ProgressView("Route berekenen...")
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var searchField: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField(
+                    navigationViewModel.selectingFor == .start
+                        ? "Zoek startlocatie..."
+                        : "Zoek bestemming...",
+                    text: $navigationViewModel.searchQuery
+                )
+                .textFieldStyle(.plain)
+                .autocorrectionDisabled()
+                .onChange(of: navigationViewModel.searchQuery) { _, _ in
+                    navigationViewModel.performSearch()
+                }
+
+                Button {
+                    navigationViewModel.searchQuery = ""
+                    navigationViewModel.searchResults = []
+                    showSearchField = false
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(8)
+            .background(Color(.systemGray6))
+            .cornerRadius(8)
+
+            if navigationViewModel.isSearching {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
             }
         }
     }
+
+    // MARK: - Active Navigation
 
     private func activeNavigationView(route: WaterwayRoute) -> some View {
         List {
@@ -102,7 +431,7 @@ struct NavigationListView: View {
                 case .straight: Image(systemName: "arrow.up").foregroundStyle(.blue)
                 }
             case .bridge:
-                Image(systemName: "archway")
+                Image(systemName: "arrow.up.and.down.square.fill")
                     .foregroundStyle(.orange)
             case .lock:
                 Image(systemName: "lock.rectangle")
@@ -110,18 +439,6 @@ struct NavigationListView: View {
             case .arrive:
                 Image(systemName: "flag.checkered")
                     .foregroundStyle(.red)
-            }
-        }
-    }
-
-    private func startNavigation(to destination: Waypoint) {
-        Task {
-            do {
-                _ = try await navigationViewModel.calculateRoute(to: destination)
-            } catch {
-                await MainActor.run {
-                    navigationViewModel.errorMessage = error.localizedDescription
-                }
             }
         }
     }

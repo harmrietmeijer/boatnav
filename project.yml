@@ -9,7 +9,12 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: "3TZFTAC2SR"
+  configs:
+    Debug:
+      DEVELOPMENT_TEAM: "3TZFTAC2SR"
+    Release:
+      DEVELOPMENT_TEAM: "3TZFTAC2SR"
 
 targets:
   BoatNav:
@@ -23,11 +28,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: nl.boatnav.app
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        CODE_SIGN_ENTITLEMENTS: BoatNav/Resources/BoatNav.entitlements
-    entitlements:
-      path: BoatNav/Resources/BoatNav.entitlements
-      properties:
-        com.apple.developer.carplay-maps: true
+        DEVELOPMENT_TEAM: "3TZFTAC2SR"
+        CODE_SIGN_STYLE: Automatic
 
   BoatNavTests:
     type: bundle.unit-test

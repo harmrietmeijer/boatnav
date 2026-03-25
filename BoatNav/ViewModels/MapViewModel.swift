@@ -24,7 +24,11 @@ class MapViewModel: ObservableObject {
     }
 
     func regionDidChange(to region: MKCoordinateRegion) {
-        currentRegion = region
+        print("[MapVM] regionDidChange: lat=\(region.center.latitude), lon=\(region.center.longitude), span=\(region.span.latitudeDelta)")
+        // Defer @Published update to avoid publishing during view updates
+        DispatchQueue.main.async { [weak self] in
+            self?.currentRegion = region
+        }
 
         // Debounce: wait 0.5s after last region change
         regionDebounce?.cancel()
@@ -36,6 +40,7 @@ class MapViewModel: ObservableObject {
     }
 
     private func loadAnnotations(for region: MKCoordinateRegion) {
+        print("[MapVM] loadAnnotations called")
         fetchTask?.cancel()
         fetchTask = Task { [weak self] in
             guard let self else { return }
@@ -50,11 +55,14 @@ class MapViewModel: ObservableObject {
                 let bridges = try await bridgeAnnotations
                 let combined = buoys + bridges
 
+                print("[MapVM] Loaded \(buoys.count) buoys, \(bridges.count) bridges, total \(combined.count)")
+
                 await MainActor.run {
                     self.annotations = combined
                     self.isLoadingAnnotations = false
                 }
             } catch {
+                print("[MapVM] Error loading annotations: \(error)")
                 await MainActor.run { self.isLoadingAnnotations = false }
             }
         }

@@ -19,6 +19,10 @@ class SettingsViewModel: ObservableObject {
         didSet { UserDefaults.standard.set(showSeamarks, forKey: "showSeamarks") }
     }
 
+    @Published var mapStyle: MapStyle {
+        didSet { UserDefaults.standard.set(mapStyle.rawValue, forKey: "mapStyle") }
+    }
+
     init() {
         let defaults = UserDefaults.standard
 
@@ -39,5 +43,12 @@ class SettingsViewModel: ObservableObject {
         self.showBuoys = defaults.bool(forKey: "showBuoys")
         self.showBridges = defaults.bool(forKey: "showBridges")
         self.showSeamarks = defaults.bool(forKey: "showSeamarks")
+
+        if let saved = defaults.string(forKey: "mapStyle"),
+           let style = MapStyle(rawValue: saved) {
+            self.mapStyle = style
+        } else {
+            self.mapStyle = .standaard
+        }
     }
 }

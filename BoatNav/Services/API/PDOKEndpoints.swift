@@ -14,7 +14,7 @@ enum PDOKEndpoints {
             URLQueryItem(name: "service", value: "WFS"),
             URLQueryItem(name: "version", value: "2.0.0"),
             URLQueryItem(name: "request", value: "GetFeature"),
-            URLQueryItem(name: "typeName", value: "vaarwegmarkeringennld:vaarwegmarkeringen_drijvend"),
+            URLQueryItem(name: "typeName", value: "vaarwegmarkeringennld:vaarweg_markeringen_drijvend_rd"),
             URLQueryItem(name: "outputFormat", value: "application/json"),
             URLQueryItem(name: "srsName", value: "EPSG:4326"),
             URLQueryItem(name: "bbox", value: "\(bbox),EPSG:4326"),
@@ -26,8 +26,8 @@ enum PDOKEndpoints {
     // MARK: - VNDS Bridges
 
     static func bridges(bbox: String) -> URL {
-        // OGC API Features endpoint
-        var components = URLComponents(string: "\(vndsBase)/collections/bruggen/items")!
+        // OGC API Features endpoint - uses lon,lat bbox order
+        var components = URLComponents(string: "\(vndsBase)/collections/l_navigability/items")!
         components.queryItems = [
             URLQueryItem(name: "f", value: "json"),
             URLQueryItem(name: "bbox", value: bbox),
@@ -39,7 +39,7 @@ enum PDOKEndpoints {
     // MARK: - VNDS Locks
 
     static func locks(bbox: String) -> URL {
-        var components = URLComponents(string: "\(vndsBase)/collections/sluizen/items")!
+        var components = URLComponents(string: "\(vndsBase)/collections/l_navigability/items")!
         components.queryItems = [
             URLQueryItem(name: "f", value: "json"),
             URLQueryItem(name: "bbox", value: bbox),
@@ -56,10 +56,29 @@ enum PDOKEndpoints {
             URLQueryItem(name: "service", value: "WFS"),
             URLQueryItem(name: "version", value: "2.0.0"),
             URLQueryItem(name: "request", value: "GetFeature"),
-            URLQueryItem(name: "typeName", value: "nwbvaarwegen:vaarwegen"),
+            URLQueryItem(name: "typeName", value: "nwbvaarwegen:vaarwegvakken"),
             URLQueryItem(name: "outputFormat", value: "application/json"),
             URLQueryItem(name: "srsName", value: "EPSG:4326"),
             URLQueryItem(name: "bbox", value: "\(bbox),EPSG:4326"),
+        ]
+        return components.url!
+    }
+
+    // MARK: - PDOK Locatieserver (Geocoding / POI search)
+
+    static func locatieserver(query: String, rows: Int = 10) -> URL {
+        var components = URLComponents(string: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/suggest")!
+        components.queryItems = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "rows", value: "\(rows)"),
+        ]
+        return components.url!
+    }
+
+    static func locatieserverLookup(id: String) -> URL {
+        var components = URLComponents(string: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/lookup")!
+        components.queryItems = [
+            URLQueryItem(name: "id", value: id),
         ]
         return components.url!
     }
@@ -70,7 +89,7 @@ enum PDOKEndpoints {
             URLQueryItem(name: "service", value: "WFS"),
             URLQueryItem(name: "version", value: "2.0.0"),
             URLQueryItem(name: "request", value: "GetFeature"),
-            URLQueryItem(name: "typeName", value: "nwbvaarwegen:vaarwegen"),
+            URLQueryItem(name: "typeName", value: "nwbvaarwegen:vaarwegvakken"),
             URLQueryItem(name: "outputFormat", value: "application/json"),
             URLQueryItem(name: "srsName", value: "EPSG:4326"),
             URLQueryItem(name: "startIndex", value: "\(startIndex)"),

@@ -8,6 +8,9 @@ struct Buoy: Identifiable {
     let color: String?
     let shape: String?
 
+    /// IALA category from PDOK data
+    let ialaCategory: String?
+
     enum BuoyType: String {
         case lateral = "lateral"
         case cardinal = "cardinal"
@@ -16,4 +19,8 @@ struct Buoy: Identifiable {
         case special = "special"
         case unknown = "unknown"
     }
+
+    /// IALA: 1 = port/bakboord (red), 2 = starboard/stuurboord (green)
+    var isPort: Bool { ialaCategory == "1" }
+    var isStarboard: Bool { ialaCategory == "2" }
 }

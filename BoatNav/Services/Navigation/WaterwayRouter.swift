@@ -12,6 +12,8 @@ class WaterwayRouter {
         let path: [WaterwayGraph.Node]
         let edges: [WaterwayGraph.Edge]
         let totalDistance: Double
+        let originSnapPoint: CLLocationCoordinate2D
+        let destinationSnapPoint: CLLocationCoordinate2D
     }
 
     func findRoute(
@@ -19,15 +21,33 @@ class WaterwayRouter {
         to destination: CLLocationCoordinate2D
     ) throws -> RouteResult {
 
-        guard let startNode = graph.nearestNode(to: origin) else {
+        guard let startSnap = graph.nearestPointOnGraph(to: origin) else {
             throw RoutingError.noNearbyWaterway(origin)
         }
-        guard let endNode = graph.nearestNode(to: destination) else {
+        guard let endSnap = graph.nearestPointOnGraph(to: destination) else {
             throw RoutingError.noNearbyWaterway(destination)
         }
 
-        if startNode == endNode {
+        let startNode = startSnap.node
+        let endNode = endSnap.node
+
+        // Compare actual snap points (not quantized nodes) to avoid false "same point" errors
+        let snapDistance = CLLocation(latitude: startSnap.point.latitude, longitude: startSnap.point.longitude)
+            .distance(from: CLLocation(latitude: endSnap.point.latitude, longitude: endSnap.point.longitude))
+        if snapDistance < 50 {
             throw RoutingError.sameStartAndEnd
+        }
+
+        // If both snap to same node but are on different segments, create a direct route
+        if startNode == endNode {
+            // Find the edge that connects these two snap points
+            return RouteResult(
+                path: [startNode],
+                edges: [],
+                totalDistance: snapDistance,
+                originSnapPoint: startSnap.point,
+                destinationSnapPoint: endSnap.point
+            )
         }
 
         // A* pathfinding
@@ -43,7 +63,10 @@ class WaterwayRouter {
             }
 
             if current == endNode {
-                return reconstructPath(cameFrom: cameFrom, current: current)
+                return reconstructPath(
+                    cameFrom: cameFrom, current: current,
+                    originSnap: startSnap.point, destinationSnap: endSnap.point
+                )
             }
 
             openSet.remove(current)
@@ -75,7 +98,9 @@ class WaterwayRouter {
 
     private func reconstructPath(
         cameFrom: [WaterwayGraph.Node: (node: WaterwayGraph.Node, edge: WaterwayGraph.Edge)],
-        current: WaterwayGraph.Node
+        current: WaterwayGraph.Node,
+        originSnap: CLLocationCoordinate2D,
+        destinationSnap: CLLocationCoordinate2D
     ) -> RouteResult {
         var path: [WaterwayGraph.Node] = [current]
         var edges: [WaterwayGraph.Edge] = []
@@ -89,7 +114,10 @@ class WaterwayRouter {
             node = entry.node
         }
 
-        return RouteResult(path: path, edges: edges, totalDistance: totalDistance)
+        return RouteResult(
+            path: path, edges: edges, totalDistance: totalDistance,
+            originSnapPoint: originSnap, destinationSnapPoint: destinationSnap
+        )
     }
 }
 

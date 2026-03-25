@@ -16,6 +16,20 @@ struct WaterwaySegment: Identifiable {
     }
 }
 
+struct RouteWarning: Identifiable {
+    let id = UUID()
+    let type: WarningType
+    let message: String
+    let coordinate: CLLocationCoordinate2D
+
+    enum WarningType {
+        case bridgeTooLow
+        case lockTooNarrow
+        case lockTooShort
+        case draftTooDeep
+    }
+}
+
 struct WaterwayRoute {
     let origin: CLLocationCoordinate2D
     let destination: CLLocationCoordinate2D
@@ -26,6 +40,7 @@ struct WaterwayRoute {
     let bridges: [Bridge]
     let locks: [Lock]
     let maneuvers: [RouteManeuver]
+    var warnings: [RouteWarning] = []
 
     var summary: String {
         let distanceKm = totalDistance / 1000

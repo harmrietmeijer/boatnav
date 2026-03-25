@@ -18,6 +18,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let speedViewModel: SpeedViewModel
     let navigationViewModel: NavigationViewModel
     let settingsViewModel = SettingsViewModel()
+    let boatProfileViewModel = BoatProfileViewModel()
+    let weatherViewModel: WeatherViewModel
 
     override init() {
         self.buoyAnnotationProvider = BuoyAnnotationProvider(pdokClient: pdokClient)
@@ -32,8 +34,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             speedCalculator: speedCalculator
         )
         self.navigationViewModel = NavigationViewModel(pdokClient: pdokClient)
+        self.navigationViewModel.locationService = locationService
+        self.navigationViewModel.boatProfileViewModel = boatProfileViewModel
+        self.weatherViewModel = WeatherViewModel(locationService: locationService)
 
         super.init()
+
+        locationService.startUpdating()
     }
 
     func application(

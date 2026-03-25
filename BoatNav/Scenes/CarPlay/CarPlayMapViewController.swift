@@ -188,10 +188,9 @@ extension CarPlayMapViewController: MKMapViewDelegate {
         case .beacon:
             view.image = UIImage(systemName: "triangle.fill")?.withTintColor(.green, renderingMode: .alwaysOriginal)
         case .bridge:
-            view.image = UIImage(systemName: "bridge")?.withTintColor(.orange, renderingMode: .alwaysOriginal)
-                ?? UIImage(systemName: "archway")?.withTintColor(.orange, renderingMode: .alwaysOriginal)
+            view.image = UIImage(systemName: "arrow.up.and.down.square.fill")?.withTintColor(.systemOrange, renderingMode: .alwaysOriginal)
         case .lock:
-            view.image = UIImage(systemName: "lock.rectangle")?.withTintColor(.purple, renderingMode: .alwaysOriginal)
+            view.image = UIImage(systemName: "door.left.hand.closed")?.withTintColor(.systemPurple, renderingMode: .alwaysOriginal)
         }
 
         return view
