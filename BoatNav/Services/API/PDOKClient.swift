@@ -108,9 +108,37 @@ class PDOKClient {
             }
         }
 
-        print("[Overpass] Parsed \(bridges.count) bridges, \(locks.count) locks")
+        // Deduplicate bridges by name + proximity (same bridge often has multiple OSM ways)
+        var uniqueBridges: [Bridge] = []
+        for bridge in bridges {
+            let isDuplicate = uniqueBridges.contains { existing in
+                let sameName = existing.name == bridge.name && bridge.name != "Onbekende brug"
+                let dist = CLLocation(latitude: existing.coordinate.latitude, longitude: existing.coordinate.longitude)
+                    .distance(from: CLLocation(latitude: bridge.coordinate.latitude, longitude: bridge.coordinate.longitude))
+                return sameName && dist < 200 // within 200m = same bridge
+            }
+            if !isDuplicate {
+                uniqueBridges.append(bridge)
+            }
+        }
 
-        let result = BridgesAndLocks(bridges: bridges, locks: locks)
+        // Deduplicate locks similarly
+        var uniqueLocks: [Lock] = []
+        for lock in locks {
+            let isDuplicate = uniqueLocks.contains { existing in
+                let sameName = existing.name == lock.name && lock.name != "Onbekende sluis"
+                let dist = CLLocation(latitude: existing.coordinate.latitude, longitude: existing.coordinate.longitude)
+                    .distance(from: CLLocation(latitude: lock.coordinate.latitude, longitude: lock.coordinate.longitude))
+                return sameName && dist < 200
+            }
+            if !isDuplicate {
+                uniqueLocks.append(lock)
+            }
+        }
+
+        print("[Overpass] Parsed \(bridges.count) bridges → \(uniqueBridges.count) unique, \(locks.count) locks → \(uniqueLocks.count) unique")
+
+        let result = BridgesAndLocks(bridges: uniqueBridges, locks: uniqueLocks)
         // Only cache non-empty results to avoid persisting failures
         if !bridges.isEmpty || !locks.isEmpty {
             cachedBridgesAndLocks = result

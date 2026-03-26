@@ -41,6 +41,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         super.init()
 
         locationService.startUpdating()
+        SubscriptionManager.shared.configure()
     }
 
     func application(

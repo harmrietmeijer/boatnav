@@ -103,6 +103,8 @@ struct ContentView: View {
                         SpeedDetailContent(activePanel: $activePanel)
                     case .boatProfile:
                         BoatProfilePanelContent()
+                    case .paywall:
+                        PaywallPanelContent(activePanel: $activePanel)
                     case .none:
                         EmptyView()
                     }

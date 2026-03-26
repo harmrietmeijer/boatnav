@@ -118,7 +118,11 @@ struct NavigationPanelContent: View {
 
             // Calculate button
             Button {
-                Task { await navigationViewModel.calculateRoute() }
+                if SubscriptionManager.shared.canNavigate {
+                    Task { await navigationViewModel.calculateRoute() }
+                } else {
+                    activePanel = .paywall
+                }
             } label: {
                 HStack {
                     Spacer()

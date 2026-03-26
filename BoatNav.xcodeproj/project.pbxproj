@@ -40,6 +40,11 @@
 		889B7E0815EE95576670B7E6 /* BoatProfilePanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6285C9B725C1EBF17D974E36 /* BoatProfilePanelContent.swift */; };
 		8DDBAA0AD42105C6BC3D3A49 /* UnitConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA92C22118D378A1C6F38F6F /* UnitConversion.swift */; };
 		9110A059E98A38558E22AE18 /* Bridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75249D3973549424E8BE25A6 /* Bridge.swift */; };
+		97F5A4502F746F2B004CC7ED /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F5A44F2F746F2B004CC7ED /* SubscriptionManager.swift */; };
+		97F5A4512F746F2B004CC7ED /* FeatureGating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F5A44E2F746F2B004CC7ED /* FeatureGating.swift */; };
+		97F5A45B2F7490BA004CC7ED /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 97F5A4592F748F95004CC7ED /* RevenueCat */; };
+		97F5A45C2F7490BA004CC7ED /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 97F5A45A2F748F95004CC7ED /* RevenueCatUI */; };
+		97F5A45E2F75072A004CC7ED /* PaywallPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F5A45D2F75072A004CC7ED /* PaywallPanelContent.swift */; };
 		9B9C63939691C570207AC7CA /* NavigationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242441DD792F47B2BA02BB /* NavigationListView.swift */; };
 		9E6E55A1BE29187DB59AC775 /* SavedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8463A6F18E68F97F176A8B99 /* SavedRoute.swift */; };
 		A2D983DAF2F34786A0836788 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BA3D6C83C2782CC2EE64E5 /* SettingsView.swift */; };
@@ -119,6 +124,9 @@
 		8CD40DADCCF99C7B83F1D94A /* CarPlaySceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlaySceneDelegate.swift; sourceTree = "<group>"; };
 		91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedViewModel.swift; sourceTree = "<group>"; };
 		920D2BD566A42E49BFD4836F /* SpeedCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedCalculatorTests.swift; sourceTree = "<group>"; };
+		97F5A44E2F746F2B004CC7ED /* FeatureGating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureGating.swift; sourceTree = "<group>"; };
+		97F5A44F2F746F2B004CC7ED /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
+		97F5A45D2F75072A004CC7ED /* PaywallPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPanelContent.swift; sourceTree = "<group>"; };
 		9B5025DDBCE9B0E47CDC1D59 /* BoatProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfileViewModel.swift; sourceTree = "<group>"; };
 		A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteLocation.swift; sourceTree = "<group>"; };
 		A99C725877AE12F1A8C8515C /* BoatNav.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoatNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +155,18 @@
 		F95B816D19BA5929AF456F49 /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
 		FC2815D31CEF65C3EB2715D8 /* BoatProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E990E8A6FRMW0001A6F11A0B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				97F5A45C2F7490BA004CC7ED /* RevenueCatUI in Frameworks */,
+				97F5A45B2F7490BA004CC7ED /* RevenueCat in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0C8777FA3580A7E6FFF3901F /* BoatNavTests */ = {
@@ -285,6 +305,7 @@
 		828E0E2953E11B0FAB87A4D0 = {
 			isa = PBXGroup;
 			children = (
+				97F5A45D2F75072A004CC7ED /* PaywallPanelContent.swift */,
 				2C6F5D7ABFF93C891BE3FBB2 /* BoatNav */,
 				0C8777FA3580A7E6FFF3901F /* BoatNavTests */,
 				E43804C17A70CBD561BA2417 /* BoatNavUITests */,
@@ -327,6 +348,8 @@
 		B45538F615265C7FF92356D7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				97F5A44E2F746F2B004CC7ED /* FeatureGating.swift */,
+				97F5A44F2F746F2B004CC7ED /* SubscriptionManager.swift */,
 				5E15CF505CDDAAA91524E9E8 /* API */,
 				7967BDDF890C91203584321B /* Audio */,
 				A9CDA6260AABEF5A60044B66 /* Cache */,
@@ -446,6 +469,7 @@
 			buildConfigurationList = D15C60501BB978CE76BEDC30 /* Build configuration list for PBXNativeTarget "BoatNav" */;
 			buildPhases = (
 				343ACC63A8667CA0410C0A0A /* Sources */,
+				E990E8A6FRMW0001A6F11A0B /* Frameworks */,
 				28DAB5BC40CE7A42602D92BE /* Resources */,
 			);
 			buildRules = (
@@ -454,6 +478,8 @@
 			);
 			name = BoatNav;
 			packageProductDependencies = (
+				97F5A4592F748F95004CC7ED /* RevenueCat */,
+				97F5A45A2F748F95004CC7ED /* RevenueCatUI */,
 			);
 			productName = BoatNav;
 			productReference = A99C725877AE12F1A8C8515C /* BoatNav.app */;
@@ -490,6 +516,9 @@
 			);
 			mainGroup = 828E0E2953E11B0FAB87A4D0;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				97F5A4582F748F95004CC7ED /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F38441C2D1DFFFAD872E71A /* Products */;
 			projectDirPath = "";
@@ -552,6 +581,8 @@
 				408AFB6EE3115F20033AF83E /* SeamarkAnnotation.swift in Sources */,
 				6922A433203D0737C3A5E444 /* SettingsPanelContent.swift in Sources */,
 				A2D983DAF2F34786A0836788 /* SettingsView.swift in Sources */,
+				97F5A4502F746F2B004CC7ED /* SubscriptionManager.swift in Sources */,
+				97F5A4512F746F2B004CC7ED /* FeatureGating.swift in Sources */,
 				F8934F62F23AF57B55F56998 /* SettingsViewModel.swift in Sources */,
 				4748ED7EAE6A035E817D1F65 /* SpeedCalculator.swift in Sources */,
 				E28526D1E130975630BCC386 /* SpeedDashboardView.swift in Sources */,
@@ -562,6 +593,7 @@
 				F0C8B5B0DDED659824B0E0FC /* TileOverlayProvider.swift in Sources */,
 				8DDBAA0AD42105C6BC3D3A49 /* UnitConversion.swift in Sources */,
 				C0EEE732C7A4A1DA016CABCD /* Waterway.swift in Sources */,
+				97F5A45E2F75072A004CC7ED /* PaywallPanelContent.swift in Sources */,
 				12BC59DDDC9931B5A1352358 /* WaterwayGraph.swift in Sources */,
 				2D0AE24031FD076D4AE0F757 /* WaterwayRouter.swift in Sources */,
 				AE5E060DEB650A7E0648EAD7 /* Waypoint.swift in Sources */,
@@ -644,7 +676,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
@@ -756,7 +787,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
@@ -877,6 +907,30 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		97F5A4582F748F95004CC7ED /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.66.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		97F5A4592F748F95004CC7ED /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97F5A4582F748F95004CC7ED /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		97F5A45A2F748F95004CC7ED /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97F5A4582F748F95004CC7ED /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E9CDAB0EE5505AE49D050845 /* Project object */;
 }

@@ -96,6 +96,37 @@ struct SettingsPanelContent: View {
                 .padding(14)
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
 
+                // Subscription
+                sectionHeader("Abonnement")
+
+                Button {
+                    activePanel = .paywall
+                } label: {
+                    HStack {
+                        Image(systemName: SubscriptionManager.shared.isPro ? "crown.fill" : "star.fill")
+                            .foregroundStyle(.yellow)
+                            .font(.system(size: 18))
+                            .frame(width: 28)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(SubscriptionManager.shared.isPro ? "BoatNav Pro" : "Upgrade naar Pro")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Text(SubscriptionManager.shared.isPro ? "Je hebt alle functies" : "Route-navigatie, CarPlay & meer")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(14)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                }
+
                 // About
                 sectionHeader("Over")
 
