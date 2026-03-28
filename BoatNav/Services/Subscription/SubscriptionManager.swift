@@ -14,10 +14,14 @@ class SubscriptionManager: ObservableObject {
     private let entitlementID = "BoatNav Pro"
     private let apiKey = "test_HvdoegnVXDKqJHCSJvIlgBRlzvz"
 
+    private let proStatusKey = "cached_pro_status"
+
     private init() {
-        // Check owner bypass
+        // Check owner bypass first, then cached status
         if UserDefaults.standard.bool(forKey: "owner_bypass") {
             isPro = true
+        } else {
+            isPro = UserDefaults.standard.bool(forKey: proStatusKey)
         }
     }
 
@@ -91,7 +95,9 @@ class SubscriptionManager: ObservableObject {
             isPro = true
             return
         }
-        isPro = info.entitlements[entitlementID]?.isActive == true
+        let active = info.entitlements[entitlementID]?.isActive == true
+        isPro = active
+        UserDefaults.standard.set(active, forKey: proStatusKey)
     }
 }
 

@@ -21,7 +21,7 @@ struct ActiveNavigationStrip: View {
                             .font(.subheadline.weight(.semibold))
                             .lineLimit(1)
                     }
-                    Text(route.distanceString + " · " + route.summary)
+                    Text(route.distanceString + " · " + route.timeString)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

@@ -246,13 +246,17 @@ class NavigationViewModel: ObservableObject {
             let result = try router.findRoute(from: origin, to: dest)
 
             let routeRegion = routeBoundingRegion(for: result)
-            let bridges = try await pdokClient.fetchBridges(for: routeRegion)
-            let locks = try await pdokClient.fetchLocks(for: routeRegion)
+            let allBridges = try await pdokClient.fetchBridges(for: routeRegion)
+            let allLocks = try await pdokClient.fetchLocks(for: routeRegion)
 
-            let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
-
-            // Build route coordinates — stay on water only (no straight lines to/from land)
-            var coordinates = [result.originSnapPoint]
+            // Build route coordinates — start from actual origin, snap onto water
+            var coordinates = [origin]
+            // Add snap point if it's significantly different from origin
+            let snapDist = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+                .distance(from: CLLocation(latitude: result.originSnapPoint.latitude, longitude: result.originSnapPoint.longitude))
+            if snapDist > 5 {
+                coordinates.append(result.originSnapPoint)
+            }
             for (i, edge) in result.edges.enumerated() {
                 var segCoords = edge.segment.coordinates
                 // Check if segment needs to be reversed based on path direction
@@ -292,6 +296,22 @@ class NavigationViewModel: ObservableObject {
                     coordinates.append(result.destinationSnapPoint)
                 }
             }
+            // Add actual destination if different from snap point
+            let destSnapDist = CLLocation(latitude: dest.latitude, longitude: dest.longitude)
+                .distance(from: CLLocation(latitude: result.destinationSnapPoint.latitude, longitude: result.destinationSnapPoint.longitude))
+            if destSnapDist > 5 {
+                coordinates.append(dest)
+            }
+
+            // Filter to only bridges/locks actually near the route path (within 150m)
+            let bridges = allBridges.filter { bridge in
+                Self.isCoordinateNearRoute(bridge.coordinate, routeCoords: coordinates, threshold: 150)
+            }
+            let locks = allLocks.filter { lock in
+                Self.isCoordinateNearRoute(lock.coordinate, routeCoords: coordinates, threshold: 150)
+            }
+
+            let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
 
             let cruisingSpeedMs = 10.0 / 3.6
             let estimatedTime = result.totalDistance / cruisingSpeedMs
@@ -454,6 +474,30 @@ class NavigationViewModel: ObservableObject {
             }
         }
         return coords.dropLast() + [snapPoint]
+    }
+
+    /// Check if a coordinate is within `threshold` meters of any point on the route
+    static func isCoordinateNearRoute(
+        _ coordinate: CLLocationCoordinate2D,
+        routeCoords: [CLLocationCoordinate2D],
+        threshold: Double
+    ) -> Bool {
+        let loc = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        // Check every 3rd point for performance (route coords are dense)
+        for i in stride(from: 0, to: routeCoords.count, by: 3) {
+            let routeLoc = CLLocation(latitude: routeCoords[i].latitude, longitude: routeCoords[i].longitude)
+            if loc.distance(from: routeLoc) < threshold {
+                return true
+            }
+        }
+        // Also check last point
+        if let last = routeCoords.last {
+            let routeLoc = CLLocation(latitude: last.latitude, longitude: last.longitude)
+            if loc.distance(from: routeLoc) < threshold {
+                return true
+            }
+        }
+        return false
     }
 
     private func routeBoundingRegion(for result: WaterwayRouter.RouteResult) -> MKCoordinateRegion {

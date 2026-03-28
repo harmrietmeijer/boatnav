@@ -209,8 +209,13 @@ struct MapViewRepresentable: UIViewRepresentable {
 
         private func coloredIcon(_ systemName: String, color: UIColor, size: CGFloat) -> UIImage? {
             let config = UIImage.SymbolConfiguration(pointSize: size, weight: .bold)
-            return UIImage(systemName: systemName, withConfiguration: config)?
-                .withTintColor(color, renderingMode: .alwaysOriginal)
+            guard let symbol = UIImage(systemName: systemName, withConfiguration: config) else { return nil }
+            // Render into a bitmap to avoid MapKit template-mode stripping tint colors
+            let tinted = symbol.withTintColor(color, renderingMode: .alwaysOriginal)
+            let renderer = UIGraphicsImageRenderer(size: tinted.size)
+            return renderer.image { _ in
+                tinted.draw(at: .zero)
+            }
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {

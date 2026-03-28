@@ -43,6 +43,15 @@ struct WaterwayRoute {
     let maneuvers: [RouteManeuver]
     var warnings: [RouteWarning] = []
 
+    var timeString: String {
+        let hours = Int(estimatedTime) / 3600
+        let minutes = (Int(estimatedTime) % 3600) / 60
+        if hours > 0 {
+            return String(format: "%d u %d min", hours, minutes)
+        }
+        return String(format: "%d min", minutes)
+    }
+
     var summary: String {
         let distanceKm = totalDistance / 1000
         let hours = Int(estimatedTime) / 3600

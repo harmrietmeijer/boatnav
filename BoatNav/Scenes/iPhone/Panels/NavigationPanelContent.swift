@@ -2,6 +2,7 @@ import SwiftUI
 
 struct NavigationPanelContent: View {
     @EnvironmentObject var navigationViewModel: NavigationViewModel
+    @EnvironmentObject var speedViewModel: SpeedViewModel
     @Binding var panelDetent: PanelDetent
     @Binding var activePanel: ActivePanel
     @State private var showSearchField = false
@@ -375,6 +376,11 @@ struct NavigationPanelContent: View {
                             HStack {
                                 Button {
                                     navigationViewModel.loadSavedRoute(route)
+                                    if SubscriptionManager.shared.canNavigate {
+                                        Task { await navigationViewModel.calculateRoute() }
+                                    } else {
+                                        activePanel = .paywall
+                                    }
                                 } label: {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(route.name)
@@ -423,9 +429,48 @@ struct NavigationPanelContent: View {
             // Route summary cards
             HStack(spacing: 10) {
                 statCard(value: route.distanceString, label: "Afstand")
-                statCard(value: route.summary, label: "Tijd")
+                statCard(value: route.timeString, label: "Tijd")
                 statCard(value: "\(route.bridges.count)", label: "Bruggen")
                 statCard(value: "\(route.locks.count)", label: "Sluizen")
+            }
+
+            // Speed limit
+            if let limit = speedViewModel.currentSpeedLimit {
+                HStack(spacing: 12) {
+                    // Speed limit sign
+                    Text(String(format: "%.0f", limit))
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(.red)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            Circle()
+                                .fill(.white)
+                                .overlay(Circle().stroke(.red, lineWidth: 3))
+                        )
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Max. snelheid")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(String(format: "%.0f km/h", limit))
+                            .font(.subheadline.weight(.semibold))
+                    }
+
+                    Spacer()
+
+                    if speedViewModel.isExceedingLimit {
+                        Label("Te snel!", systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.red)
+                    }
+                }
+                .padding(14)
+                .background(
+                    speedViewModel.isExceedingLimit
+                        ? Color.red.opacity(0.08)
+                        : Color.blue.opacity(0.05),
+                    in: RoundedRectangle(cornerRadius: 14)
+                )
             }
 
             // Warnings
