@@ -7,9 +7,12 @@ class SpeedViewModel: ObservableObject {
     @Published var speedKnots: Double = 0
     @Published var isValid: Bool = false
     @Published var displayString: String = "-- km/h | -- kn"
+    @Published var currentSpeedLimit: Double? // km/h, nil = unknown
+    @Published var isExceedingLimit: Bool = false
 
     private let locationService: LocationService
     private let speedCalculator: SpeedCalculator
+    let speedLimitService = SpeedLimitService()
     private var cancellables = Set<AnyCancellable>()
 
     init(locationService: LocationService, speedCalculator: SpeedCalculator) {
@@ -35,5 +38,10 @@ class SpeedViewModel: ObservableObject {
         } else {
             displayString = "-- km/h | -- kn"
         }
+
+        // Update speed limit for current position
+        let limit = speedLimitService.speedLimit(at: location.coordinate)
+        currentSpeedLimit = limit
+        isExceedingLimit = limit != nil && reading.isValid && reading.kmh > limit!
     }
 }

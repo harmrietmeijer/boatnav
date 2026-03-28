@@ -7,10 +7,16 @@ struct SpeedPill: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 16) {
+                // Speed limit indicator
+                if let limit = speedViewModel.currentSpeedLimit {
+                    speedLimitBadge(limit: limit)
+                }
+
                 speedValue(
                     value: speedViewModel.speedKmh,
                     unit: "km/h",
-                    isValid: speedViewModel.isValid
+                    isValid: speedViewModel.isValid,
+                    isWarning: speedViewModel.isExceedingLimit
                 )
 
                 Divider()
@@ -30,12 +36,24 @@ struct SpeedPill: View {
         .buttonStyle(.plain)
     }
 
-    private func speedValue(value: Double, unit: String, isValid: Bool) -> some View {
+    private func speedLimitBadge(limit: Double) -> some View {
+        Text(String(format: "%.0f", limit))
+            .font(.system(size: 14, weight: .bold, design: .rounded))
+            .foregroundStyle(.red)
+            .frame(width: 32, height: 32)
+            .background(
+                Circle()
+                    .fill(.white)
+                    .overlay(Circle().stroke(.red, lineWidth: 2.5))
+            )
+    }
+
+    private func speedValue(value: Double, unit: String, isValid: Bool, isWarning: Bool = false) -> some View {
         HStack(spacing: 4) {
             Text(String(format: "%.1f", value))
                 .font(.system(size: 24, weight: .bold, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(isValid ? .primary : .secondary)
+                .foregroundStyle(isWarning ? Color.red : (isValid ? Color.primary : Color.secondary))
 
             Text(unit)
                 .font(.system(size: 12, weight: .medium))

@@ -20,6 +20,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let settingsViewModel = SettingsViewModel()
     let boatProfileViewModel = BoatProfileViewModel()
     let weatherViewModel: WeatherViewModel
+    let hazardReportViewModel = HazardReportViewModel()
 
     override init() {
         self.buoyAnnotationProvider = BuoyAnnotationProvider(pdokClient: pdokClient)
@@ -40,6 +41,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         super.init()
 
+        hazardReportViewModel.startMonitoring(locationService: locationService)
         locationService.startUpdating()
         SubscriptionManager.shared.configure()
     }

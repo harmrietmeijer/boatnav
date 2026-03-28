@@ -51,6 +51,54 @@ class WaterwayGraph {
             adjacencyList[startNode, default: []].append(forwardEdge)
             adjacencyList[endNode, default: []].append(backwardEdge)
         }
+
+        mergeCloseNodes(threshold: 5.0)
+    }
+
+    /// Merge graph nodes that are within threshold meters of each other.
+    /// This fixes gaps where PDOK waterway segments have endpoints slightly offset.
+    private func mergeCloseNodes(threshold: CLLocationDistance) {
+        let nodeArray = Array(nodes)
+        var mergeMap: [Node: Node] = [:] // maps old node → canonical node
+
+        for i in 0..<nodeArray.count {
+            let nodeA = nodeArray[i]
+            if mergeMap[nodeA] != nil { continue } // already merged
+            let locA = CLLocation(latitude: nodeA.coordinate.latitude, longitude: nodeA.coordinate.longitude)
+
+            for j in (i + 1)..<nodeArray.count {
+                let nodeB = nodeArray[j]
+                if mergeMap[nodeB] != nil { continue }
+                let locB = CLLocation(latitude: nodeB.coordinate.latitude, longitude: nodeB.coordinate.longitude)
+
+                if locA.distance(from: locB) <= threshold && nodeA != nodeB {
+                    mergeMap[nodeB] = nodeA
+                }
+            }
+        }
+
+        guard !mergeMap.isEmpty else { return }
+
+        // Rebuild adjacency list with merged nodes
+        var newAdjacency: [Node: [Edge]] = [:]
+        var newNodes = Set<Node>()
+
+        for (node, edges) in adjacencyList {
+            let canonical = mergeMap[node] ?? node
+            newNodes.insert(canonical)
+
+            for edge in edges {
+                let newFrom = mergeMap[edge.from] ?? edge.from
+                let newTo = mergeMap[edge.to] ?? edge.to
+                guard newFrom != newTo else { continue } // skip self-loops
+                let newEdge = Edge(from: newFrom, to: newTo, segment: edge.segment, weight: edge.weight)
+                newAdjacency[canonical, default: []].append(newEdge)
+                newNodes.insert(newTo)
+            }
+        }
+
+        self.adjacencyList = newAdjacency
+        self.nodes = newNodes
     }
 
     /// Maximum snap distance in meters

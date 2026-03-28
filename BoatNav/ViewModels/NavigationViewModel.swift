@@ -251,9 +251,8 @@ class NavigationViewModel: ObservableObject {
 
             let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
 
-            // Build route coordinates with proper segment direction
-            // Start from actual origin, then to snap point on waterway
-            var coordinates = [origin, result.originSnapPoint]
+            // Build route coordinates — stay on water only (no straight lines to/from land)
+            var coordinates = [result.originSnapPoint]
             for (i, edge) in result.edges.enumerated() {
                 var segCoords = edge.segment.coordinates
                 // Check if segment needs to be reversed based on path direction
@@ -264,6 +263,16 @@ class NavigationViewModel: ObservableObject {
                         segCoords.reverse()
                     }
                 }
+
+                // Trim first segment: start from originSnapPoint
+                if i == 0 {
+                    segCoords = Self.trimSegmentStart(segCoords, to: result.originSnapPoint)
+                }
+                // Trim last segment: end at destinationSnapPoint
+                if i == result.edges.count - 1 {
+                    segCoords = Self.trimSegmentEnd(segCoords, to: result.destinationSnapPoint)
+                }
+
                 // Skip first coord of segment if it's close to the last added coord (avoid duplicates)
                 if let last = coordinates.last, !segCoords.isEmpty {
                     let dist = CLLocation(latitude: last.latitude, longitude: last.longitude)
@@ -274,9 +283,15 @@ class NavigationViewModel: ObservableObject {
                 }
                 coordinates.append(contentsOf: segCoords)
             }
-            // End at snap point, then to actual destination
-            coordinates.append(result.destinationSnapPoint)
-            coordinates.append(dest)
+            // Ensure route ends exactly at the destination snap point
+            if let last = coordinates.last {
+                let distToSnap = CLLocation(latitude: last.latitude, longitude: last.longitude)
+                    .distance(from: CLLocation(latitude: result.destinationSnapPoint.latitude,
+                                               longitude: result.destinationSnapPoint.longitude))
+                if distToSnap > 5 {
+                    coordinates.append(result.destinationSnapPoint)
+                }
+            }
 
             let cruisingSpeedMs = 10.0 / 3.6
             let estimatedTime = result.totalDistance / cruisingSpeedMs
@@ -398,6 +413,48 @@ class NavigationViewModel: ObservableObject {
     }
 
     // MARK: - Private
+
+    /// Trim segment coordinates so the path starts at the snap point instead of the segment start.
+    static func trimSegmentStart(
+        _ coords: [CLLocationCoordinate2D],
+        to snapPoint: CLLocationCoordinate2D
+    ) -> [CLLocationCoordinate2D] {
+        guard coords.count >= 2 else { return [snapPoint] }
+        let snap = CLLocation(latitude: snapPoint.latitude, longitude: snapPoint.longitude)
+        // Find the line sub-segment the snap point falls on
+        for i in 0..<coords.count - 1 {
+            let a = CLLocation(latitude: coords[i].latitude, longitude: coords[i].longitude)
+            let b = CLLocation(latitude: coords[i + 1].latitude, longitude: coords[i + 1].longitude)
+            let segLen = a.distance(from: b)
+            let distA = snap.distance(from: a)
+            let distB = snap.distance(from: b)
+            // Snap point is on this sub-segment if the triangle inequality holds (within tolerance)
+            if distA + distB < segLen + 10 {
+                return [snapPoint] + Array(coords[(i + 1)...])
+            }
+        }
+        return [snapPoint] + coords.dropFirst()
+    }
+
+    /// Trim segment coordinates so the path ends at the snap point instead of the segment end.
+    static func trimSegmentEnd(
+        _ coords: [CLLocationCoordinate2D],
+        to snapPoint: CLLocationCoordinate2D
+    ) -> [CLLocationCoordinate2D] {
+        guard coords.count >= 2 else { return [snapPoint] }
+        let snap = CLLocation(latitude: snapPoint.latitude, longitude: snapPoint.longitude)
+        for i in 0..<coords.count - 1 {
+            let a = CLLocation(latitude: coords[i].latitude, longitude: coords[i].longitude)
+            let b = CLLocation(latitude: coords[i + 1].latitude, longitude: coords[i + 1].longitude)
+            let segLen = a.distance(from: b)
+            let distA = snap.distance(from: a)
+            let distB = snap.distance(from: b)
+            if distA + distB < segLen + 10 {
+                return Array(coords[...i]) + [snapPoint]
+            }
+        }
+        return coords.dropLast() + [snapPoint]
+    }
 
     private func routeBoundingRegion(for result: WaterwayRouter.RouteResult) -> MKCoordinateRegion {
         let coords = result.edges.flatMap { $0.segment.coordinates }

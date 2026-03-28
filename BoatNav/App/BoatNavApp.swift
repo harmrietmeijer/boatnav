@@ -13,6 +13,7 @@ struct BoatNavApp: App {
                 .environmentObject(appDelegate.settingsViewModel)
                 .environmentObject(appDelegate.boatProfileViewModel)
                 .environmentObject(appDelegate.weatherViewModel)
+                .environmentObject(appDelegate.hazardReportViewModel)
         }
     }
 }

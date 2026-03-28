@@ -6,6 +6,7 @@ struct WaterwaySegment: Identifiable {
     let coordinates: [CLLocationCoordinate2D]
     let cemtClass: String?
     let length: Double // meters
+    let maxSpeedKmh: Double? // speed limit in km/h (nil = unknown)
 
     var startNode: CLLocationCoordinate2D {
         coordinates.first!

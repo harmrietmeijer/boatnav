@@ -16,12 +16,20 @@ settings:
     Release:
       DEVELOPMENT_TEAM: "3TZFTAC2SR"
 
+packages:
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios.git
+    from: "5.0.0"
+
 targets:
   BoatNav:
     type: application
     platform: iOS
     sources:
       - BoatNav
+    dependencies:
+      - package: RevenueCat
+        product: RevenueCat
     settings:
       base:
         INFOPLIST_FILE: BoatNav/Resources/Info.plist

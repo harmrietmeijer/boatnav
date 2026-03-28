@@ -109,12 +109,18 @@ enum GeoJSONDecoder {
                 length += from.distance(from: to)
             }
 
+            // Try to extract speed limit from PDOK properties
+            let maxSpeed = props["maxSnelheid"]?.doubleValue
+                ?? props["max_snelheid"]?.doubleValue
+                ?? props["snelheid"]?.doubleValue
+
             return WaterwaySegment(
                 id: props["gml_id"]?.stringValue ?? props["vwkId"]?.stringValue ?? UUID().uuidString,
                 name: props["vwgNaam"]?.stringValue ?? props["vrtNaam"]?.stringValue ?? props["naam"]?.stringValue ?? "Onbekend",
                 coordinates: coordinates,
                 cemtClass: props["cemt_klasse"]?.stringValue ?? props["vrtCode"]?.stringValue,
-                length: length
+                length: length,
+                maxSpeedKmh: maxSpeed
             )
         }
     }

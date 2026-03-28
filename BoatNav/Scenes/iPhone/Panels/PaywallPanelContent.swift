@@ -167,7 +167,7 @@ struct PaywallPanelContent: View {
             Spacer()
 
             Image(systemName: free ? "checkmark.circle.fill" : "xmark.circle")
-                .foregroundStyle(free ? .green : .quaternary)
+                .foregroundStyle(free ? Color.green : Color.gray.opacity(0.3))
                 .font(.system(size: 14))
                 .frame(width: 36)
 

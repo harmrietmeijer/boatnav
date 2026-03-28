@@ -14,6 +14,7 @@ struct MapPreviewView: View {
                     mapViewModel: mapViewModel,
                     navigationViewModel: navigationViewModel,
                     annotations: mapViewModel.annotations,
+                    hazardAnnotations: [],
                     routeCoordinates: navigationViewModel.currentRoute?.coordinates ?? [],
                     startCoordinate: navigationViewModel.startSelection.coordinate,
                     destinationCoordinate: navigationViewModel.destinationSelection.coordinate,

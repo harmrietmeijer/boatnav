@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject var speedViewModel: SpeedViewModel
     @EnvironmentObject var navigationViewModel: NavigationViewModel
     @EnvironmentObject var settingsViewModel: SettingsViewModel
+    @EnvironmentObject var hazardReportViewModel: HazardReportViewModel
 
     @State private var activePanel: ActivePanel = .none
     @State private var panelDetent: PanelDetent = .half
@@ -16,6 +17,7 @@ struct ContentView: View {
                 mapViewModel: mapViewModel,
                 navigationViewModel: navigationViewModel,
                 annotations: mapViewModel.annotations,
+                hazardAnnotations: hazardReportViewModel.annotations,
                 routeCoordinates: navigationViewModel.currentRoute?.coordinates ?? [],
                 startCoordinate: navigationViewModel.startSelection.coordinate,
                 destinationCoordinate: navigationViewModel.destinationSelection.coordinate,
@@ -66,7 +68,17 @@ struct ContentView: View {
                 Spacer()
             }
 
-            // Layer 2: Menu buttons (right side)
+            // Layer 2: Menu buttons (right side) + hazard report button
+            VStack {
+                Spacer()
+                HStack {
+                    HazardReportButton()
+                        .padding(.leading, 16)
+                        .padding(.bottom, 100)
+                    Spacer()
+                }
+            }
+
             MapButtonCluster(activePanel: $activePanel)
 
             // Layer 3: Speed pill (bottom center)
@@ -122,6 +134,26 @@ struct ContentView: View {
                     activePanel = .navigation
                     panelDetent = .half
                 }
+            }
+        }
+        .alert(
+            "Melding in de buurt",
+            isPresented: Binding(
+                get: { hazardReportViewModel.proximityAlert != nil },
+                set: { if !$0 { hazardReportViewModel.proximityAlert = nil } }
+            )
+        ) {
+            if let report = hazardReportViewModel.proximityAlert {
+                Button("Ja, nog aanwezig") {
+                    hazardReportViewModel.confirmStillPresent(for: report.id)
+                }
+                Button("Nee, verwijderd", role: .destructive) {
+                    hazardReportViewModel.voteRemoval(for: report.id)
+                }
+            }
+        } message: {
+            if let report = hazardReportViewModel.proximityAlert {
+                Text("\(report.category.displayName) gemeld op deze locatie. Is dit er nog?")
             }
         }
         .task {

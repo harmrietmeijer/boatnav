@@ -16,7 +16,8 @@ final class WaterwayRouterTests: XCTestCase {
                 CLLocationCoordinate2D(latitude: 51.80, longitude: 4.65),
             ],
             cemtClass: nil,
-            length: 3700 // ~3.7 km
+            length: 3700, // ~3.7 km
+            maxSpeedKmh: nil
         )
 
         let segmentBC = WaterwaySegment(
@@ -27,7 +28,8 @@ final class WaterwayRouterTests: XCTestCase {
                 CLLocationCoordinate2D(latitude: 51.80, longitude: 4.70),
             ],
             cemtClass: nil,
-            length: 3700
+            length: 3700,
+            maxSpeedKmh: nil
         )
 
         graph.build(from: [segmentAB, segmentBC])
@@ -56,7 +58,8 @@ final class WaterwayRouterTests: XCTestCase {
                 CLLocationCoordinate2D(latitude: 51.80, longitude: 4.65),
             ],
             cemtClass: nil,
-            length: 3700
+            length: 3700,
+            maxSpeedKmh: nil
         )
 
         let segment2 = WaterwaySegment(
@@ -67,7 +70,8 @@ final class WaterwayRouterTests: XCTestCase {
                 CLLocationCoordinate2D(latitude: 52.00, longitude: 5.05),
             ],
             cemtClass: nil,
-            length: 3500
+            length: 3500,
+            maxSpeedKmh: nil
         )
 
         graph.build(from: [segment1, segment2])
@@ -93,7 +97,8 @@ final class WaterwayRouterTests: XCTestCase {
                 CLLocationCoordinate2D(latitude: 51.80, longitude: 4.65),
             ],
             cemtClass: nil,
-            length: 3700
+            length: 3700,
+            maxSpeedKmh: nil
         )
 
         graph.build(from: [segment])

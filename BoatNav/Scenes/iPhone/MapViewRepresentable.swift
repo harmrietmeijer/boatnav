@@ -7,6 +7,7 @@ struct MapViewRepresentable: UIViewRepresentable {
 
     // These drive SwiftUI diffing so updateUIView gets called
     let annotations: [SeamarkAnnotation]
+    let hazardAnnotations: [HazardAnnotation]
     let routeCoordinates: [CLLocationCoordinate2D]
     let startCoordinate: CLLocationCoordinate2D?
     let destinationCoordinate: CLLocationCoordinate2D?
@@ -73,10 +74,8 @@ struct MapViewRepresentable: UIViewRepresentable {
             context.coordinator.showSeamarks = showSeamarks
         }
 
-        // Update seamark + pin annotations (filtered by settings)
-        let existing = mapView.annotations.filter { $0 is SeamarkAnnotation || $0 is PinAnnotation }
-        mapView.removeAnnotations(existing)
-
+        // Update seamark annotations (only when the array actually changes)
+        let existingSeamarks = mapView.annotations.compactMap { $0 as? SeamarkAnnotation }
         let filteredAnnotations = annotations.filter { annotation in
             switch annotation.type {
             case .buoy, .beacon: return showBuoys
@@ -84,17 +83,39 @@ struct MapViewRepresentable: UIViewRepresentable {
             case .lock: return true
             }
         }
-        print("[MapView] updateUIView: \(annotations.count) total, \(filteredAnnotations.count) after filter (buoys=\(showBuoys), bridges=\(showBridges))")
-        mapView.addAnnotations(filteredAnnotations)
-
-        // Show start/destination pins
-        if let coord = startCoordinate {
-            let pin = PinAnnotation(coordinate: coord, title: "Start", pinType: .start)
-            mapView.addAnnotation(pin)
+        if existingSeamarks.count != filteredAnnotations.count {
+            mapView.removeAnnotations(existingSeamarks)
+            mapView.addAnnotations(filteredAnnotations)
         }
-        if let coord = destinationCoordinate {
-            let pin = PinAnnotation(coordinate: coord, title: "Bestemming", pinType: .destination)
-            mapView.addAnnotation(pin)
+
+        // Update hazard annotations (diff by report ID to avoid unnecessary remove/add)
+        let existingHazards = mapView.annotations.compactMap { $0 as? HazardAnnotation }
+        let existingIDs = Set(existingHazards.map(\.reportId))
+        let newIDs = Set(hazardAnnotations.map(\.reportId))
+        if existingIDs != newIDs {
+            mapView.removeAnnotations(existingHazards)
+            mapView.addAnnotations(hazardAnnotations)
+        }
+
+        // Update pin annotations (diff by coordinate to avoid unnecessary remove/add)
+        let existingPins = mapView.annotations.compactMap { $0 as? PinAnnotation }
+        let existingStart = existingPins.first(where: { $0.pinType == .start })
+        let existingDest = existingPins.first(where: { $0.pinType == .destination })
+
+        let startChanged = !coordsEqual(existingStart?.coordinate, startCoordinate)
+        let destChanged = !coordsEqual(existingDest?.coordinate, destinationCoordinate)
+
+        if startChanged {
+            if let old = existingStart { mapView.removeAnnotation(old) }
+            if let coord = startCoordinate {
+                mapView.addAnnotation(PinAnnotation(coordinate: coord, title: "Start", pinType: .start))
+            }
+        }
+        if destChanged {
+            if let old = existingDest { mapView.removeAnnotation(old) }
+            if let coord = destinationCoordinate {
+                mapView.addAnnotation(PinAnnotation(coordinate: coord, title: "Bestemming", pinType: .destination))
+            }
         }
 
         // Show route overlay - only update when route changes
@@ -125,6 +146,14 @@ struct MapViewRepresentable: UIViewRepresentable {
             context.coordinator.lastRouteCount = newCount
             context.coordinator.lastRouteStartLat = routeCoordinates.first?.latitude ?? 0
             context.coordinator.lastRouteStartLon = routeCoordinates.first?.longitude ?? 0
+        }
+    }
+
+    private func coordsEqual(_ a: CLLocationCoordinate2D?, _ b: CLLocationCoordinate2D?) -> Bool {
+        switch (a, b) {
+        case (nil, nil): return true
+        case (nil, _), (_, nil): return false
+        case (let a?, let b?): return a.latitude == b.latitude && a.longitude == b.longitude
         }
     }
 
@@ -175,7 +204,6 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-            print("[MapDelegate] regionDidChangeAnimated")
             mapViewModel.regionDidChange(to: mapView.region)
         }
 
@@ -186,14 +214,12 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            if let pin = annotation as? PinAnnotation {
-                let identifier = "PinAnnotation-\(pin.pinType)"
-                let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-                    as? MKMarkerAnnotationView
-                    ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                view.annotation = annotation
-                view.canShowCallout = true
+            // Skip user location annotation
+            if annotation is MKUserLocation { return nil }
 
+            if let pin = annotation as? PinAnnotation {
+                let view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: nil)
+                view.canShowCallout = true
                 switch pin.pinType {
                 case .start:
                     view.markerTintColor = .systemGreen
@@ -205,17 +231,18 @@ struct MapViewRepresentable: UIViewRepresentable {
                 return view
             }
 
+            if let hazard = annotation as? HazardAnnotation {
+                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: nil)
+                view.canShowCallout = true
+                view.image = coloredIcon(hazard.category.iconName, color: hazard.iconColor, size: 22)
+                view.centerOffset = CGPoint(x: 0, y: 0)
+                return view
+            }
+
             guard let seamark = annotation as? SeamarkAnnotation else { return nil }
 
-            let identifier = "Seamark-\(seamark.type)-\(seamark.buoyColor)"
-            let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-                ?? MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-
-            view.annotation = annotation
+            let view = MKAnnotationView(annotation: annotation, reuseIdentifier: nil)
             view.canShowCallout = true
-
-            // Remove old subviews (height label)
-            view.subviews.forEach { $0.removeFromSuperview() }
 
             switch seamark.type {
             case .buoy:
@@ -224,7 +251,6 @@ struct MapViewRepresentable: UIViewRepresentable {
                 view.image = coloredIcon("triangle.fill", color: seamark.buoyColor.uiColor, size: 12)
             case .bridge:
                 view.image = coloredIcon("arrow.up.and.down.square.fill", color: .systemOrange, size: 18)
-                // Add height label below icon
                 if let height = seamark.clearanceHeight {
                     let label = UILabel()
                     label.text = String(format: "%.1fm", height)
