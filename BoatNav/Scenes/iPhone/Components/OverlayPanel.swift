@@ -87,6 +87,7 @@ struct OverlayPanel<Content: View>: View {
                 )
             }
             .ignoresSafeArea(edges: .bottom)
+            .offset(y: -keyboardHeight)
         }
         .transition(.move(edge: .bottom).combined(with: .opacity))
         .onReceive(keyboardPublisher) { height in
@@ -113,7 +114,7 @@ struct OverlayPanel<Content: View>: View {
     private func height(for detent: PanelDetent, in maxHeight: CGFloat) -> CGFloat {
         switch detent {
         case .collapsed: return 80
-        case .half: return maxHeight * 0.50
+        case .half: return maxHeight * 0.75
         case .expanded: return maxHeight * 0.85
         }
     }

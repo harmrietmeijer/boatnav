@@ -251,9 +251,9 @@ struct MapViewRepresentable: UIViewRepresentable {
 
             switch seamark.type {
             case .buoy:
-                view.image = coloredIcon("circle.fill", color: seamark.buoyColor.uiColor, size: 12)
+                view.image = coloredIcon("circle.fill", color: seamark.buoyColor.uiColor, size: 7)
             case .beacon:
-                view.image = coloredIcon("triangle.fill", color: seamark.buoyColor.uiColor, size: 12)
+                view.image = coloredIcon("triangle.fill", color: seamark.buoyColor.uiColor, size: 7)
             case .bridge:
                 view.image = coloredIcon("arrow.up.and.down.square.fill", color: .systemOrange, size: 18)
                 if let height = seamark.clearanceHeight {

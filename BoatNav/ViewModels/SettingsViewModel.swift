@@ -30,7 +30,7 @@ class SettingsViewModel: ObservableObject {
             defaults.set(10.0, forKey: "cruisingSpeedKmh")
         }
         if defaults.object(forKey: "showBuoys") == nil {
-            defaults.set(true, forKey: "showBuoys")
+            defaults.set(false, forKey: "showBuoys")
         }
         if defaults.object(forKey: "showBridges") == nil {
             defaults.set(true, forKey: "showBridges")

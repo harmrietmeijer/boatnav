@@ -84,7 +84,7 @@ class PDOKClient {
             let bridgeTag = tags["bridge"] ?? ""
             let lockTag = tags["lock"] ?? ""
 
-            if seamarkType == "bridge" || bridgeTag == "movable" || (bridgeTag == "yes" && tags["highway"] != nil) {
+            if seamarkType == "bridge" || bridgeTag == "movable" || bridgeTag == "yes" {
                 let clearance = Double(tags["maxheight"] ?? tags["seamark:bridge:clearance_height"] ?? tags["seamark:bridge:clearance_height_closed"] ?? "") ?? 0
                 bridges.append(Bridge(
                     id: "osm-\(element["id"] ?? 0)",

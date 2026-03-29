@@ -157,6 +157,9 @@ class ManeuverGenerator {
     }
 
     private func findInsertionIndex(for location: CLLocation, in maneuvers: [RouteManeuver]) -> Int? {
+        var bestIndex: Int?
+        var bestDistance = Double.infinity
+
         for i in 0..<maneuvers.count - 1 {
             let from = CLLocation(latitude: maneuvers[i].coordinate.latitude, longitude: maneuvers[i].coordinate.longitude)
             let to = CLLocation(latitude: maneuvers[i + 1].coordinate.latitude, longitude: maneuvers[i + 1].coordinate.longitude)
@@ -165,11 +168,28 @@ class ManeuverGenerator {
             let distFromTo = location.distance(from: to)
             let segmentDist = from.distance(from: to)
 
-            if distFromFrom + distFromTo < segmentDist * 1.5 && distFromFrom < 2000 {
-                return i + 1
+            // Check if the point falls roughly between these two maneuvers
+            if distFromFrom + distFromTo < segmentDist * 2.0 && distFromFrom < 5000 {
+                if distFromFrom < bestDistance {
+                    bestDistance = distFromFrom
+                    bestIndex = i + 1
+                }
             }
         }
-        return nil
+
+        // Fallback: if no segment matched, find the nearest maneuver and insert after it
+        if bestIndex == nil {
+            for i in 0..<maneuvers.count {
+                let maneuverLoc = CLLocation(latitude: maneuvers[i].coordinate.latitude, longitude: maneuvers[i].coordinate.longitude)
+                let dist = location.distance(from: maneuverLoc)
+                if dist < bestDistance && dist < 1000 {
+                    bestDistance = dist
+                    bestIndex = min(i + 1, maneuvers.count - 1)
+                }
+            }
+        }
+
+        return bestIndex
     }
 
     private func distanceFromPreviousManeuver(at index: Int, bridge: Bridge?, maneuvers: [RouteManeuver]) -> Double {

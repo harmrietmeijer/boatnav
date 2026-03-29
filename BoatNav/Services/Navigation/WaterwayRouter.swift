@@ -21,15 +21,17 @@ class WaterwayRouter {
         to destination: CLLocationCoordinate2D
     ) throws -> RouteResult {
 
-        guard let startSnap = graph.nearestPointOnGraph(to: origin) else {
+        // Get multiple snap candidates for both origin and destination
+        // This helps find harbor entrance/exit points instead of just the closest waterway
+        let startCandidates = graph.nearestPointsOnGraph(to: origin, maxResults: 3)
+        let endCandidates = graph.nearestPointsOnGraph(to: destination, maxResults: 3)
+
+        guard let startSnap = startCandidates.first else {
             throw RoutingError.noNearbyWaterway(origin)
         }
-        guard let endSnap = graph.nearestPointOnGraph(to: destination) else {
+        guard let endSnap = endCandidates.first else {
             throw RoutingError.noNearbyWaterway(destination)
         }
-
-        let startNode = startSnap.node
-        let endNode = endSnap.node
 
         // Compare actual snap points (not quantized nodes) to avoid false "same point" errors
         let snapDistance = CLLocation(latitude: startSnap.point.latitude, longitude: startSnap.point.longitude)
@@ -38,11 +40,32 @@ class WaterwayRouter {
             throw RoutingError.sameStartAndEnd
         }
 
-        // If both snap to same node but are on different segments, create a direct route
-        if startNode == endNode {
-            // Find the edge that connects these two snap points
+        // Try multiple combinations of snap candidates and pick the shortest valid route
+        var bestResult: RouteResult?
+        var bestTotalCost = Double.infinity
+
+        for sc in startCandidates {
+            for ec in endCandidates {
+                if sc.node == ec.node { continue }
+                if let result = try? findRouteAStar(from: sc.node, to: ec.node, originSnap: sc.point, destinationSnap: ec.point) {
+                    // Total cost = snap distance to origin + route distance + snap distance to destination
+                    let totalCost = sc.distance + result.totalDistance + ec.distance
+                    if totalCost < bestTotalCost {
+                        bestTotalCost = totalCost
+                        bestResult = result
+                    }
+                }
+            }
+        }
+
+        if let result = bestResult {
+            return result
+        }
+
+        // Fallback: try the closest snaps directly
+        if startSnap.node == endSnap.node {
             return RouteResult(
-                path: [startNode],
+                path: [startSnap.node],
                 edges: [],
                 totalDistance: snapDistance,
                 originSnapPoint: startSnap.point,
@@ -50,14 +73,22 @@ class WaterwayRouter {
             )
         }
 
-        // A* pathfinding
+        throw RoutingError.noRouteFound(from: origin, to: destination)
+    }
+
+    /// A* pathfinding between two specific nodes
+    private func findRouteAStar(
+        from startNode: WaterwayGraph.Node,
+        to endNode: WaterwayGraph.Node,
+        originSnap: CLLocationCoordinate2D,
+        destinationSnap: CLLocationCoordinate2D
+    ) throws -> RouteResult {
         var openSet: Set<WaterwayGraph.Node> = [startNode]
         var cameFrom: [WaterwayGraph.Node: (node: WaterwayGraph.Node, edge: WaterwayGraph.Edge)] = [:]
         var gScore: [WaterwayGraph.Node: Double] = [startNode: 0]
         var fScore: [WaterwayGraph.Node: Double] = [startNode: heuristic(from: startNode, to: endNode)]
 
         while !openSet.isEmpty {
-            // Get node with lowest fScore
             guard let current = openSet.min(by: { (fScore[$0] ?? .infinity) < (fScore[$1] ?? .infinity) }) else {
                 break
             }
@@ -65,7 +96,7 @@ class WaterwayRouter {
             if current == endNode {
                 return reconstructPath(
                     cameFrom: cameFrom, current: current,
-                    originSnap: startSnap.point, destinationSnap: endSnap.point
+                    originSnap: originSnap, destinationSnap: destinationSnap
                 )
             }
 
@@ -85,7 +116,7 @@ class WaterwayRouter {
             }
         }
 
-        throw RoutingError.noRouteFound(from: origin, to: destination)
+        throw RoutingError.noRouteFound(from: startNode.coordinate, to: endNode.coordinate)
     }
 
     // MARK: - Private

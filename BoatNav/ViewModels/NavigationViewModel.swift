@@ -303,12 +303,12 @@ class NavigationViewModel: ObservableObject {
                 coordinates.append(dest)
             }
 
-            // Filter to only bridges/locks actually near the route path (within 150m)
+            // Filter to only bridges/locks actually near the route path (within 250m)
             let bridges = allBridges.filter { bridge in
-                Self.isCoordinateNearRoute(bridge.coordinate, routeCoords: coordinates, threshold: 150)
+                Self.isCoordinateNearRoute(bridge.coordinate, routeCoords: coordinates, threshold: 250)
             }
             let locks = allLocks.filter { lock in
-                Self.isCoordinateNearRoute(lock.coordinate, routeCoords: coordinates, threshold: 150)
+                Self.isCoordinateNearRoute(lock.coordinate, routeCoords: coordinates, threshold: 250)
             }
 
             let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
@@ -483,16 +483,8 @@ class NavigationViewModel: ObservableObject {
         threshold: Double
     ) -> Bool {
         let loc = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        // Check every 3rd point for performance (route coords are dense)
-        for i in stride(from: 0, to: routeCoords.count, by: 3) {
-            let routeLoc = CLLocation(latitude: routeCoords[i].latitude, longitude: routeCoords[i].longitude)
-            if loc.distance(from: routeLoc) < threshold {
-                return true
-            }
-        }
-        // Also check last point
-        if let last = routeCoords.last {
-            let routeLoc = CLLocation(latitude: last.latitude, longitude: last.longitude)
+        for coord in routeCoords {
+            let routeLoc = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
             if loc.distance(from: routeLoc) < threshold {
                 return true
             }

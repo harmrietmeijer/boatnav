@@ -17,7 +17,7 @@ class HazardReportViewModel: ObservableObject {
     private let proximityThreshold: CLLocationDistance = 500
 
     /// Cooldown before re-alerting about the same report
-    private let suppressionDuration: TimeInterval = 600 // 10 minutes
+    private let suppressionDuration: TimeInterval = 1800 // 30 minutes
 
     init() {
         self.reports = HazardReport.loadAll()
@@ -40,6 +40,8 @@ class HazardReportViewModel: ObservableObject {
         guard let location = locationService?.currentLocation else { return }
         let report = HazardReport(category: category, coordinate: location.coordinate)
         reports.append(report)
+        // Auto-suppress own report so the creator doesn't get alerted immediately
+        suppressedReportIDs[report.id] = Date()
         save()
         rebuildAnnotations()
     }

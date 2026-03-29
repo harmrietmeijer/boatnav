@@ -113,11 +113,22 @@ class WaterwayGraph {
     /// Find the nearest point on any edge in the graph (not just nodes).
     /// Projects onto segment line segments for much better accuracy.
     func nearestPointOnGraph(to coordinate: CLLocationCoordinate2D) -> SnapResult? {
+        let candidates = nearestPointsOnGraph(to: coordinate, maxResults: 1)
+        return candidates.first
+    }
+
+    /// Find multiple nearby snap candidates, sorted by distance.
+    /// Useful for harbor entrances where the closest snap may not be the best route entry point.
+    func nearestPointsOnGraph(to coordinate: CLLocationCoordinate2D, maxResults: Int) -> [SnapResult] {
         let target = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
 
-        var bestDistance = Double.infinity
-        var bestPoint = coordinate
-        var bestNode: Node?
+        struct Candidate {
+            let node: Node
+            let point: CLLocationCoordinate2D
+            let distance: Double
+        }
+
+        var candidates: [Candidate] = []
 
         for (_, edges) in adjacencyList {
             for edge in edges {
@@ -130,26 +141,31 @@ class WaterwayGraph {
                         latitude: projected.latitude, longitude: projected.longitude
                     ))
 
-                    if dist < bestDistance {
-                        bestDistance = dist
-                        bestPoint = projected
-                        // Pick the closer endpoint node for A* routing
-                        let distFrom = CLLocation(
-                            latitude: edge.from.coordinate.latitude,
-                            longitude: edge.from.coordinate.longitude
-                        ).distance(from: CLLocation(latitude: projected.latitude, longitude: projected.longitude))
-                        let distTo = CLLocation(
-                            latitude: edge.to.coordinate.latitude,
-                            longitude: edge.to.coordinate.longitude
-                        ).distance(from: CLLocation(latitude: projected.latitude, longitude: projected.longitude))
-                        bestNode = distFrom < distTo ? edge.from : edge.to
+                    guard dist <= Self.maxSnapDistance else { continue }
+
+                    // Pick the closer endpoint node for A* routing
+                    let distFrom = CLLocation(
+                        latitude: edge.from.coordinate.latitude,
+                        longitude: edge.from.coordinate.longitude
+                    ).distance(from: CLLocation(latitude: projected.latitude, longitude: projected.longitude))
+                    let distTo = CLLocation(
+                        latitude: edge.to.coordinate.latitude,
+                        longitude: edge.to.coordinate.longitude
+                    ).distance(from: CLLocation(latitude: projected.latitude, longitude: projected.longitude))
+                    let node = distFrom < distTo ? edge.from : edge.to
+
+                    // Avoid duplicate nodes in candidates
+                    if !candidates.contains(where: { $0.node == node && abs($0.distance - dist) < 10 }) {
+                        candidates.append(Candidate(node: node, point: projected, distance: dist))
                     }
                 }
             }
         }
 
-        guard let node = bestNode, bestDistance <= Self.maxSnapDistance else { return nil }
-        return SnapResult(node: node, point: bestPoint, distance: bestDistance)
+        return candidates
+            .sorted { $0.distance < $1.distance }
+            .prefix(maxResults)
+            .map { SnapResult(node: $0.node, point: $0.point, distance: $0.distance) }
     }
 
     /// Project a point onto a line segment, returning the closest point on that segment.
