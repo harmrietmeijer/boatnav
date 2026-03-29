@@ -1,4 +1,5 @@
 import CoreLocation
+import CloudKit
 
 struct HazardReport: Identifiable, Codable {
     let id: String
@@ -59,7 +60,48 @@ struct HazardReport: Identifiable, Codable {
         self.removalVotes = 0
     }
 
-    // MARK: - Persistence
+    init(id: String, category: HazardCategory, latitude: Double, longitude: Double, createdAt: Date, removalVotes: Int) {
+        self.id = id
+        self.category = category
+        self.latitude = latitude
+        self.longitude = longitude
+        self.createdAt = createdAt
+        self.removalVotes = removalVotes
+    }
+
+    // MARK: - CloudKit
+
+    static let recordType = "HazardReport"
+
+    func toCKRecord() -> CKRecord {
+        let record = CKRecord(recordType: Self.recordType, recordID: CKRecord.ID(recordName: id))
+        record["reportID"] = id as CKRecordValue
+        record["category"] = category.rawValue as CKRecordValue
+        record["latitude"] = latitude as CKRecordValue
+        record["longitude"] = longitude as CKRecordValue
+        record["createdAt"] = createdAt as CKRecordValue
+        record["removalVotes"] = removalVotes as CKRecordValue
+        return record
+    }
+
+    init?(from record: CKRecord) {
+        guard let reportID = record["reportID"] as? String,
+              let categoryRaw = record["category"] as? String,
+              let category = HazardCategory(rawValue: categoryRaw),
+              let latitude = record["latitude"] as? Double,
+              let longitude = record["longitude"] as? Double,
+              let createdAt = record["createdAt"] as? Date else {
+            return nil
+        }
+        self.id = reportID
+        self.category = category
+        self.latitude = latitude
+        self.longitude = longitude
+        self.createdAt = createdAt
+        self.removalVotes = (record["removalVotes"] as? Int) ?? 0
+    }
+
+    // MARK: - Local Persistence
 
     private static let storageKey = "hazardReports"
 
