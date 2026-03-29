@@ -37,6 +37,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         self.navigationViewModel = NavigationViewModel(pdokClient: pdokClient)
         self.navigationViewModel.locationService = locationService
         self.navigationViewModel.boatProfileViewModel = boatProfileViewModel
+        self.navigationViewModel.speedLimitService = speedViewModel.speedLimitService
         self.weatherViewModel = WeatherViewModel(locationService: locationService)
 
         super.init()
@@ -44,6 +45,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         hazardReportViewModel.startMonitoring(locationService: locationService)
         locationService.startUpdating()
         SubscriptionManager.shared.configure()
+
+        // Load waterway graph for routing and speed limits
+        Task {
+            await navigationViewModel.loadWaterwayGraph()
+        }
     }
 
     func application(

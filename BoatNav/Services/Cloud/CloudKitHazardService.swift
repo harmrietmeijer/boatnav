@@ -54,7 +54,7 @@ class CloudKitHazardService {
                 print("[CloudKit] Deleted report \(reportID) (votes >= 2)")
             } else {
                 let record = try await publicDB.record(for: recordID)
-                record["removalVotes"] = newVotes as CKRecordValue
+                record["votes"] = NSNumber(value: newVotes)
                 try await publicDB.save(record)
                 print("[CloudKit] Updated votes for \(reportID) to \(newVotes)")
             }

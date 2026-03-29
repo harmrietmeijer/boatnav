@@ -75,12 +75,12 @@ struct HazardReport: Identifiable, Codable {
 
     func toCKRecord() -> CKRecord {
         let record = CKRecord(recordType: Self.recordType, recordID: CKRecord.ID(recordName: id))
-        record["reportID"] = id as CKRecordValue
-        record["category"] = category.rawValue as CKRecordValue
-        record["latitude"] = latitude as CKRecordValue
-        record["longitude"] = longitude as CKRecordValue
-        record["createdAt"] = createdAt as CKRecordValue
-        record["removalVotes"] = removalVotes as CKRecordValue
+        record["reportID"] = id as NSString
+        record["category"] = category.rawValue as NSString
+        record["latitude"] = NSNumber(value: latitude)
+        record["longitude"] = NSNumber(value: longitude)
+        record["createdAt"] = createdAt as NSDate
+        record["votes"] = NSNumber(value: removalVotes)
         return record
     }
 
@@ -98,7 +98,7 @@ struct HazardReport: Identifiable, Codable {
         self.latitude = latitude
         self.longitude = longitude
         self.createdAt = createdAt
-        self.removalVotes = (record["removalVotes"] as? Int) ?? 0
+        self.removalVotes = (record["votes"] as? Int) ?? 0
     }
 
     // MARK: - Local Persistence

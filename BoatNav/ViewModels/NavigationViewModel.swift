@@ -81,6 +81,7 @@ class NavigationViewModel: ObservableObject {
     let pdokClient: PDOKClient
     weak var locationService: LocationService?
     weak var boatProfileViewModel: BoatProfileViewModel?
+    weak var speedLimitService: SpeedLimitService?
     private var waterwayGraph: WaterwayGraph?
     private var router: WaterwayRouter?
     private var maneuverGenerator = ManeuverGenerator()
@@ -95,6 +96,7 @@ class NavigationViewModel: ObservableObject {
     // MARK: - Waterway graph
 
     func loadWaterwayGraph() async {
+        print("[Nav] loadWaterwayGraph started, speedLimitService is \(speedLimitService == nil ? "nil" : "set")")
         do {
             let segments = try await pdokClient.fetchWaterways(
                 for: .init(
@@ -108,10 +110,16 @@ class NavigationViewModel: ObservableObject {
             self.waterwayGraph = graph
             self.router = WaterwayRouter(graph: graph)
 
+            let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
+            let withCemt = segments.filter { $0.cemtClass != nil && !$0.cemtClass!.isEmpty }.count
+            print("[Nav] Loaded \(segments.count) segments, \(withSpeed) with speed, \(withCemt) with CEMT, speedLimitService is \(speedLimitService == nil ? "nil!" : "set")")
+
             await MainActor.run {
+                self.speedLimitService?.update(segments: segments)
                 self.errorMessage = nil
             }
         } catch {
+            print("[Nav] loadWaterwayGraph FAILED: \(error.localizedDescription)")
             await MainActor.run {
                 self.errorMessage = "Kan vaarwegdata niet laden: \(error.localizedDescription)"
             }

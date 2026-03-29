@@ -172,28 +172,51 @@ class PDOKClient {
 
     // MARK: - Overpass helper
 
+    /// Overpass API endpoints — primary + fallback mirrors
+    private let overpassEndpoints = [
+        "https://overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter",
+        "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+    ]
+
     private func fetchOverpass(query: String) async throws -> [[String: Any]] {
-        var components = URLComponents(string: "https://overpass-api.de/api/interpreter")!
-        components.queryItems = [URLQueryItem(name: "data", value: query)]
+        for (i, endpoint) in overpassEndpoints.enumerated() {
+            var components = URLComponents(string: endpoint)!
+            components.queryItems = [URLQueryItem(name: "data", value: query)]
 
-        var request = URLRequest(url: components.url!)
-        request.setValue("BoatNav/1.0", forHTTPHeaderField: "User-Agent")
-        request.timeoutInterval = 15
+            var request = URLRequest(url: components.url!)
+            request.setValue("BoatNav/1.0", forHTTPHeaderField: "User-Agent")
+            request.timeoutInterval = 20
 
-        print("[Overpass] Fetching: \(query.prefix(80))...")
-        let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            print("[Overpass] HTTP error: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
-            return []
+            let label = i == 0 ? "primary" : "mirror \(i)"
+            print("[Overpass] Fetching (\(label)): \(query.prefix(80))...")
+
+            do {
+                let (data, response) = try await session.data(for: request)
+                guard let http = response as? HTTPURLResponse else { continue }
+
+                if (200...299).contains(http.statusCode) {
+                    print("[Overpass] Response (\(label)): \(data.count) bytes")
+                    guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                          let elements = json["elements"] as? [[String: Any]] else {
+                        return []
+                    }
+                    print("[Overpass] Elements: \(elements.count)")
+                    return elements
+                }
+
+                print("[Overpass] HTTP \(http.statusCode) from \(label)")
+                // 429/504/503 → try next mirror
+                if [429, 503, 504].contains(http.statusCode) { continue }
+                return [] // Other errors, don't retry
+            } catch {
+                print("[Overpass] \(label) failed: \(error.localizedDescription)")
+                continue // Network error → try next mirror
+            }
         }
-        print("[Overpass] Response: \(data.count) bytes")
 
-        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let elements = json["elements"] as? [[String: Any]] else {
-            return []
-        }
-        print("[Overpass] Elements: \(elements.count)")
-        return elements
+        print("[Overpass] All endpoints failed")
+        return []
     }
 
     // MARK: - Waterways / NWB Vaarwegen
