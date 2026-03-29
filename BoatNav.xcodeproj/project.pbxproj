@@ -35,6 +35,7 @@
 		6922A433203D0737C3A5E444 /* SettingsPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7E6E4AF2D1A1A8CA6AC61 /* SettingsPanelContent.swift */; };
 		6D5147634CECB7EA29D0818D /* SpeedLimitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6306F6BA2DF6259990541CC0 /* SpeedLimitService.swift */; };
 		6F6FDB5193B89D6CB3799EDD /* PaywallPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496867366A6AB6138A4614C2 /* PaywallPanelContent.swift */; };
+		731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */; };
 		7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFDC4FC1273FA957B613F80 /* ContentView.swift */; };
 		7AA8F36364A921EC2D93D4D0 /* TileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC70EBC17375CD538F1056E0 /* TileCache.swift */; };
 		80BABDD4F9311E253FCB0EF7 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE2BDAF4F0B6AB79DE10B7 /* LocationService.swift */; };
@@ -142,6 +143,7 @@
 		B783D7F81DBD4241F4529007 /* TileOverlayProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileOverlayProvider.swift; sourceTree = "<group>"; };
 		B88F4559ED2A241123D65E49 /* ActiveNavigationStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveNavigationStrip.swift; sourceTree = "<group>"; };
 		BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
+		C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitHazardService.swift; sourceTree = "<group>"; };
 		C9D8621EC967D5D1182A85E6 /* SeamarkAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamarkAnnotation.swift; sourceTree = "<group>"; };
 		CA92C22118D378A1C6F38F6F /* UnitConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversion.swift; sourceTree = "<group>"; };
 		CF38F51FE5C7EE95AA9D2B6E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -331,6 +333,14 @@
 			);
 			sourceTree = "<group>";
 		};
+		84506D205FAA64E7DC91AF5A /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
 		93A2B0364E704EEDB4355467 /* CarPlay */ = {
 			isa = PBXGroup;
 			children = (
@@ -369,6 +379,7 @@
 				5E15CF505CDDAAA91524E9E8 /* API */,
 				7967BDDF890C91203584321B /* Audio */,
 				A9CDA6260AABEF5A60044B66 /* Cache */,
+				84506D205FAA64E7DC91AF5A /* Cloud */,
 				6285AB989911DF87C65E470C /* Location */,
 				75374E22D699A37A66240078 /* Map */,
 				718E3A76A4B2BBF01783F71B /* Navigation */,
@@ -570,6 +581,7 @@
 				338016AFAC5D721BD15A8BBA /* BuoyAnnotationProvider.swift in Sources */,
 				4AC875120D4EF34166B726BB /* CarPlayMapViewController.swift in Sources */,
 				CC1A1BEEAE9F3BD0C180FB3B /* CarPlaySceneDelegate.swift in Sources */,
+				731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */,
 				7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */,
 				4E944F786FF2DEF928E544E4 /* CoordinateHelpers.swift in Sources */,
 				EC383080FED750E6E1A9BB0D /* FavoriteLocation.swift in Sources */,
@@ -693,6 +705,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
@@ -802,6 +815,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;

@@ -20,8 +20,11 @@ class HazardReportViewModel: ObservableObject {
     /// Cooldown before re-alerting about the same report
     private let suppressionDuration: TimeInterval = 1800 // 30 minutes
 
+    private static let suppressionKey = "hazard_suppressions"
+
     init() {
         self.reports = HazardReport.loadAll()
+        loadSuppressions()
         rebuildAnnotations()
 
         // Fetch from CloudKit on launch
@@ -52,8 +55,8 @@ class HazardReportViewModel: ObservableObject {
         guard let location = locationService?.currentLocation else { return }
         let report = HazardReport(category: category, coordinate: location.coordinate)
         reports.append(report)
-        // Auto-suppress own report so the creator doesn't get alerted immediately
-        suppressedReportIDs[report.id] = Date()
+        // Auto-suppress own report for 30 minutes
+        suppressReport(report.id)
         save()
         rebuildAnnotations()
 
@@ -69,6 +72,8 @@ class HazardReportViewModel: ObservableObject {
         if shouldDelete {
             reports.remove(at: index)
         }
+        // Suppress so we don't get asked again
+        suppressReport(reportId)
         save()
         rebuildAnnotations()
         proximityAlert = nil
@@ -78,8 +83,34 @@ class HazardReportViewModel: ObservableObject {
     }
 
     func confirmStillPresent(for reportId: String) {
-        suppressedReportIDs[reportId] = Date()
+        suppressReport(reportId)
         proximityAlert = nil
+    }
+
+    // MARK: - Suppression persistence
+
+    private func suppressReport(_ reportId: String) {
+        suppressedReportIDs[reportId] = Date()
+        saveSuppressions()
+    }
+
+    private func saveSuppressions() {
+        // Only save non-expired suppressions
+        let now = Date()
+        let active = suppressedReportIDs.filter { now.timeIntervalSince($0.value) < suppressionDuration }
+        let dict = active.mapValues { $0.timeIntervalSince1970 }
+        UserDefaults.standard.set(dict, forKey: Self.suppressionKey)
+    }
+
+    private func loadSuppressions() {
+        guard let dict = UserDefaults.standard.dictionary(forKey: Self.suppressionKey) as? [String: Double] else { return }
+        let now = Date()
+        for (id, timestamp) in dict {
+            let date = Date(timeIntervalSince1970: timestamp)
+            if now.timeIntervalSince(date) < suppressionDuration {
+                suppressedReportIDs[id] = date
+            }
+        }
     }
 
     // MARK: - CloudKit sync
@@ -156,8 +187,12 @@ class HazardReportViewModel: ObservableObject {
         guard proximityAlert == nil else { return }
 
         // Clean up expired suppressions
-        suppressedReportIDs = suppressedReportIDs.filter {
-            now.timeIntervalSince($0.value) < suppressionDuration
+        let expiredIDs = suppressedReportIDs.filter { now.timeIntervalSince($0.value) >= suppressionDuration }.keys
+        if !expiredIDs.isEmpty {
+            for id in expiredIDs {
+                suppressedReportIDs.removeValue(forKey: id)
+            }
+            saveSuppressions()
         }
 
         for report in reports {
