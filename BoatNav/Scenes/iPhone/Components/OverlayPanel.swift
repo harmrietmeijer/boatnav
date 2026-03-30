@@ -14,6 +14,7 @@ enum ActivePanel: Equatable {
     case speedDetail
     case boatProfile
     case paywall
+    case locationSharing
 }
 
 struct OverlayPanel<Content: View>: View {
@@ -27,12 +28,12 @@ struct OverlayPanel<Content: View>: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let maxHeight = geometry.size.height
-            let targetHeight = height(for: detent, in: maxHeight)
+            let screenHeight = geometry.size.height + geometry.safeAreaInsets.bottom
+            let targetHeight = height(for: detent, in: screenHeight)
             let currentHeight = max(0, targetHeight - dragOffset)
 
             VStack(spacing: 0) {
-                Spacer()
+                Spacer(minLength: 0)
 
                 VStack(spacing: 0) {
                     // Drag handle + sticky close button
@@ -64,7 +65,7 @@ struct OverlayPanel<Content: View>: View {
                     ScrollView {
                         content()
                             .padding(.horizontal, 20)
-                            .padding(.bottom, max(keyboardHeight, max(geometry.safeAreaInsets.bottom, 20)))
+                            .padding(.bottom, max(geometry.safeAreaInsets.bottom, 20))
                     }
                     .scrollDismissesKeyboard(.interactively)
                 }
@@ -76,19 +77,24 @@ struct OverlayPanel<Content: View>: View {
                         .shadow(color: .black.opacity(0.12), radius: 20, y: -5)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .gesture(
+                .simultaneousGesture(
                     DragGesture()
                         .updating($dragOffset) { value, state, _ in
                             state = value.translation.height
                         }
                         .onEnded { value in
-                            handleDragEnd(translation: value.translation.height, velocity: value.predictedEndTranslation.height, maxHeight: maxHeight)
+                            handleDragEnd(translation: value.translation.height, velocity: value.predictedEndTranslation.height, maxHeight: screenHeight)
                         }
                 )
+
+                // Keyboard spacer: pushes panel above keyboard
+                if keyboardHeight > 0 {
+                    Color.clear
+                        .frame(height: keyboardHeight - geometry.safeAreaInsets.bottom)
+                }
             }
-            .ignoresSafeArea(edges: .bottom)
-            .offset(y: -keyboardHeight)
         }
+        .ignoresSafeArea(edges: .bottom)
         .transition(.move(edge: .bottom).combined(with: .opacity))
         .onReceive(keyboardPublisher) { height in
             withAnimation(.spring(duration: 0.3, bounce: 0.1)) {

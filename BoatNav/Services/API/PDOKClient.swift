@@ -63,8 +63,10 @@ class PDOKClient {
           way["bridge"="yes"]["maxheight"](\(bbox));
           node["waterway"="lock_gate"](\(bbox));
           node["seamark:type"="lock_basin"](\(bbox));
+          node["lock"="yes"](\(bbox));
           way["lock"="yes"](\(bbox));
           way["waterway"="lock"](\(bbox));
+          relation["waterway"="lock"](\(bbox));
         );
         out center 500;
         """
@@ -95,15 +97,20 @@ class PDOKClient {
                     isOperable: bridgeTag == "movable" || tags["seamark:bridge:category"] == "opening",
                     waterwayName: tags["waterway:name"]
                 ))
-            } else if waterwayTag == "lock_gate" || seamarkType == "lock_basin" || lockTag == "yes" {
+            } else if waterwayTag == "lock_gate" || waterwayTag == "lock" || seamarkType == "lock_basin" || lockTag == "yes" {
                 locks.append(Lock(
                     id: "osm-\(element["id"] ?? 0)",
-                    name: tags["name"] ?? tags["seamark:name"] ?? "Onbekende sluis",
+                    name: tags["lock_name"] ?? tags["name"] ?? tags["seamark:name"] ?? "Onbekende sluis",
                     coordinate: coord,
-                    length: Double(tags["lock:length"] ?? tags["seamark:lock_basin:length"] ?? ""),
-                    width: Double(tags["lock:width"] ?? tags["seamark:lock_basin:width"] ?? ""),
-                    depth: Double(tags["lock:depth"] ?? tags["seamark:lock_basin:depth"] ?? ""),
-                    waterwayName: tags["waterway:name"]
+                    length: Double(tags["lock:length"] ?? tags["maxlength"] ?? tags["seamark:lock_basin:length"] ?? ""),
+                    width: Double(tags["lock:width"] ?? tags["maxwidth"] ?? tags["seamark:lock_basin:width"] ?? ""),
+                    depth: Double(tags["lock:depth"] ?? tags["maxdraught"] ?? tags["maxdraft"] ?? tags["seamark:lock_basin:depth"] ?? ""),
+                    waterwayName: tags["waterway:name"],
+                    openingHours: tags["opening_hours"] ?? tags["seamark:opening_hours"],
+                    vhfChannel: tags["vhf"],
+                    phone: tags["phone"] ?? tags["contact:phone"],
+                    operatorName: tags["operator"],
+                    passageTime: tags["passage_time"]
                 ))
             }
         }
@@ -181,6 +188,12 @@ class PDOKClient {
 
     private func fetchOverpass(query: String) async throws -> [[String: Any]] {
         for (i, endpoint) in overpassEndpoints.enumerated() {
+            // Stop retrying if the Task was cancelled
+            if Task.isCancelled {
+                print("[Overpass] Task cancelled, aborting")
+                return []
+            }
+
             var components = URLComponents(string: endpoint)!
             components.queryItems = [URLQueryItem(name: "data", value: query)]
 
@@ -209,6 +222,9 @@ class PDOKClient {
                 // 429/504/503 → try next mirror
                 if [429, 503, 504].contains(http.statusCode) { continue }
                 return [] // Other errors, don't retry
+            } catch is CancellationError {
+                print("[Overpass] \(label) cancelled")
+                return [] // Don't retry mirrors on cancellation
             } catch {
                 print("[Overpass] \(label) failed: \(error.localizedDescription)")
                 continue // Network error → try next mirror
@@ -217,6 +233,99 @@ class PDOKClient {
 
         print("[Overpass] All endpoints failed")
         return []
+    }
+
+    // MARK: - Waterside Restaurants
+
+    private var cachedRestaurants: [WatersideRestaurant] = []
+    private var cachedRestaurantBbox: (minLat: Double, minLon: Double, maxLat: Double, maxLon: Double)?
+
+    struct WatersideRestaurant {
+        let id: String
+        let name: String
+        let coordinate: CLLocationCoordinate2D
+        let cuisine: String?
+        let phone: String?
+        let website: String?
+    }
+
+    func fetchWatersideRestaurants(for region: MKCoordinateRegion) async throws -> [WatersideRestaurant] {
+        let halfLat = max(region.span.latitudeDelta / 2, 0.025)
+        let halfLon = max(region.span.longitudeDelta / 2, 0.025)
+        let minLat = region.center.latitude - halfLat
+        let maxLat = region.center.latitude + halfLat
+        let minLon = region.center.longitude - halfLon
+        let maxLon = region.center.longitude + halfLon
+
+        if let cached = cachedRestaurantBbox,
+           minLat >= cached.minLat && maxLat <= cached.maxLat &&
+           minLon >= cached.minLon && maxLon <= cached.maxLon {
+            return cachedRestaurants
+        }
+
+        let fetchMinLat = minLat - 0.01
+        let fetchMaxLat = maxLat + 0.01
+        let fetchMinLon = minLon - 0.01
+        let fetchMaxLon = maxLon + 0.01
+        let bbox = "\(fetchMinLat),\(fetchMinLon),\(fetchMaxLat),\(fetchMaxLon)"
+
+        // Lightweight query: restaurants/cafes near marinas, harbours, moorings (nodes only — fast)
+        let query = """
+        [out:json][timeout:10];
+        (
+          node["leisure"="marina"](\(bbox));
+          node["mooring"](\(bbox));
+          node["harbour"](\(bbox));
+          node["seamark:type"="harbour"](\(bbox));
+          node["waterway"="dock"](\(bbox));
+          node["leisure"="yacht_club"](\(bbox));
+        )->.docks;
+        (
+          node["amenity"="restaurant"](around.docks:500)(\(bbox));
+          way["amenity"="restaurant"](around.docks:500)(\(bbox));
+          node["amenity"="cafe"](around.docks:500)(\(bbox));
+          way["amenity"="cafe"](around.docks:500)(\(bbox));
+        );
+        out center tags 300;
+        """
+
+        let elements = try await fetchOverpass(query: query)
+
+        let restaurants = elements.compactMap { element -> WatersideRestaurant? in
+            let tags = element["tags"] as? [String: String] ?? [:]
+            let amenity = tags["amenity"] ?? "restaurant"
+            let name = tags["name"] ?? (amenity == "cafe" ? "Café" : "Restaurant")
+            guard let (lat, lon) = extractCoordinate(from: element) else { return nil }
+
+            return WatersideRestaurant(
+                id: "rest-\(element["id"] ?? 0)",
+                name: name,
+                coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+                cuisine: tags["cuisine"],
+                phone: tags["phone"] ?? tags["contact:phone"],
+                website: tags["website"] ?? tags["contact:website"]
+            )
+        }
+
+        // Deduplicate by name + proximity
+        var unique: [WatersideRestaurant] = []
+        for r in restaurants {
+            let isDuplicate = unique.contains { existing in
+                let dist = CLLocation(latitude: existing.coordinate.latitude, longitude: existing.coordinate.longitude)
+                    .distance(from: CLLocation(latitude: r.coordinate.latitude, longitude: r.coordinate.longitude))
+                return existing.name == r.name && dist < 100
+            }
+            if !isDuplicate { unique.append(r) }
+        }
+
+        print("[Overpass] Fetched \(elements.count) waterside restaurants → \(unique.count) unique")
+
+        if !unique.isEmpty {
+            cachedRestaurants = unique
+            cachedRestaurantBbox = (fetchMinLat, fetchMinLon, fetchMaxLat, fetchMaxLon)
+        }
+
+        return unique
     }
 
     // MARK: - Waterways / NWB Vaarwegen

@@ -15,6 +15,10 @@ class SettingsViewModel: ObservableObject {
         didSet { UserDefaults.standard.set(showBridges, forKey: "showBridges") }
     }
 
+    @Published var showRestaurants: Bool {
+        didSet { UserDefaults.standard.set(showRestaurants, forKey: "showRestaurants") }
+    }
+
     @Published var showSeamarks: Bool {
         didSet { UserDefaults.standard.set(showSeamarks, forKey: "showSeamarks") }
     }
@@ -35,6 +39,9 @@ class SettingsViewModel: ObservableObject {
         if defaults.object(forKey: "showBridges") == nil {
             defaults.set(true, forKey: "showBridges")
         }
+        if defaults.object(forKey: "showRestaurants") == nil {
+            defaults.set(false, forKey: "showRestaurants")
+        }
         if defaults.object(forKey: "showSeamarks") == nil {
             defaults.set(true, forKey: "showSeamarks")
         }
@@ -42,6 +49,7 @@ class SettingsViewModel: ObservableObject {
         self.cruisingSpeedKmh = defaults.double(forKey: "cruisingSpeedKmh")
         self.showBuoys = defaults.bool(forKey: "showBuoys")
         self.showBridges = defaults.bool(forKey: "showBridges")
+        self.showRestaurants = defaults.bool(forKey: "showRestaurants")
         self.showSeamarks = defaults.bool(forKey: "showSeamarks")
 
         if let saved = defaults.string(forKey: "mapStyle"),

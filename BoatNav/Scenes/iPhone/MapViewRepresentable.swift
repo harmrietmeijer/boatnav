@@ -8,6 +8,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     // These drive SwiftUI diffing so updateUIView gets called
     let annotations: [SeamarkAnnotation]
     let hazardAnnotations: [HazardAnnotation]
+    let friendAnnotations: [FriendAnnotation]
     let routeCoordinates: [CLLocationCoordinate2D]
     let startCoordinate: CLLocationCoordinate2D?
     let destinationCoordinate: CLLocationCoordinate2D?
@@ -16,6 +17,8 @@ struct MapViewRepresentable: UIViewRepresentable {
     let showSeamarks: Bool
     let showBuoys: Bool
     let showBridges: Bool
+    let showRestaurants: Bool
+    let rwsLockService: RWSLockService
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
@@ -81,6 +84,7 @@ struct MapViewRepresentable: UIViewRepresentable {
             case .buoy, .beacon: return showBuoys
             case .bridge: return showBridges
             case .lock: return true
+            case .restaurant: return showRestaurants
             }
         }
         if existingSeamarks.count != filteredAnnotations.count {
@@ -95,6 +99,15 @@ struct MapViewRepresentable: UIViewRepresentable {
         if existingIDs != newIDs {
             mapView.removeAnnotations(existingHazards)
             mapView.addAnnotations(hazardAnnotations)
+        }
+
+        // Update friend annotations (diff by friend ID)
+        let existingFriends = mapView.annotations.compactMap { $0 as? FriendAnnotation }
+        let existingFriendIDs = Set(existingFriends.map(\.friendID))
+        let newFriendIDs = Set(friendAnnotations.map(\.friendID))
+        if existingFriendIDs != newFriendIDs || existingFriends.count != friendAnnotations.count {
+            mapView.removeAnnotations(existingFriends)
+            mapView.addAnnotations(friendAnnotations)
         }
 
         // Update pin annotations (diff by coordinate to avoid unnecessary remove/add)
@@ -158,12 +171,13 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(mapViewModel: mapViewModel, navigationViewModel: navigationViewModel)
+        Coordinator(mapViewModel: mapViewModel, navigationViewModel: navigationViewModel, rwsLockService: rwsLockService)
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
         let mapViewModel: MapViewModel
         let navigationViewModel: NavigationViewModel
+        let rwsLockService: RWSLockService
         var lastRouteCount = 0
         var lastRouteStartLat: Double = 0
         var lastRouteStartLon: Double = 0
@@ -173,9 +187,10 @@ struct MapViewRepresentable: UIViewRepresentable {
         var currentMapStyle: MapStyle = .standaard
         var showSeamarks: Bool = true
 
-        init(mapViewModel: MapViewModel, navigationViewModel: NavigationViewModel) {
+        init(mapViewModel: MapViewModel, navigationViewModel: NavigationViewModel, rwsLockService: RWSLockService) {
             self.mapViewModel = mapViewModel
             self.navigationViewModel = navigationViewModel
+            self.rwsLockService = rwsLockService
         }
 
         @objc func handleMapTap(_ gesture: UITapGestureRecognizer) {
@@ -207,6 +222,30 @@ struct MapViewRepresentable: UIViewRepresentable {
             mapViewModel.regionDidChange(to: mapView.region)
         }
 
+        func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+            // Friend: navigate to
+            if let friend = view.annotation as? FriendAnnotation {
+                navigationViewModel.setDestinationFromFriend(
+                    name: friend.title ?? "Vriend",
+                    coordinate: friend.coordinate
+                )
+                return
+            }
+
+            guard let seamark = view.annotation as? SeamarkAnnotation, seamark.type == .lock else { return }
+            // Call the lock's phone number
+            if let lockInfo = rwsLockService.lockInfo(near: seamark.coordinate),
+               let phone = lockInfo.phone {
+                // Clean phone number: take first number if multiple
+                let cleaned = phone.components(separatedBy: "/").first?
+                    .replacingOccurrences(of: " ", with: "")
+                    .replacingOccurrences(of: "-", with: "") ?? ""
+                if let url = URL(string: "tel://\(cleaned)") {
+                    UIApplication.shared.open(url)
+                }
+            }
+        }
+
         private func coloredIcon(_ systemName: String, color: UIColor, size: CGFloat) -> UIImage? {
             let config = UIImage.SymbolConfiguration(pointSize: size, weight: .bold)
             guard let symbol = UIImage(systemName: systemName, withConfiguration: config) else { return nil }
@@ -233,6 +272,33 @@ struct MapViewRepresentable: UIViewRepresentable {
                     view.markerTintColor = .systemRed
                     view.glyphImage = UIImage(systemName: "flag.fill")
                 }
+                return view
+            }
+
+            if let friend = annotation as? FriendAnnotation {
+                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: nil)
+                view.canShowCallout = true
+                let color: UIColor = friend.isStale ? .systemGray : .systemTeal
+                view.image = coloredIcon("sailboat.fill", color: color, size: 22)
+                // Name label below icon
+                let label = UILabel()
+                label.text = friend.title
+                label.font = .systemFont(ofSize: 10, weight: .semibold)
+                label.textColor = .white
+                label.backgroundColor = color.withAlphaComponent(0.85)
+                label.textAlignment = .center
+                label.layer.cornerRadius = 4
+                label.clipsToBounds = true
+                label.sizeToFit()
+                label.frame = CGRect(x: -label.frame.width / 2 - 2, y: 14, width: label.frame.width + 8, height: 16)
+                view.addSubview(label)
+                // Navigate button in callout
+                let navButton = UIButton(type: .system)
+                navButton.setImage(UIImage(systemName: "arrow.triangle.turn.up.right.diamond.fill"), for: .normal)
+                navButton.tintColor = .systemBlue
+                navButton.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+                view.rightCalloutAccessoryView = navButton
+                view.centerOffset = CGPoint(x: 0, y: 0)
                 return view
             }
 
@@ -271,6 +337,28 @@ struct MapViewRepresentable: UIViewRepresentable {
                 }
             case .lock:
                 view.image = coloredIcon("door.left.hand.closed", color: .systemPurple, size: 18)
+                // Enrich with RWS data
+                let enrichedText = rwsLockService.enrichedSubtitle(
+                    for: seamark.coordinate,
+                    baseSubtitle: seamark.subtitle ?? "Sluis"
+                )
+                let detailLabel = UILabel()
+                detailLabel.numberOfLines = 0
+                detailLabel.font = .systemFont(ofSize: 12)
+                detailLabel.textColor = .secondaryLabel
+                detailLabel.text = enrichedText
+                view.detailCalloutAccessoryView = detailLabel
+                // Phone button if RWS has a number
+                if let lockInfo = rwsLockService.lockInfo(near: seamark.coordinate),
+                   lockInfo.phone != nil {
+                    let phoneButton = UIButton(type: .system)
+                    phoneButton.setImage(UIImage(systemName: "phone.fill"), for: .normal)
+                    phoneButton.tintColor = .systemGreen
+                    phoneButton.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+                    view.rightCalloutAccessoryView = phoneButton
+                }
+            case .restaurant:
+                view.image = coloredIcon("fork.knife", color: UIColor(red: 0.85, green: 0.35, blue: 0.1, alpha: 1.0), size: 16)
             }
 
             view.centerOffset = CGPoint(x: 0, y: 0)

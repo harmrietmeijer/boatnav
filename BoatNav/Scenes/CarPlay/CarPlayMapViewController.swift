@@ -191,6 +191,8 @@ extension CarPlayMapViewController: MKMapViewDelegate {
             view.image = UIImage(systemName: "arrow.up.and.down.square.fill")?.withTintColor(.systemOrange, renderingMode: .alwaysOriginal)
         case .lock:
             view.image = UIImage(systemName: "door.left.hand.closed")?.withTintColor(.systemPurple, renderingMode: .alwaysOriginal)
+        case .restaurant:
+            view.image = UIImage(systemName: "fork.knife")?.withTintColor(.systemBrown, renderingMode: .alwaysOriginal)
         }
 
         return view

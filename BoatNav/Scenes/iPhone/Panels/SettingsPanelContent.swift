@@ -65,6 +65,13 @@ struct SettingsPanelContent: View {
                     )
                     Divider().padding(.leading, 48)
                     settingsToggle(
+                        icon: "fork.knife",
+                        iconColor: .brown,
+                        label: "Restaurants aan het water",
+                        isOn: $settingsViewModel.showRestaurants
+                    )
+                    Divider().padding(.leading, 48)
+                    settingsToggle(
                         icon: "water.waves",
                         iconColor: .blue,
                         label: "Zeemerken (OpenSeaMap)",

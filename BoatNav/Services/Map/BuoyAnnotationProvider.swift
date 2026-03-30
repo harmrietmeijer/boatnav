@@ -6,8 +6,10 @@ class BuoyAnnotationProvider {
     private let pdokClient: PDOKClient
     private var lastBuoyRegion: MKCoordinateRegion?
     private var lastBridgeRegion: MKCoordinateRegion?
+    private var lastRestaurantRegion: MKCoordinateRegion?
     private var cachedBuoyAnnotations: [SeamarkAnnotation] = []
     private var cachedBridgeAnnotations: [SeamarkAnnotation] = []
+    private var cachedRestaurantAnnotations: [SeamarkAnnotation] = []
 
     init(pdokClient: PDOKClient) {
         self.pdokClient = pdokClient
@@ -82,19 +84,61 @@ class BuoyAnnotationProvider {
         }
 
         annotations += locks.map { lock in
-            var parts: [String] = []
-            if let l = lock.length { parts.append(String(format: "L: %.0fm", l)) }
-            if let w = lock.width { parts.append(String(format: "B: %.0fm", w)) }
-            if let d = lock.depth { parts.append(String(format: "D: %.1fm", d)) }
+            var lines: [String] = []
+
+            // Dimensions
+            var dims: [String] = []
+            if let l = lock.length { dims.append(String(format: "L: %.0fm", l)) }
+            if let w = lock.width { dims.append(String(format: "B: %.0fm", w)) }
+            if let d = lock.depth { dims.append(String(format: "D: %.1fm", d)) }
+            if !dims.isEmpty { lines.append(dims.joined(separator: ", ")) }
+
+            // Opening hours
+            if let hours = lock.openingHours { lines.append("⏰ \(hours)") }
+
+            // VHF & phone
+            if let vhf = lock.vhfChannel { lines.append("📻 VHF \(vhf)") }
+            if let phone = lock.phone { lines.append("📞 \(phone)") }
+
+            // Passage time & operator
+            if let pt = lock.passageTime { lines.append("Schuttijd: \(pt) min") }
+            if let op = lock.operatorName { lines.append(op) }
+
+            let subtitle = lines.isEmpty ? "Sluis" : lines.joined(separator: "\n")
             return SeamarkAnnotation(
                 coordinate: lock.coordinate,
                 title: lock.name,
-                subtitle: parts.isEmpty ? "Sluis" : parts.joined(separator: ", "),
+                subtitle: subtitle,
                 type: .lock
             )
         }
 
         cachedBridgeAnnotations = annotations
+        return annotations
+    }
+
+    func fetchRestaurantAnnotations(for region: MKCoordinateRegion) async throws -> [SeamarkAnnotation] {
+        if let last = lastRestaurantRegion, isRegionSimilar(last, region) {
+            return cachedRestaurantAnnotations
+        }
+
+        lastRestaurantRegion = region
+
+        let restaurants = try await pdokClient.fetchWatersideRestaurants(for: region)
+        print("[BuoyProvider] Fetched \(restaurants.count) waterside restaurants")
+
+        let annotations = restaurants.map { restaurant in
+            let subtitle = [restaurant.cuisine, restaurant.phone]
+                .compactMap { $0 }
+                .joined(separator: " · ")
+            return SeamarkAnnotation(
+                coordinate: restaurant.coordinate,
+                title: restaurant.name,
+                subtitle: subtitle.isEmpty ? "Restaurant aan het water" : subtitle,
+                type: .restaurant
+            )
+        }
+        cachedRestaurantAnnotations = annotations
         return annotations
     }
 

@@ -26,6 +26,12 @@ struct MapButtonCluster: View {
             )
 
             MapButton(
+                icon: "person.2.fill",
+                isActive: activePanel == .locationSharing,
+                action: { togglePanel(.locationSharing) }
+            )
+
+            MapButton(
                 icon: "gearshape.fill",
                 isActive: activePanel == .settings,
                 action: { togglePanel(.settings) }

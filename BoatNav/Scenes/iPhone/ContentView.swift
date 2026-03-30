@@ -6,6 +6,7 @@ struct ContentView: View {
     @EnvironmentObject var navigationViewModel: NavigationViewModel
     @EnvironmentObject var settingsViewModel: SettingsViewModel
     @EnvironmentObject var hazardReportViewModel: HazardReportViewModel
+    @EnvironmentObject var locationSharingViewModel: LocationSharingViewModel
 
     @State private var activePanel: ActivePanel = .none
     @State private var panelDetent: PanelDetent = .half
@@ -18,6 +19,7 @@ struct ContentView: View {
                 navigationViewModel: navigationViewModel,
                 annotations: mapViewModel.annotations,
                 hazardAnnotations: hazardReportViewModel.annotations,
+                friendAnnotations: locationSharingViewModel.friendAnnotations,
                 routeCoordinates: navigationViewModel.currentRoute?.coordinates ?? [],
                 startCoordinate: navigationViewModel.startSelection.coordinate,
                 destinationCoordinate: navigationViewModel.destinationSelection.coordinate,
@@ -25,7 +27,9 @@ struct ContentView: View {
                 mapStyle: settingsViewModel.mapStyle,
                 showSeamarks: settingsViewModel.showSeamarks,
                 showBuoys: settingsViewModel.showBuoys,
-                showBridges: settingsViewModel.showBridges
+                showBridges: settingsViewModel.showBridges,
+                showRestaurants: settingsViewModel.showRestaurants,
+                rwsLockService: mapViewModel.rwsLockService ?? RWSLockService()
             )
             .ignoresSafeArea()
 
@@ -117,6 +121,8 @@ struct ContentView: View {
                         BoatProfilePanelContent()
                     case .paywall:
                         PaywallPanelContent(activePanel: $activePanel)
+                    case .locationSharing:
+                        LocationSharingPanelContent(activePanel: $activePanel)
                     case .none:
                         EmptyView()
                     }

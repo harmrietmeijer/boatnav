@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0073924A5E528D6A76ADAB70 /* CloudKitLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */; };
 		011E65980143FB97F0F1F450 /* OverlayPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267E45C70DC65B3F19E92EA6 /* OverlayPanel.swift */; };
+		06027A739DADED675D5872F7 /* RWSLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */; };
 		0963EEB4EB3556C59869D8B6 /* SpeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */; };
 		0ACFED9787A97342DC69E860 /* BoatNavUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B72455E4B52C9D4EC432E3B /* BoatNavUITests.swift */; };
 		0BECEC30909C469A823E399A /* SpeedCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920D2BD566A42E49BFD4836F /* SpeedCalculatorTests.swift */; };
@@ -31,10 +33,12 @@
 		4E944F786FF2DEF928E544E4 /* CoordinateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383B5884879CC14FA7F28C9 /* CoordinateHelpers.swift */; };
 		4EF70EB46BBF863193D79CCF /* MapViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5DC361DBE456B5C539B380 /* MapViewRepresentable.swift */; };
 		5410EC0EAB7E32D39E2383A1 /* PDOKClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C7879367950A876E84519D /* PDOKClient.swift */; };
+		552EB77B2A2FF45ADBA1D40A /* LocationSharingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208E2F9231414F01CF18592 /* LocationSharingViewModel.swift */; };
 		5E9B9887C91A4573A8AEDD1E /* NavigationPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14FF1725F5761952B559A09 /* NavigationPanelContent.swift */; };
 		6922A433203D0737C3A5E444 /* SettingsPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7E6E4AF2D1A1A8CA6AC61 /* SettingsPanelContent.swift */; };
 		6D5147634CECB7EA29D0818D /* SpeedLimitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6306F6BA2DF6259990541CC0 /* SpeedLimitService.swift */; };
 		6F6FDB5193B89D6CB3799EDD /* PaywallPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496867366A6AB6138A4614C2 /* PaywallPanelContent.swift */; };
+		701E2D21ACA5D06A053D087F /* LocationSharingPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00804ED3D7B09AC0CC954568 /* LocationSharingPanelContent.swift */; };
 		731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */; };
 		7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFDC4FC1273FA957B613F80 /* ContentView.swift */; };
 		7AA8F36364A921EC2D93D4D0 /* TileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC70EBC17375CD538F1056E0 /* TileCache.swift */; };
@@ -48,6 +52,7 @@
 		99EEA1B24234A8462BFA17C1 /* HazardReportButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA5507A89B9F6734D0CF99E /* HazardReportButton.swift */; };
 		9B9C63939691C570207AC7CA /* NavigationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242441DD792F47B2BA02BB /* NavigationListView.swift */; };
 		9E6E55A1BE29187DB59AC775 /* SavedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8463A6F18E68F97F176A8B99 /* SavedRoute.swift */; };
+		9FDD089A997D21CCF8254A14 /* FriendLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBFFBBEF581AE6C0F4D0D37 /* FriendLocation.swift */; };
 		A2D983DAF2F34786A0836788 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BA3D6C83C2782CC2EE64E5 /* SettingsView.swift */; };
 		A4EF4D4E84E21C155311FFA6 /* BoatNavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 391E0290E1CE82F689DAFE87 /* BoatNavApp.swift */; };
 		AE5E060DEB650A7E0648EAD7 /* Waypoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254A4AB0F7AD23A00F2D8BC9 /* Waypoint.swift */; };
@@ -57,6 +62,7 @@
 		C0823CC225D9165509427E84 /* FeatureGating.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D78AFC4D590B28BC9CC0D2 /* FeatureGating.swift */; };
 		C0EEE732C7A4A1DA016CABCD /* Waterway.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81AE5CAA09B353D86E18C9A6 /* Waterway.swift */; };
 		CA2496093834175384B8347B /* HazardReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576E72B79740DD5DC2BCF0D0 /* HazardReportViewModel.swift */; };
+		CAF4FEB02EA14F6D8B7C207E /* FriendAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C26899DA95B259ACF08364E /* FriendAnnotation.swift */; };
 		CC1A1BEEAE9F3BD0C180FB3B /* CarPlaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD40DADCCF99C7B83F1D94A /* CarPlaySceneDelegate.swift */; };
 		D41C9AFC3A9EF5DCE92C1F89 /* BoatProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5025DDBCE9B0E47CDC1D59 /* BoatProfileViewModel.swift */; };
 		D463FCC580A52B597650633C /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A79F53462CF566579CDC55 /* WeatherService.swift */; };
@@ -93,6 +99,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00804ED3D7B09AC0CC954568 /* LocationSharingPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSharingPanelContent.swift; sourceTree = "<group>"; };
 		0ADBF9B26026C2CD8B17B8C5 /* BuoyAnnotationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuoyAnnotationProvider.swift; sourceTree = "<group>"; };
 		0EE51B723FBC5E7AFDC58D7C /* MapPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPreviewView.swift; sourceTree = "<group>"; };
 		10BB218BC49F43B77C352F51 /* BoatNav.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BoatNav.entitlements; sourceTree = "<group>"; };
@@ -100,6 +107,7 @@
 		1A59A5975C0ABCC9CA5E297F /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		1A81BDE224C21EAB1C902084 /* GeoJSONDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoJSONDecoder.swift; sourceTree = "<group>"; };
 		1B72455E4B52C9D4EC432E3B /* BoatNavUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatNavUITests.swift; sourceTree = "<group>"; };
+		1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitLocationService.swift; sourceTree = "<group>"; };
 		254A4AB0F7AD23A00F2D8BC9 /* Waypoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waypoint.swift; sourceTree = "<group>"; };
 		267E45C70DC65B3F19E92EA6 /* OverlayPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPanel.swift; sourceTree = "<group>"; };
 		278832E55517ED80A2D5D484 /* SpeedDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedDashboardView.swift; sourceTree = "<group>"; };
@@ -114,6 +122,7 @@
 		4EA5507A89B9F6734D0CF99E /* HazardReportButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardReportButton.swift; sourceTree = "<group>"; };
 		50C0C571731156E3ECC8D4D5 /* WaterwayGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterwayGraph.swift; sourceTree = "<group>"; };
 		50C1CFCC9420C06AF84A7AC9 /* ManeuverGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManeuverGenerator.swift; sourceTree = "<group>"; };
+		5208E2F9231414F01CF18592 /* LocationSharingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSharingViewModel.swift; sourceTree = "<group>"; };
 		576E72B79740DD5DC2BCF0D0 /* HazardReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardReportViewModel.swift; sourceTree = "<group>"; };
 		5D4F1EA32D7623142F757C72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6285C9B725C1EBF17D974E36 /* BoatProfilePanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfilePanelContent.swift; sourceTree = "<group>"; };
@@ -121,6 +130,7 @@
 		63AE699C9930D8664C0FB153 /* HazardAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardAnnotation.swift; sourceTree = "<group>"; };
 		66AAAB7DCC0DDC8AAED884C2 /* MapButtonCluster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapButtonCluster.swift; sourceTree = "<group>"; };
 		68F7E6E4AF2D1A1A8CA6AC61 /* SettingsPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPanelContent.swift; sourceTree = "<group>"; };
+		6C26899DA95B259ACF08364E /* FriendAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendAnnotation.swift; sourceTree = "<group>"; };
 		706CE6177AF3F586318EE2AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		719223D780A104CB12E1614D /* CoordinateHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateHelperTests.swift; sourceTree = "<group>"; };
 		75249D3973549424E8BE25A6 /* Bridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bridge.swift; sourceTree = "<group>"; };
@@ -128,6 +138,7 @@
 		76F5FA3B9B2CA41542BDA758 /* Buoy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buoy.swift; sourceTree = "<group>"; };
 		797DA785F95BAB2268F67D61 /* SpeedDetailContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedDetailContent.swift; sourceTree = "<group>"; };
 		7A47B066CAE705BC22B03C9D /* CarPlayMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayMapViewController.swift; sourceTree = "<group>"; };
+		7FBFFBBEF581AE6C0F4D0D37 /* FriendLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendLocation.swift; sourceTree = "<group>"; };
 		81AE5CAA09B353D86E18C9A6 /* Waterway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waterway.swift; sourceTree = "<group>"; };
 		8463A6F18E68F97F176A8B99 /* SavedRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoute.swift; sourceTree = "<group>"; };
 		8B4131598D679662DF618FC1 /* BoatNavUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BoatNavUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,6 +175,7 @@
 		F78251C8C0304D2BA3D09BAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F89A4934B6FBA7618708FAF0 /* HazardReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardReport.swift; sourceTree = "<group>"; };
 		F95B816D19BA5929AF456F49 /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
+		F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RWSLockService.swift; sourceTree = "<group>"; };
 		FC2815D31CEF65C3EB2715D8 /* BoatProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -217,6 +229,7 @@
 			children = (
 				9B5025DDBCE9B0E47CDC1D59 /* BoatProfileViewModel.swift */,
 				576E72B79740DD5DC2BCF0D0 /* HazardReportViewModel.swift */,
+				5208E2F9231414F01CF18592 /* LocationSharingViewModel.swift */,
 				1A59A5975C0ABCC9CA5E297F /* MapViewModel.swift */,
 				F5DFCFD2608FC3F283ADF259 /* NavigationViewModel.swift */,
 				F0BDA15B6E0E3535202D40A8 /* SettingsViewModel.swift */,
@@ -259,6 +272,7 @@
 				1A81BDE224C21EAB1C902084 /* GeoJSONDecoder.swift */,
 				F2C7879367950A876E84519D /* PDOKClient.swift */,
 				D7BE10126150D8CAE76D9E79 /* PDOKEndpoints.swift */,
+				F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */,
 				E0A79F53462CF566579CDC55 /* WeatherService.swift */,
 			);
 			path = API;
@@ -315,6 +329,7 @@
 			isa = PBXGroup;
 			children = (
 				6285C9B725C1EBF17D974E36 /* BoatProfilePanelContent.swift */,
+				00804ED3D7B09AC0CC954568 /* LocationSharingPanelContent.swift */,
 				B14FF1725F5761952B559A09 /* NavigationPanelContent.swift */,
 				496867366A6AB6138A4614C2 /* PaywallPanelContent.swift */,
 				68F7E6E4AF2D1A1A8CA6AC61 /* SettingsPanelContent.swift */,
@@ -337,6 +352,7 @@
 			isa = PBXGroup;
 			children = (
 				C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */,
+				1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */,
 			);
 			path = Cloud;
 			sourceTree = "<group>";
@@ -406,6 +422,8 @@
 				75249D3973549424E8BE25A6 /* Bridge.swift */,
 				76F5FA3B9B2CA41542BDA758 /* Buoy.swift */,
 				A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */,
+				6C26899DA95B259ACF08364E /* FriendAnnotation.swift */,
+				7FBFFBBEF581AE6C0F4D0D37 /* FriendLocation.swift */,
 				63AE699C9930D8664C0FB153 /* HazardAnnotation.swift */,
 				F89A4934B6FBA7618708FAF0 /* HazardReport.swift */,
 				F95B816D19BA5929AF456F49 /* Lock.swift */,
@@ -582,16 +600,21 @@
 				4AC875120D4EF34166B726BB /* CarPlayMapViewController.swift in Sources */,
 				CC1A1BEEAE9F3BD0C180FB3B /* CarPlaySceneDelegate.swift in Sources */,
 				731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */,
+				0073924A5E528D6A76ADAB70 /* CloudKitLocationService.swift in Sources */,
 				7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */,
 				4E944F786FF2DEF928E544E4 /* CoordinateHelpers.swift in Sources */,
 				EC383080FED750E6E1A9BB0D /* FavoriteLocation.swift in Sources */,
 				C0823CC225D9165509427E84 /* FeatureGating.swift in Sources */,
+				CAF4FEB02EA14F6D8B7C207E /* FriendAnnotation.swift in Sources */,
+				9FDD089A997D21CCF8254A14 /* FriendLocation.swift in Sources */,
 				F2EC4525B4F6CCEA57A02FE1 /* GeoJSONDecoder.swift in Sources */,
 				D8162423F5B295FCE81CE4AE /* HazardAnnotation.swift in Sources */,
 				1543A4E1793EE821CE8AF902 /* HazardReport.swift in Sources */,
 				99EEA1B24234A8462BFA17C1 /* HazardReportButton.swift in Sources */,
 				CA2496093834175384B8347B /* HazardReportViewModel.swift in Sources */,
 				80BABDD4F9311E253FCB0EF7 /* LocationService.swift in Sources */,
+				701E2D21ACA5D06A053D087F /* LocationSharingPanelContent.swift in Sources */,
+				552EB77B2A2FF45ADBA1D40A /* LocationSharingViewModel.swift in Sources */,
 				E0CD77386BBB3DE56EEBBA93 /* Lock.swift in Sources */,
 				FE730611C4BED2ADE088F861 /* ManeuverGenerator.swift in Sources */,
 				3B26E70DFDF4377B9FE864C6 /* MapButtonCluster.swift in Sources */,
@@ -607,6 +630,7 @@
 				5410EC0EAB7E32D39E2383A1 /* PDOKClient.swift in Sources */,
 				D9EB25036AECCA4DD8F30FAE /* PDOKEndpoints.swift in Sources */,
 				6F6FDB5193B89D6CB3799EDD /* PaywallPanelContent.swift in Sources */,
+				06027A739DADED675D5872F7 /* RWSLockService.swift in Sources */,
 				9E6E55A1BE29187DB59AC775 /* SavedRoute.swift in Sources */,
 				408AFB6EE3115F20033AF83E /* SeamarkAnnotation.swift in Sources */,
 				6922A433203D0737C3A5E444 /* SettingsPanelContent.swift in Sources */,

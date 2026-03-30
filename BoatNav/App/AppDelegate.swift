@@ -11,6 +11,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let tileOverlayProvider = TileOverlayProvider()
     let buoyAnnotationProvider: BuoyAnnotationProvider
     let nowPlayingService = NowPlayingService()
+    let rwsLockService = RWSLockService()
 
     // MARK: - Shared ViewModels
 
@@ -21,6 +22,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let boatProfileViewModel = BoatProfileViewModel()
     let weatherViewModel: WeatherViewModel
     let hazardReportViewModel = HazardReportViewModel()
+    let locationSharingViewModel = LocationSharingViewModel()
 
     override init() {
         self.buoyAnnotationProvider = BuoyAnnotationProvider(pdokClient: pdokClient)
@@ -39,16 +41,26 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         self.navigationViewModel.boatProfileViewModel = boatProfileViewModel
         self.navigationViewModel.speedLimitService = speedViewModel.speedLimitService
         self.weatherViewModel = WeatherViewModel(locationService: locationService)
+        self.mapViewModel.rwsLockService = rwsLockService
 
         super.init()
 
         hazardReportViewModel.startMonitoring(locationService: locationService)
+        locationSharingViewModel.startMonitoring(locationService: locationService)
+        locationSharingViewModel.navigationViewModel = navigationViewModel
         locationService.startUpdating()
         SubscriptionManager.shared.configure()
 
         // Load waterway graph for routing and speed limits
         Task {
             await navigationViewModel.loadWaterwayGraph()
+            await rwsLockService.fetchLockMetadata()
+
+            // DEBUG: seed test friend in Biesbosch — remove after testing
+            let cloudService = CloudKitLocationService()
+            if let result = await cloudService.seedTestFriend() {
+                print("[DEBUG] Test friend created — zoek met code: \(result.shareCode)")
+            }
         }
     }
 

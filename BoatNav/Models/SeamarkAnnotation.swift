@@ -14,6 +14,7 @@ class SeamarkAnnotation: NSObject, MKAnnotation {
         case beacon
         case bridge
         case lock
+        case restaurant
     }
 
     enum BuoyColor {

@@ -66,7 +66,12 @@ enum GeoJSONDecoder {
                 length: props["lengte"]?.doubleValue,
                 width: props["breedte"]?.doubleValue,
                 depth: props["diepte"]?.doubleValue,
-                waterwayName: props["vaarweg_naam"]?.stringValue
+                waterwayName: props["vaarweg_naam"]?.stringValue,
+                openingHours: nil,
+                vhfChannel: nil,
+                phone: nil,
+                operatorName: nil,
+                passageTime: nil
             )
         }
     }

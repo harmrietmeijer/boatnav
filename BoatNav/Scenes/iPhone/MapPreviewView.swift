@@ -15,6 +15,7 @@ struct MapPreviewView: View {
                     navigationViewModel: navigationViewModel,
                     annotations: mapViewModel.annotations,
                     hazardAnnotations: [],
+                    friendAnnotations: [],
                     routeCoordinates: navigationViewModel.currentRoute?.coordinates ?? [],
                     startCoordinate: navigationViewModel.startSelection.coordinate,
                     destinationCoordinate: navigationViewModel.destinationSelection.coordinate,
@@ -22,7 +23,9 @@ struct MapPreviewView: View {
                     mapStyle: settingsViewModel.mapStyle,
                     showSeamarks: settingsViewModel.showSeamarks,
                     showBuoys: settingsViewModel.showBuoys,
-                    showBridges: settingsViewModel.showBridges
+                    showBridges: settingsViewModel.showBridges,
+                    showRestaurants: settingsViewModel.showRestaurants,
+                    rwsLockService: RWSLockService()
                 )
                 .ignoresSafeArea(edges: .top)
 

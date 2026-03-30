@@ -6,6 +6,7 @@ class MapViewModel: ObservableObject {
     let tileOverlayProvider: TileOverlayProvider
     let buoyAnnotationProvider: BuoyAnnotationProvider
     let pdokClient: PDOKClient
+    var rwsLockService: RWSLockService?
 
     @Published var annotations: [SeamarkAnnotation] = []
     @Published var currentRegion = MKCoordinateRegion(
@@ -15,7 +16,13 @@ class MapViewModel: ObservableObject {
     @Published var isLoadingAnnotations = false
 
     private var fetchTask: Task<Void, Never>?
+    private var bridgeTask: Task<Void, Never>?
+    private var restaurantTask: Task<Void, Never>?
     private var regionDebounce: DispatchWorkItem?
+
+    /// Cached Overpass annotations — separate lifecycle so they survive map pans
+    private var cachedBridgeAnnotations: [SeamarkAnnotation] = []
+    private var cachedRestaurantAnnotations: [SeamarkAnnotation] = []
 
     init(tileOverlayProvider: TileOverlayProvider, buoyAnnotationProvider: BuoyAnnotationProvider, pdokClient: PDOKClient) {
         self.tileOverlayProvider = tileOverlayProvider
@@ -25,12 +32,10 @@ class MapViewModel: ObservableObject {
 
     func regionDidChange(to region: MKCoordinateRegion) {
         print("[MapVM] regionDidChange: lat=\(region.center.latitude), lon=\(region.center.longitude), span=\(region.span.latitudeDelta)")
-        // Defer @Published update to avoid publishing during view updates
         DispatchQueue.main.async { [weak self] in
             self?.currentRegion = region
         }
 
-        // Debounce: wait 0.5s after last region change
         regionDebounce?.cancel()
         let workItem = DispatchWorkItem { [weak self] in
             self?.loadAnnotations(for: region)
@@ -39,31 +44,54 @@ class MapViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
     }
 
+    private func mergeAnnotations(buoys: [SeamarkAnnotation]? = nil) {
+        let b = buoys ?? annotations.filter { $0.type == .buoy || $0.type == .beacon }
+        annotations = b + cachedBridgeAnnotations + cachedRestaurantAnnotations
+    }
+
     private func loadAnnotations(for region: MKCoordinateRegion) {
         print("[MapVM] loadAnnotations called")
+
+        // 1. Buoys: fast PDOK fetch, safe to cancel on pan
         fetchTask?.cancel()
         fetchTask = Task { [weak self] in
             guard let self else { return }
-
             await MainActor.run { self.isLoadingAnnotations = true }
 
-            do {
-                async let buoyAnnotations = buoyAnnotationProvider.fetchAnnotations(for: region)
-                async let bridgeAnnotations = buoyAnnotationProvider.fetchBridgeAnnotations(for: region)
+            let buoys = (try? await buoyAnnotationProvider.fetchAnnotations(for: region)) ?? []
+            print("[MapVM] Loaded \(buoys.count) buoys")
 
-                let buoys = try await buoyAnnotations
-                let bridges = try await bridgeAnnotations
-                let combined = buoys + bridges
+            await MainActor.run {
+                self.mergeAnnotations(buoys: buoys)
+                self.isLoadingAnnotations = false
+            }
+        }
 
-                print("[MapVM] Loaded \(buoys.count) buoys, \(bridges.count) bridges, total \(combined.count)")
-
+        // 2. Bridges/locks: Overpass, don't cancel on pan (has its own cache)
+        if bridgeTask == nil {
+            bridgeTask = Task { [weak self] in
+                guard let self else { return }
+                let bridges = (try? await buoyAnnotationProvider.fetchBridgeAnnotations(for: region)) ?? []
+                print("[MapVM] Loaded \(bridges.count) bridges/locks")
                 await MainActor.run {
-                    self.annotations = combined
-                    self.isLoadingAnnotations = false
+                    self.cachedBridgeAnnotations = bridges
+                    self.mergeAnnotations()
+                    self.bridgeTask = nil
                 }
-            } catch {
-                print("[MapVM] Error loading annotations: \(error)")
-                await MainActor.run { self.isLoadingAnnotations = false }
+            }
+        }
+
+        // 3. Restaurants: Overpass, don't cancel on pan
+        if restaurantTask == nil {
+            restaurantTask = Task { [weak self] in
+                guard let self else { return }
+                let restaurants = (try? await buoyAnnotationProvider.fetchRestaurantAnnotations(for: region)) ?? []
+                print("[MapVM] Loaded \(restaurants.count) restaurants")
+                await MainActor.run {
+                    self.cachedRestaurantAnnotations = restaurants
+                    self.mergeAnnotations()
+                    self.restaurantTask = nil
+                }
             }
         }
     }

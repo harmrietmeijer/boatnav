@@ -409,6 +409,11 @@ class NavigationViewModel: ObservableObject {
         currentRoute = nil
     }
 
+    func setDestinationFromFriend(name: String, coordinate: CLLocationCoordinate2D) {
+        startSelection = .currentLocation
+        destinationSelection = .search(name: name, coordinate: coordinate)
+    }
+
     // MARK: - Saved routes
 
     func saveCurrentRoute() {

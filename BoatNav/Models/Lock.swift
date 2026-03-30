@@ -8,4 +8,9 @@ struct Lock: Identifiable {
     let width: Double? // meters
     let depth: Double? // meters
     let waterwayName: String?
+    let openingHours: String?
+    let vhfChannel: String?
+    let phone: String?
+    let operatorName: String?
+    let passageTime: String? // minutes
 }
