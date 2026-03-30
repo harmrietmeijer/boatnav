@@ -10,6 +10,8 @@ struct ContentView: View {
 
     @State private var activePanel: ActivePanel = .none
     @State private var panelDetent: PanelDetent = .half
+    @State private var favoriteName = ""
+    @State private var favoriteDescription = ""
 
     var body: some View {
         ZStack {
@@ -29,6 +31,7 @@ struct ContentView: View {
                 showBuoys: settingsViewModel.showBuoys,
                 showBridges: settingsViewModel.showBridges,
                 showRestaurants: settingsViewModel.showRestaurants,
+                recenterOnUser: mapViewModel.recenterTrigger,
                 rwsLockService: mapViewModel.rwsLockService ?? RWSLockService()
             )
             .ignoresSafeArea()
@@ -142,28 +145,215 @@ struct ContentView: View {
                 }
             }
         }
-        .alert(
-            "Melding in de buurt",
-            isPresented: Binding(
-                get: { hazardReportViewModel.proximityAlert != nil },
-                set: { if !$0 { hazardReportViewModel.proximityAlert = nil } }
-            )
-        ) {
-            if let report = hazardReportViewModel.proximityAlert {
-                Button("Ja, nog aanwezig") {
-                    hazardReportViewModel.confirmStillPresent(for: report.id)
+        .overlay {
+            // Hazard category picker
+            BrandedDialog(
+                isPresented: hazardReportViewModel.showCategoryPicker,
+                onDismiss: {
+                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        hazardReportViewModel.showCategoryPicker = false
+                    }
                 }
-                Button("Nee, verwijderd", role: .destructive) {
-                    hazardReportViewModel.voteRemoval(for: report.id)
-                }
+            ) {
+                HazardCategoryPicker()
+                    .environmentObject(hazardReportViewModel)
             }
-        } message: {
+        }
+        .overlay {
+            // Add favorite dialog
+            BrandedDialog(
+                isPresented: navigationViewModel.showAddFavoriteSheet,
+                onDismiss: {
+                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        favoriteName = ""
+                        favoriteDescription = ""
+                        navigationViewModel.showAddFavoriteSheet = false
+                    }
+                }
+            ) {
+                addFavoriteContent
+            }
+        }
+        .overlay {
             if let report = hazardReportViewModel.proximityAlert {
-                Text("\(report.category.displayName) gemeld op deze locatie. Is dit er nog?")
+                BrandedDialog(
+                    isPresented: true,
+                    onDismiss: { hazardReportViewModel.proximityAlert = nil }
+                ) {
+                    BrandedAlertContent(
+                        icon: "exclamationmark.triangle.fill",
+                        iconColor: .orange,
+                        title: "Melding in de buurt",
+                        message: "\(report.category.displayName) gemeld op deze locatie. Is dit er nog?",
+                        buttons: [
+                            BrandedAlertButton(title: "Ja, nog aanwezig", style: .primary) {
+                                hazardReportViewModel.confirmStillPresent(for: report.id)
+                            },
+                            BrandedAlertButton(title: "Nee, verwijderd", style: .destructive) {
+                                hazardReportViewModel.voteRemoval(for: report.id)
+                            }
+                        ]
+                    )
+                }
             }
         }
         .task {
             await navigationViewModel.loadWaterwayGraph()
+        }
+    }
+
+    // MARK: - Add Favorite Content (Branded)
+
+    private var addFavoriteContent: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Favoriet toevoegen")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        favoriteName = ""
+                        favoriteDescription = ""
+                        navigationViewModel.showAddFavoriteSheet = false
+                    }
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 26, height: 26)
+                        .background(.quaternary, in: Circle())
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 16)
+
+            VStack(spacing: 10) {
+                TextField("Naam (bijv. Jachthaven Westergoot)", text: $favoriteName)
+                    .font(.subheadline)
+                    .padding(12)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+
+                TextField("Omschrijving (optioneel)", text: $favoriteDescription)
+                    .font(.subheadline)
+                    .padding(12)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 16)
+
+            VStack(spacing: 2) {
+                if navigationViewModel.destinationSelection != .none {
+                    Button {
+                        guard let coord = navigationViewModel.destinationSelection.coordinate else { return }
+                        navigationViewModel.addFavorite(
+                            name: favoriteName.isEmpty ? navigationViewModel.destinationSelection.displayName : favoriteName,
+                            description: favoriteDescription,
+                            coordinate: coord
+                        )
+                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                            favoriteName = ""
+                            favoriteDescription = ""
+                            navigationViewModel.showAddFavoriteSheet = false
+                        }
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "flag.fill")
+                                .foregroundStyle(.red)
+                                .frame(width: 24)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Bestemming")
+                                    .font(.subheadline.weight(.medium))
+                                Text(navigationViewModel.destinationSelection.displayName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(.blue)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                    }
+                    .foregroundStyle(.primary)
+                }
+
+                if navigationViewModel.startSelection != .none,
+                   navigationViewModel.startSelection != .currentLocation {
+                    if navigationViewModel.destinationSelection != .none {
+                        Divider().padding(.leading, 56)
+                    }
+                    Button {
+                        guard let coord = navigationViewModel.startSelection.coordinate else { return }
+                        navigationViewModel.addFavorite(
+                            name: favoriteName.isEmpty ? navigationViewModel.startSelection.displayName : favoriteName,
+                            description: favoriteDescription,
+                            coordinate: coord
+                        )
+                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                            favoriteName = ""
+                            favoriteDescription = ""
+                            navigationViewModel.showAddFavoriteSheet = false
+                        }
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "circle.fill")
+                                .foregroundStyle(.green)
+                                .frame(width: 24)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Startlocatie")
+                                    .font(.subheadline.weight(.medium))
+                                Text(navigationViewModel.startSelection.displayName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(.blue)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                    }
+                    .foregroundStyle(.primary)
+                }
+
+                Divider().padding(.leading, 56)
+
+                Button {
+                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        navigationViewModel.showAddFavoriteSheet = false
+                    }
+                    navigationViewModel.startMapSelection(for: .destination)
+                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        panelDetent = .collapsed
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundStyle(.blue)
+                            .frame(width: 24)
+                        Text("Kies op kaart")
+                            .font(.subheadline.weight(.medium))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                }
+                .foregroundStyle(.primary)
+            }
+            .padding(.bottom, 16)
+
+            Text("Selecteer eerst een bestemming via zoeken of de kaart, en voeg die dan toe als favoriet.")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
         }
     }
 }

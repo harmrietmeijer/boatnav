@@ -45,6 +45,7 @@
 		80BABDD4F9311E253FCB0EF7 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE2BDAF4F0B6AB79DE10B7 /* LocationService.swift */; };
 		84E24D90C4C4E8FDE9064C6A /* CoordinateHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719223D780A104CB12E1614D /* CoordinateHelperTests.swift */; };
 		8634B1498637A5424E5A81D5 /* MapPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE51B723FBC5E7AFDC58D7C /* MapPreviewView.swift */; };
+		8781E6211EDE35E90BC268B3 /* BrandedDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D82C5273BA2D561982ABC64 /* BrandedDialog.swift */; };
 		87B45B51B859811870CEACD4 /* Buoy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F5FA3B9B2CA41542BDA758 /* Buoy.swift */; };
 		889B7E0815EE95576670B7E6 /* BoatProfilePanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6285C9B725C1EBF17D974E36 /* BoatProfilePanelContent.swift */; };
 		8DDBAA0AD42105C6BC3D3A49 /* UnitConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA92C22118D378A1C6F38F6F /* UnitConversion.swift */; };
@@ -117,6 +118,7 @@
 		391E0290E1CE82F689DAFE87 /* BoatNavApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatNavApp.swift; sourceTree = "<group>"; };
 		3BFDC4FC1273FA957B613F80 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3D33D240C0C6656C68D1A283 /* SpeedCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedCalculator.swift; sourceTree = "<group>"; };
+		3D82C5273BA2D561982ABC64 /* BrandedDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandedDialog.swift; sourceTree = "<group>"; };
 		41BA3D6C83C2782CC2EE64E5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		496867366A6AB6138A4614C2 /* PaywallPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPanelContent.swift; sourceTree = "<group>"; };
 		4EA5507A89B9F6734D0CF99E /* HazardReportButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardReportButton.swift; sourceTree = "<group>"; };
@@ -457,6 +459,7 @@
 			isa = PBXGroup;
 			children = (
 				B88F4559ED2A241123D65E49 /* ActiveNavigationStrip.swift */,
+				3D82C5273BA2D561982ABC64 /* BrandedDialog.swift */,
 				4EA5507A89B9F6734D0CF99E /* HazardReportButton.swift */,
 				66AAAB7DCC0DDC8AAED884C2 /* MapButtonCluster.swift */,
 				D5B56D6ABA9EDBD5A3B7BFC9 /* MapSelectionBanner.swift */,
@@ -594,6 +597,7 @@
 				36EEE65DD39D4C76C8EAB6EF /* BoatProfile.swift in Sources */,
 				889B7E0815EE95576670B7E6 /* BoatProfilePanelContent.swift in Sources */,
 				D41C9AFC3A9EF5DCE92C1F89 /* BoatProfileViewModel.swift in Sources */,
+				8781E6211EDE35E90BC268B3 /* BrandedDialog.swift in Sources */,
 				9110A059E98A38558E22AE18 /* Bridge.swift in Sources */,
 				87B45B51B859811870CEACD4 /* Buoy.swift in Sources */,
 				338016AFAC5D721BD15A8BBA /* BuoyAnnotationProvider.swift in Sources */,

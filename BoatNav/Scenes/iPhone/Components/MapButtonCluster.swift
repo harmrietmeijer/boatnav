@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MapButtonCluster: View {
     @Binding var activePanel: ActivePanel
+    @EnvironmentObject var mapViewModel: MapViewModel
 
     var body: some View {
         VStack(spacing: 12) {
@@ -10,7 +11,7 @@ struct MapButtonCluster: View {
             MapButton(
                 icon: "location.fill",
                 isActive: false,
-                action: { /* re-center handled by map */ }
+                action: { mapViewModel.recenterTrigger = true }
             )
 
             MapButton(

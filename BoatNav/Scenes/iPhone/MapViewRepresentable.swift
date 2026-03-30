@@ -18,6 +18,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     let showBuoys: Bool
     let showBridges: Bool
     let showRestaurants: Bool
+    let recenterOnUser: Bool
     let rwsLockService: RWSLockService
 
     func makeUIView(context: Context) -> MKMapView {
@@ -53,6 +54,14 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
+        // Re-center on user location
+        if recenterOnUser {
+            mapView.setUserTrackingMode(.followWithHeading, animated: true)
+            DispatchQueue.main.async {
+                mapViewModel.recenterTrigger = false
+            }
+        }
+
         // Swap BRT tile overlay if map style changed
         if mapStyle != context.coordinator.currentMapStyle {
             if let old = context.coordinator.currentBRTOverlay {

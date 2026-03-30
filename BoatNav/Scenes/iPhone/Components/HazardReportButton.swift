@@ -5,7 +5,9 @@ struct HazardReportButton: View {
 
     var body: some View {
         Button {
-            hazardReportViewModel.showCategoryPicker = true
+            withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                hazardReportViewModel.showCategoryPicker = true
+            }
         } label: {
             Image(systemName: "exclamationmark.bubble.fill")
                 .font(.system(size: 20, weight: .medium))
@@ -15,49 +17,70 @@ struct HazardReportButton: View {
                 .shadow(color: .black.opacity(0.2), radius: 10, y: 4)
         }
         .buttonStyle(.plain)
-        .sheet(isPresented: $hazardReportViewModel.showCategoryPicker) {
-            HazardCategoryPicker()
-                .environmentObject(hazardReportViewModel)
-                .presentationDetents([.medium])
-        }
     }
 }
 
 struct HazardCategoryPicker: View {
     @EnvironmentObject var hazardReportViewModel: HazardReportViewModel
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
-            List {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("Melding plaatsen")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        hazardReportViewModel.showCategoryPicker = false
+                    }
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 26, height: 26)
+                        .background(.quaternary, in: Circle())
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 12)
+
+            // Categories
+            VStack(spacing: 2) {
                 ForEach(HazardReport.HazardCategory.allCases, id: \.self) { category in
                     Button {
                         hazardReportViewModel.addReport(category: category)
-                        dismiss()
+                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                            hazardReportViewModel.showCategoryPicker = false
+                        }
                     } label: {
                         HStack(spacing: 14) {
                             Image(systemName: category.iconName)
-                                .font(.system(size: 22))
+                                .font(.system(size: 20))
                                 .foregroundStyle(Color(hex: category.iconColorHex))
                                 .frame(width: 32)
 
                             Text(category.displayName)
+                                .font(.subheadline)
                                 .foregroundStyle(.primary)
-                                .font(.body)
 
                             Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
                         }
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                    }
+
+                    if category != HazardReport.HazardCategory.allCases.last {
+                        Divider().padding(.leading, 66)
                     }
                 }
             }
-            .navigationTitle("Melding plaatsen")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Annuleer") { dismiss() }
-                }
-            }
+            .padding(.bottom, 16)
         }
     }
 }

@@ -6,8 +6,6 @@ struct NavigationPanelContent: View {
     @Binding var panelDetent: PanelDetent
     @Binding var activePanel: ActivePanel
     @State private var showSearchField = false
-    @State private var favoriteName = ""
-    @State private var favoriteDescription = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,9 +22,6 @@ struct NavigationPanelContent: View {
             } else {
                 routePlanningContent
             }
-        }
-        .sheet(isPresented: $navigationViewModel.showAddFavoriteSheet) {
-            addFavoriteSheet
         }
     }
 
@@ -599,80 +594,4 @@ struct NavigationPanelContent: View {
         }
     }
 
-    // MARK: - Add Favorite Sheet
-
-    private var addFavoriteSheet: some View {
-        NavigationStack {
-            Form {
-                Section("Locatie toevoegen aan favorieten") {
-                    TextField("Naam (bijv. Jachthaven Westergoot)", text: $favoriteName)
-                    TextField("Omschrijving (optioneel)", text: $favoriteDescription)
-                }
-
-                Section("Locatie kiezen") {
-                    if navigationViewModel.destinationSelection != .none {
-                        Button {
-                            guard let coord = navigationViewModel.destinationSelection.coordinate else { return }
-                            navigationViewModel.addFavorite(
-                                name: favoriteName.isEmpty ? navigationViewModel.destinationSelection.displayName : favoriteName,
-                                description: favoriteDescription,
-                                coordinate: coord
-                            )
-                            favoriteName = ""
-                            favoriteDescription = ""
-                            navigationViewModel.showAddFavoriteSheet = false
-                        } label: {
-                            Label("Gebruik huidige bestemming: \(navigationViewModel.destinationSelection.displayName)", systemImage: "flag.fill")
-                        }
-                        .disabled(favoriteName.isEmpty && navigationViewModel.destinationSelection.displayName.isEmpty)
-                    }
-
-                    if navigationViewModel.startSelection != .none,
-                       navigationViewModel.startSelection != .currentLocation {
-                        Button {
-                            guard let coord = navigationViewModel.startSelection.coordinate else { return }
-                            navigationViewModel.addFavorite(
-                                name: favoriteName.isEmpty ? navigationViewModel.startSelection.displayName : favoriteName,
-                                description: favoriteDescription,
-                                coordinate: coord
-                            )
-                            favoriteName = ""
-                            favoriteDescription = ""
-                            navigationViewModel.showAddFavoriteSheet = false
-                        } label: {
-                            Label("Gebruik startlocatie: \(navigationViewModel.startSelection.displayName)", systemImage: "circle.fill")
-                        }
-                        .disabled(favoriteName.isEmpty && navigationViewModel.startSelection.displayName.isEmpty)
-                    }
-
-                    Button {
-                        navigationViewModel.showAddFavoriteSheet = false
-                        navigationViewModel.startMapSelection(for: .destination)
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                            panelDetent = .collapsed
-                        }
-                    } label: {
-                        Label("Kies op kaart", systemImage: "mappin.and.ellipse")
-                    }
-                }
-
-                Section {
-                    Text("Tip: selecteer eerst een bestemming via zoeken of de kaart, en voeg die dan toe als favoriet.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .navigationTitle("Favoriet toevoegen")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Annuleer") {
-                        favoriteName = ""
-                        favoriteDescription = ""
-                        navigationViewModel.showAddFavoriteSheet = false
-                    }
-                }
-            }
-        }
-    }
 }

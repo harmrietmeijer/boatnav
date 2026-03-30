@@ -25,6 +25,7 @@ struct MapPreviewView: View {
                     showBuoys: settingsViewModel.showBuoys,
                     showBridges: settingsViewModel.showBridges,
                     showRestaurants: settingsViewModel.showRestaurants,
+                    recenterOnUser: false,
                     rwsLockService: RWSLockService()
                 )
                 .ignoresSafeArea(edges: .top)

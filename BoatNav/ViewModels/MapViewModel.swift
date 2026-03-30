@@ -14,6 +14,7 @@ class MapViewModel: ObservableObject {
         span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)
     )
     @Published var isLoadingAnnotations = false
+    @Published var recenterTrigger = false
 
     private var fetchTask: Task<Void, Never>?
     private var bridgeTask: Task<Void, Never>?
