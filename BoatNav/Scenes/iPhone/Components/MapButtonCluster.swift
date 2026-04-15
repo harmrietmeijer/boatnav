@@ -3,6 +3,9 @@ import SwiftUI
 struct MapButtonCluster: View {
     @Binding var activePanel: ActivePanel
     @EnvironmentObject var mapViewModel: MapViewModel
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+
+    private var isCompact: Bool { verticalSizeClass == .compact }
 
     var body: some View {
         VStack(spacing: Design.Spacing.sm) {
@@ -39,7 +42,7 @@ struct MapButtonCluster: View {
             )
         }
         .padding(.trailing, Design.Spacing.lg)
-        .padding(.bottom, 160)
+        .padding(.bottom, isCompact ? 80 : 160)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
 

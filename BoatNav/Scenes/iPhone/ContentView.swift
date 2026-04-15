@@ -89,30 +89,36 @@ struct ContentView: View {
             }
 
             // Layer 2: Menu buttons (right side) + hazard report button
-            VStack {
-                Spacer()
-                HStack(alignment: .bottom) {
-                    HazardReportButton()
-                        .padding(.leading, Design.Spacing.lg)
+            GeometryReader { geo in
+                let isLandscape = geo.size.width > geo.size.height
+                VStack {
                     Spacer()
+                    HStack(alignment: .bottom) {
+                        HazardReportButton()
+                            .padding(.leading, isLandscape ? geo.safeAreaInsets.leading + Design.Spacing.lg : Design.Spacing.lg)
+                        Spacer()
+                    }
+                    .padding(.bottom, isLandscape ? 80 : 160)
                 }
-                .padding(.bottom, 160)
             }
 
             MapButtonCluster(activePanel: $activePanel)
 
             // Layer 3: Data strip (bottom, full width)
             if activePanel == .none {
-                VStack {
-                    Spacer()
-                    SpeedPill(speedViewModel: speedViewModel) {
-                        withAnimation(Design.Animation.panel) {
-                            activePanel = .speedDetail
-                            panelDetent = .half
+                GeometryReader { geo in
+                    let isLandscape = geo.size.width > geo.size.height
+                    VStack {
+                        Spacer()
+                        SpeedPill(speedViewModel: speedViewModel) {
+                            withAnimation(Design.Animation.panel) {
+                                activePanel = .speedDetail
+                                panelDetent = .half
+                            }
                         }
+                        .padding(.horizontal, isLandscape ? geo.safeAreaInsets.leading + Design.Spacing.lg : Design.Spacing.lg)
+                        .padding(.bottom, max(geo.safeAreaInsets.bottom, Design.Spacing.sm))
                     }
-                    .padding(.horizontal, Design.Spacing.lg)
-                    .padding(.bottom, Design.Spacing.sm)
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }

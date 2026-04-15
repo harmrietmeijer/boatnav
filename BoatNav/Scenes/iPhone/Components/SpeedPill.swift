@@ -4,7 +4,10 @@ import SwiftUI
 /// Matches the "Live data strip" from the design system document.
 struct SpeedPill: View {
     @ObservedObject var speedViewModel: SpeedViewModel
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     let onTap: () -> Void
+
+    private var isCompact: Bool { verticalSizeClass == .compact }
 
     var body: some View {
         Button {
@@ -51,20 +54,22 @@ struct SpeedPill: View {
                     }
                 }
                 .padding(.horizontal, 18)
-                .padding(.top, 14)
-                .padding(.bottom, 12)
+                .padding(.top, isCompact ? 8 : 14)
+                .padding(.bottom, isCompact ? 8 : 12)
 
-                // Bottom row — secondary data
-                HStack(spacing: Design.Spacing.xl) {
-                    smallData(label: "GPS", value: speedViewModel.isValid ? "actief" : "wacht...")
-                }
-                .padding(.horizontal, 18)
-                .padding(.vertical, Design.Spacing.sm)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(Design.Colors.border)
-                        .frame(height: 1)
+                // Bottom row — secondary data (hidden in landscape)
+                if !isCompact {
+                    HStack(spacing: Design.Spacing.xl) {
+                        smallData(label: "GPS", value: speedViewModel.isValid ? "actief" : "wacht...")
+                    }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, Design.Spacing.sm)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .overlay(alignment: .top) {
+                        Rectangle()
+                            .fill(Design.Colors.border)
+                            .frame(height: 1)
+                    }
                 }
             }
             .surfaceCard(cornerRadius: Design.Corner.lg)
@@ -83,7 +88,7 @@ struct SpeedPill: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(value)
-                    .font(.system(size: 24, weight: .bold, design: .monospaced))
+                    .font(.system(size: isCompact ? 18 : 24, weight: .bold, design: .monospaced))
                     .monospacedDigit()
                     .foregroundStyle(isWarning ? Design.Red.r4 : Design.Colors.text)
 
