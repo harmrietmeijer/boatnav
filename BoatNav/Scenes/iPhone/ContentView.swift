@@ -91,17 +91,17 @@ struct ContentView: View {
             // Layer 2: Menu buttons (right side) + hazard report button
             VStack {
                 Spacer()
-                HStack {
+                HStack(alignment: .bottom) {
                     HazardReportButton()
                         .padding(.leading, Design.Spacing.lg)
-                        .padding(.bottom, 100)
                     Spacer()
                 }
+                .padding(.bottom, 160)
             }
 
             MapButtonCluster(activePanel: $activePanel)
 
-            // Layer 3: Speed pill (bottom center)
+            // Layer 3: Data strip (bottom, full width)
             if activePanel == .none {
                 VStack {
                     Spacer()
@@ -111,7 +111,8 @@ struct ContentView: View {
                             panelDetent = .half
                         }
                     }
-                    .padding(.bottom, Design.Spacing.xxl)
+                    .padding(.horizontal, Design.Spacing.lg)
+                    .padding(.bottom, Design.Spacing.sm)
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }

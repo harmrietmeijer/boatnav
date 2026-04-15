@@ -39,7 +39,7 @@ struct MapButtonCluster: View {
             )
         }
         .padding(.trailing, Design.Spacing.lg)
-        .padding(.bottom, 100)
+        .padding(.bottom, 160)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
