@@ -40,13 +40,13 @@ struct OverlayPanel<Content: View>: View {
                     HStack {
                         Spacer()
                         Capsule()
-                            .fill(Color(.systemGray3))
-                            .frame(width: 36, height: 5)
+                            .fill(.white.opacity(0.25))
+                            .frame(width: 40, height: 5)
                         Spacer()
                     }
                     .overlay(alignment: .trailing) {
                         Button {
-                            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                            withAnimation(Design.Animation.panel) {
                                 onDismiss()
                             }
                         } label: {
@@ -56,10 +56,10 @@ struct OverlayPanel<Content: View>: View {
                                 .frame(width: 28, height: 28)
                                 .background(.quaternary, in: Circle())
                         }
-                        .padding(.trailing, 16)
+                        .padding(.trailing, Design.Spacing.xl)
                     }
-                    .padding(.top, 14)
-                    .padding(.bottom, 10)
+                    .padding(.top, Design.Spacing.md)
+                    .padding(.bottom, Design.Spacing.sm)
 
                     // Content
                     ScrollView {
@@ -72,11 +72,22 @@ struct OverlayPanel<Content: View>: View {
                 .frame(height: currentHeight)
                 .frame(maxWidth: .infinity)
                 .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: .black.opacity(0.12), radius: 20, y: -5)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                        RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [.white.opacity(0.25), .white.opacity(0.05)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.5
+                            )
+                    }
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .shadow(color: .black.opacity(0.20), radius: 24, y: -6)
+                .clipShape(RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous))
                 .simultaneousGesture(
                     DragGesture()
                         .updating($dragOffset) { value, state, _ in
@@ -130,7 +141,7 @@ struct OverlayPanel<Content: View>: View {
 
         // If dragged down significantly or with high velocity, dismiss or collapse
         if velocity > 800 || (translation > 100 && detent == .collapsed) {
-            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+            withAnimation(Design.Animation.panel) {
                 onDismiss()
             }
             return
@@ -148,7 +159,7 @@ struct OverlayPanel<Content: View>: View {
         ]
 
         if let nearest = distances.min(by: { $0.1 < $1.1 }) {
-            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+            withAnimation(Design.Animation.panel) {
                 detent = nearest.0
             }
         }

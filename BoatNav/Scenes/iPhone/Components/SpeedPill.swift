@@ -5,8 +5,11 @@ struct SpeedPill: View {
     let onTap: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 16) {
+        Button {
+            Haptics.selection()
+            onTap()
+        } label: {
+            HStack(spacing: Design.Spacing.lg) {
                 // Speed limit indicator
                 if let limit = speedViewModel.currentSpeedLimit {
                     speedLimitBadge(limit: limit)
@@ -16,24 +19,28 @@ struct SpeedPill: View {
                     value: speedViewModel.speedKmh,
                     unit: "km/h",
                     isValid: speedViewModel.isValid,
-                    isWarning: speedViewModel.isExceedingLimit
+                    isWarning: speedViewModel.isExceedingLimit,
+                    isPrimary: true
                 )
 
-                Divider()
-                    .frame(height: 32)
+                Capsule()
+                    .fill(.quaternary)
+                    .frame(width: 1, height: 28)
 
                 speedValue(
                     value: speedViewModel.speedKnots,
                     unit: "kn",
-                    isValid: speedViewModel.isValid
+                    isValid: speedViewModel.isValid,
+                    isPrimary: false
                 )
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial, in: Capsule())
-            .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+            .padding(.horizontal, Design.Spacing.xxl)
+            .padding(.vertical, 14)
+            .glassCard(cornerRadius: Design.Corner.pill)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.boatNav)
+        .accessibilityLabel("Snelheid: \(String(format: "%.1f", speedViewModel.speedKmh)) kilometer per uur, \(String(format: "%.1f", speedViewModel.speedKnots)) knopen")
+        .accessibilityHint("Tik voor snelheidsdetails")
     }
 
     private func speedLimitBadge(limit: Double) -> some View {
@@ -48,16 +55,17 @@ struct SpeedPill: View {
             )
     }
 
-    private func speedValue(value: Double, unit: String, isValid: Bool, isWarning: Bool = false) -> some View {
-        HStack(spacing: 4) {
+    private func speedValue(value: Double, unit: String, isValid: Bool, isWarning: Bool = false, isPrimary: Bool = true) -> some View {
+        HStack(spacing: Design.Spacing.xs + 2) {
             Text(String(format: "%.1f", value))
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(.system(size: isPrimary ? 26 : 22, weight: .bold, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(isWarning ? Color.red : (isValid ? Color.primary : Color.secondary))
+                .foregroundStyle(isWarning ? Color.red : (isValid ? (isPrimary ? Color.primary : Design.Colors.accent) : Color.secondary))
 
             Text(unit)
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
+                .padding(.top, 4)
         }
     }
 }

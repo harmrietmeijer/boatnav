@@ -5,7 +5,7 @@ struct MapButtonCluster: View {
     @EnvironmentObject var mapViewModel: MapViewModel
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Design.Spacing.md) {
             Spacer()
 
             MapButton(
@@ -29,6 +29,7 @@ struct MapButtonCluster: View {
             MapButton(
                 icon: "person.2.fill",
                 isActive: activePanel == .locationSharing,
+                accentColor: Design.Colors.mint,
                 action: { togglePanel(.locationSharing) }
             )
 
@@ -38,13 +39,14 @@ struct MapButtonCluster: View {
                 action: { togglePanel(.settings) }
             )
         }
-        .padding(.trailing, 16)
+        .padding(.trailing, Design.Spacing.lg)
         .padding(.bottom, 100)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
     private func togglePanel(_ panel: ActivePanel) {
-        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+        Haptics.selection()
+        withAnimation(Design.Animation.panel) {
             if activePanel == panel {
                 activePanel = .none
             } else {
@@ -57,6 +59,7 @@ struct MapButtonCluster: View {
 struct MapButton: View {
     let icon: String
     let isActive: Bool
+    var accentColor: Color = Design.Colors.accent
     let action: () -> Void
 
     var body: some View {
@@ -64,15 +67,28 @@ struct MapButton: View {
             Image(systemName: icon)
                 .font(.system(size: 18, weight: .medium))
                 .foregroundStyle(isActive ? .white : .primary)
-                .frame(width: 44, height: 44)
+                .frame(width: Design.Touch.minimum, height: Design.Touch.minimum)
                 .background(
                     isActive
-                        ? AnyShapeStyle(Color.blue)
+                        ? AnyShapeStyle(
+                            LinearGradient(
+                                colors: [accentColor, accentColor.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                          )
                         : AnyShapeStyle(.ultraThinMaterial),
                     in: Circle()
                 )
-                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                .overlay(
+                    Circle()
+                        .strokeBorder(
+                            isActive ? .white.opacity(0.25) : Design.Colors.cardBorderDark,
+                            lineWidth: 0.5
+                        )
+                )
+                .shadow(color: .black.opacity(0.15), radius: 16, y: 6)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.boatNav)
     }
 }
