@@ -2,11 +2,9 @@ import SwiftUI
 
 struct BrandedDialog<Content: View>: View {
     let isPresented: Bool
+    var isFlitsStyle: Bool = false
     let onDismiss: () -> Void
     @ViewBuilder let content: () -> Content
-
-    /// Optional: set to true for flitsmeister-style deep purple dialog
-    var isFlitsStyle: Bool = false
 
     var body: some View {
         if isPresented {

@@ -13,7 +13,7 @@ struct PaywallPanelContent: View {
                 // Header
                 HStack {
                     Text("BoatNav Pro")
-                        .font(.title3.weight(.bold))
+                        .font(.title3.weight(.regular))
                     Spacer()
                 }
 
@@ -24,7 +24,7 @@ struct PaywallPanelContent: View {
                         .foregroundStyle(Design.Purple.p4)
 
                     Text("Navigeer zorgeloos")
-                        .font(.title2.weight(.bold))
+                        .font(.title2.weight(.regular))
 
                     Text("Upgrade voor volledige route-navigatie, brugwaarschuwingen en meer")
                         .font(.subheadline)
@@ -66,7 +66,7 @@ struct PaywallPanelContent: View {
                                             .font(.headline)
                                         Spacer()
                                         Text(yearly.localizedPriceString)
-                                            .font(.headline)
+                                            .font(.system(.headline, design: .monospaced))
                                     }
                                     HStack {
                                         Text("7 dagen gratis proberen")
@@ -95,7 +95,7 @@ struct PaywallPanelContent: View {
                                         .font(.subheadline.weight(.semibold))
                                     Spacer()
                                     Text(lifetime.localizedPriceString)
-                                        .font(.subheadline.weight(.semibold))
+                                        .font(.system(.subheadline, design: .monospaced).weight(.semibold))
                                     Text("eenmalig")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
@@ -162,7 +162,7 @@ struct PaywallPanelContent: View {
                 .frame(width: 24)
 
             Text(title)
-                .font(.subheadline)
+                .font(.subheadline.weight(.medium))
 
             Spacer()
 

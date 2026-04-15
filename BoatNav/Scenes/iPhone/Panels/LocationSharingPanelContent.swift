@@ -11,7 +11,7 @@ struct LocationSharingPanelContent: View {
                 Image(systemName: "person.2.fill")
                     .foregroundStyle(Design.Green.g4)
                 Text("Locatie delen")
-                    .font(.title3.weight(.bold))
+                    .font(.title3.weight(.regular))
                 Spacer()
             }
             .padding(.bottom, Design.Spacing.xl)
@@ -223,7 +223,7 @@ struct LocationSharingPanelContent: View {
                     .font(.subheadline.weight(.medium))
                 let age = Date().timeIntervalSince(friend.lastUpdated)
                 Text(age < 60 ? "Zojuist" : age < 3600 ? "\(Int(age / 60)) min geleden" : "\(Int(age / 3600)) uur geleden")
-                    .font(.caption)
+                    .font(.system(.caption, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
 
@@ -261,10 +261,10 @@ struct LocationSharingPanelContent: View {
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.caption.weight(.semibold))
+            .font(.system(.caption, design: .monospaced).weight(.medium))
             .foregroundStyle(Design.Colors.text3)
             .textCase(.uppercase)
-            .tracking(0.5)
+            .tracking(1.5)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

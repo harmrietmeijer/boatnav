@@ -13,8 +13,8 @@ struct WeatherBarView: View {
                         .symbolRenderingMode(.multicolor)
                     Text(String(format: "%.0f°", w.temperature))
                         .font(.system(size: 13, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Design.Blue.b5)
                 }
-                .foregroundStyle(Design.Colors.text)
 
                 divider
 
@@ -25,14 +25,14 @@ struct WeatherBarView: View {
                         .foregroundStyle(Design.Blue.b4)
                     Text("Bft \(w.beaufort)")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Design.Colors.text)
+                        .foregroundStyle(Design.Blue.b5)
                     Image(systemName: "arrow.up")
                         .font(.system(size: 8, weight: .bold))
                         .rotationEffect(.degrees(w.windDirection))
-                        .foregroundStyle(Design.Colors.text3)
+                        .foregroundStyle(Design.Gray.g4)
                     Text(w.windDirectionLabel)
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(Design.Colors.text3)
+                        .foregroundStyle(Design.Gray.g4)
                 }
 
                 divider
@@ -41,23 +41,27 @@ struct WeatherBarView: View {
                 HStack(spacing: 4) {
                     Image(systemName: w.precipitation > 0 ? "drop.fill" : "drop")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(w.precipitation > 0 ? Design.Blue.b4 : Design.Colors.text3)
+                        .foregroundStyle(w.precipitation > 0 ? Design.Blue.b4 : Design.Gray.g4)
                     Text(w.precipitation > 0
                          ? String(format: "%.1f mm", w.precipitation)
                          : "Droog")
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundStyle(w.precipitation > 0 ? Design.Colors.text : Design.Colors.text3)
+                        .foregroundStyle(w.precipitation > 0 ? Design.Blue.b5 : Design.Gray.g4)
                 }
             }
             .padding(.horizontal, Design.Spacing.lg)
             .padding(.vertical, Design.Spacing.sm + 2)
-            .surfaceCard(cornerRadius: Design.Corner.pill)
+            .tintedCard(
+                tint: Design.Ink.secondary,
+                border: Color.white.opacity(0.06),
+                cornerRadius: Design.Corner.pill
+            )
         }
     }
 
     private var divider: some View {
         Rectangle()
-            .fill(Design.Colors.border)
+            .fill(Color.white.opacity(0.1))
             .frame(width: 1, height: 14)
     }
 }

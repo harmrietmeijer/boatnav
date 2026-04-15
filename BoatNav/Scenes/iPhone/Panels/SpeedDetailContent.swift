@@ -18,9 +18,10 @@ struct SpeedDetailContent: View {
             // Panel header
             HStack(spacing: Design.Spacing.sm) {
                 Image(systemName: "gauge.open.with.lines.needle.33percent")
-                    .foregroundStyle(Design.Blue.b4)
+                    .foregroundStyle(Design.Blue.b5)
                 Text("Snelheid")
-                    .font(.title3.weight(.bold))
+                    .font(.title3.weight(.regular))
+                    .foregroundStyle(.white)
                 Spacer()
             }
             .padding(.bottom, Design.Spacing.xxl)
@@ -29,7 +30,7 @@ struct SpeedDetailContent: View {
                 // Primary speed - km/h
                 ZStack {
                     Circle()
-                        .stroke(Design.Blue.b4.opacity(0.12), lineWidth: 8)
+                        .stroke(Design.Blue.b1.opacity(0.3), lineWidth: 8)
                         .frame(width: 190, height: 190)
                     Circle()
                         .trim(from: 0, to: min(speedViewModel.speedKmh / 30.0, 1.0))
@@ -43,11 +44,11 @@ struct SpeedDetailContent: View {
                     VStack(spacing: Design.Spacing.xs) {
                         Text(String(format: "%.1f", speedViewModel.speedKmh))
                             .font(.system(size: 72, weight: .bold, design: .monospaced))
-                            .foregroundStyle(speedViewModel.isValid ? .primary : .secondary)
+                            .foregroundStyle(speedViewModel.isValid ? Design.Nav.dataText : .secondary)
                             .contentTransition(.numericText())
                         Text("km/h")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Design.Colors.text3)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(Design.Blue.b5.opacity(0.7))
                     }
                 }
 
@@ -59,7 +60,7 @@ struct SpeedDetailContent: View {
 
                     Text("knopen")
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Design.Colors.text3)
+                        .foregroundStyle(Design.Blue.b5.opacity(0.7))
                 }
 
                 if !speedViewModel.isValid {
@@ -69,9 +70,9 @@ struct SpeedDetailContent: View {
                         Text("Wachten op GPS signaal...")
                             .font(.caption)
                     }
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Design.Blue.b5)
                     .padding(Design.Spacing.md)
-                    .surfaceCard(cornerRadius: Design.Corner.sm)
+                    .tintedCard(tint: Design.Nav.statBg, border: Color.white.opacity(0.06))
                 }
 
                 Spacer(minLength: 20)

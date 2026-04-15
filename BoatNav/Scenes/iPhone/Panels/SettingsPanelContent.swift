@@ -11,7 +11,7 @@ struct SettingsPanelContent: View {
                 Image(systemName: "gearshape.fill")
                     .foregroundStyle(Design.Colors.text2)
                 Text("Instellingen")
-                    .font(.title3.weight(.bold))
+                    .font(.title3.weight(.regular))
                 Spacer()
             }
             .padding(.bottom, Design.Spacing.xl)
@@ -165,10 +165,10 @@ struct SettingsPanelContent: View {
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.caption.weight(.semibold))
+            .font(.system(.caption, design: .monospaced).weight(.medium))
             .foregroundStyle(Design.Colors.text3)
             .textCase(.uppercase)
-            .tracking(0.5)
+            .tracking(1.5)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -181,7 +181,7 @@ struct SettingsPanelContent: View {
                 .background(iconColor.opacity(0.12), in: Circle())
 
             Text(label)
-                .font(.subheadline)
+                .font(.subheadline.weight(.medium))
 
             Spacer()
 
@@ -199,7 +199,7 @@ struct SettingsPanelContent: View {
                 .font(.subheadline)
             Spacer()
             Text(value)
-                .font(.subheadline)
+                .font(.system(.subheadline, design: .monospaced))
                 .foregroundStyle(.secondary)
         }
         .padding(.horizontal, Design.Spacing.lg)

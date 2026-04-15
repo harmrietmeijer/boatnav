@@ -17,7 +17,7 @@ struct BoatProfilePanelContent: View {
                     .font(.title2)
                     .foregroundStyle(Design.Blue.b4)
                 Text("Bootprofiel")
-                    .font(.title2.bold())
+                    .font(.title2.weight(.regular))
                 Spacer()
             }
 
@@ -71,7 +71,7 @@ struct BoatProfilePanelContent: View {
             // Dimensions
             VStack(alignment: .leading, spacing: 14) {
                 Text("Afmetingen")
-                    .font(.subheadline.bold())
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
 
                 dimensionRow(
@@ -162,6 +162,7 @@ struct BoatProfilePanelContent: View {
 
             HStack(spacing: 4) {
                 TextField("0.0", value: value, format: .number.precision(.fractionLength(1)))
+                    .font(.system(.body, design: .monospaced))
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 60)

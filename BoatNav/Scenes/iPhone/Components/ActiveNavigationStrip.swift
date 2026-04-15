@@ -25,23 +25,27 @@ struct ActiveNavigationStrip: View {
                     if let first = route.maneuvers.first {
                         Text(first.instruction)
                             .font(.subheadline.weight(.medium))
-                            .foregroundStyle(Design.Colors.text)
+                            .foregroundStyle(.white)
                             .lineLimit(1)
                     }
                     Text(route.distanceString + " · " + route.timeString)
                         .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(Design.Colors.text3)
+                        .foregroundStyle(Design.Blue.b5)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.down")
                     .font(.caption2.weight(.bold))
-                    .foregroundStyle(Design.Colors.text3)
+                    .foregroundStyle(Design.Gray.g4)
             }
             .padding(.horizontal, Design.Spacing.lg)
             .padding(.vertical, Design.Spacing.md)
-            .surfaceCard(cornerRadius: Design.Corner.lg)
+            .tintedCard(
+                tint: Design.Ink.secondary,
+                border: Color.white.opacity(0.06),
+                cornerRadius: Design.Corner.lg
+            )
         }
         .buttonStyle(.boatNav)
         .padding(.horizontal, Design.Spacing.lg)

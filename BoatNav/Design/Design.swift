@@ -111,6 +111,91 @@ enum Design {
         static let cardBorderDark = Color(hex: 0x0B1929).opacity(0.18)
     }
 
+    // MARK: - Theme: Navigation (dark overlays on map)
+
+    enum Nav {
+        static let statBg    = Color.white.opacity(0.04)
+        static let dataText  = Color(hex: 0xE8F4FF)
+        static let labelText = Blue.b5.opacity(0.7)
+    }
+
+    // MARK: - Theme: Flitsmeister (deep purple)
+
+    enum Flits {
+        static let bg        = Color(hex: 0x0C0820)
+        static let surface   = Color(hex: 0x1E1040)
+        static let border    = Color(hex: 0x3C2875)
+        static let toastBg   = Color(hex: 0x120A28)
+    }
+
+    // MARK: - Theme: Route Planning (warm parchment)
+
+    enum Route {
+        static let bg        = Color(hex: 0xF5F2EC)
+        static let text      = Color(hex: 0x1A1008)
+        static let text2     = Color(hex: 0x5A4020)
+        static let text3     = Color(hex: 0x8A7060)
+        static let border    = Color(hex: 0xD4C8B8)
+        static let rowTint   = Color(hex: 0x8B6030).opacity(0.06)
+        static let cta       = Color(hex: 0x8B3020)
+        static let tideBg    = Color(hex: 0xFDF9F5)
+        static let wpDot     = Color(hex: 0x6B4020)
+    }
+
+    // MARK: - Panel Theme
+
+    enum PanelTheme {
+        case standard   // white surface — settings, boat profile, paywall
+        case navigation // dark ink — active navigation
+        case flits      // deep purple — flitsmeister
+        case route      // warm parchment — route planning
+
+        var background: Color {
+            switch self {
+            case .standard: return Colors.surface
+            case .navigation: return Ink.primary
+            case .flits: return Flits.bg
+            case .route: return Route.bg
+            }
+        }
+
+        var handleColor: Color {
+            switch self {
+            case .standard: return Colors.borderMd
+            case .navigation: return Color.white.opacity(0.15)
+            case .flits: return Purple.p5.opacity(0.2)
+            case .route: return Route.border
+            }
+        }
+
+        var closeButtonBg: Color {
+            switch self {
+            case .standard: return Colors.bg
+            case .navigation: return Color.white.opacity(0.08)
+            case .flits: return Purple.p5.opacity(0.1)
+            case .route: return Route.border.opacity(0.5)
+            }
+        }
+
+        var closeButtonFg: Color {
+            switch self {
+            case .standard: return Colors.text3
+            case .navigation: return Blue.b5
+            case .flits: return Purple.p4
+            case .route: return Route.text3
+            }
+        }
+
+        var borderColor: Color {
+            switch self {
+            case .standard: return Colors.border
+            case .navigation: return Color.white.opacity(0.06)
+            case .flits: return Flits.border
+            case .route: return Route.border
+            }
+        }
+    }
+
     // MARK: - Corner Radius
 
     enum Corner {
@@ -206,6 +291,18 @@ extension View {
     /// Dark-tinted card for status/accent elements
     func tintedCard(tint: Color, border: Color, cornerRadius: CGFloat = Design.Corner.md) -> some View {
         modifier(TintedCard(tint: tint, borderColor: border, cornerRadius: cornerRadius))
+    }
+
+    /// Warm parchment card for route planning
+    func routeCard(cornerRadius: CGFloat = Design.Corner.md) -> some View {
+        self
+            .background(Design.Route.rowTint, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+
+    /// Semi-transparent stat card for dark navigation overlay
+    func navStatCard(cornerRadius: CGFloat = Design.Corner.sm) -> some View {
+        self
+            .background(Design.Nav.statBg, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 
     // Legacy modifiers — map to surfaceCard
@@ -330,6 +427,50 @@ extension ButtonStyle where Self == OutlineButtonStyle {
 }
 extension ButtonStyle where Self == FlitsButtonStyle {
     static var flits: FlitsButtonStyle { FlitsButtonStyle() }
+}
+
+/// Route CTA — warm dark red-brown (#8B3020), white text
+struct RouteCTAButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Design.Route.cta, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Route secondary — warm transparent border
+struct RouteOutlineButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(Design.Route.text2)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(
+                Design.Route.rowTint,
+                in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Color(hex: 0x8B6030).opacity(0.2), lineWidth: 1)
+            )
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == RouteCTAButtonStyle {
+    static var routeCTA: RouteCTAButtonStyle { RouteCTAButtonStyle() }
+}
+extension ButtonStyle where Self == RouteOutlineButtonStyle {
+    static var routeOutline: RouteOutlineButtonStyle { RouteOutlineButtonStyle() }
 }
 
 // MARK: - Haptics

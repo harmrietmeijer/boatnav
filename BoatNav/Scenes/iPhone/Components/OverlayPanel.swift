@@ -19,6 +19,7 @@ enum ActivePanel: Equatable {
 
 struct OverlayPanel<Content: View>: View {
     @Binding var detent: PanelDetent
+    var theme: Design.PanelTheme = .standard
     let onDismiss: () -> Void
     @ViewBuilder let content: () -> Content
 
@@ -40,7 +41,7 @@ struct OverlayPanel<Content: View>: View {
                     HStack {
                         Spacer()
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(Design.Colors.borderMd)
+                            .fill(theme.handleColor)
                             .frame(width: 36, height: 3)
                         Spacer()
                     }
@@ -51,9 +52,9 @@ struct OverlayPanel<Content: View>: View {
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(Design.Colors.text3)
+                                .foregroundStyle(theme.closeButtonFg)
                                 .frame(width: 28, height: 28)
-                                .background(Design.Colors.bg, in: RoundedRectangle(cornerRadius: Design.Corner.sm, style: .continuous))
+                                .background(theme.closeButtonBg, in: RoundedRectangle(cornerRadius: Design.Corner.sm, style: .continuous))
                         }
                         .padding(.trailing, Design.Spacing.lg)
                     }
@@ -72,11 +73,11 @@ struct OverlayPanel<Content: View>: View {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Design.Colors.surface)
+                        .fill(theme.background)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .strokeBorder(Design.Colors.border, lineWidth: 1)
+                        .strokeBorder(theme.borderColor, lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .shadow(color: .black.opacity(0.08), radius: 20, y: -4)

@@ -13,6 +13,19 @@ struct ContentView: View {
     @State private var favoriteName = ""
     @State private var favoriteDescription = ""
 
+    private var panelTheme: Design.PanelTheme {
+        switch activePanel {
+        case .navigation:
+            return navigationViewModel.isNavigating ? .navigation : .route
+        case .speedDetail:
+            return .navigation
+        case .settings, .boatProfile, .paywall, .locationSharing:
+            return .standard
+        case .none:
+            return .standard
+        }
+    }
+
     var body: some View {
         ZStack {
             // Layer 0: Full-screen map (always visible)
@@ -105,7 +118,7 @@ struct ContentView: View {
 
             // Layer 4: Overlay panel
             if activePanel != .none {
-                OverlayPanel(detent: $panelDetent) {
+                OverlayPanel(detent: $panelDetent, theme: panelTheme) {
                     withAnimation(Design.Animation.panel) {
                         activePanel = .none
                     }
@@ -146,9 +159,10 @@ struct ContentView: View {
             }
         }
         .overlay {
-            // Hazard category picker
+            // Hazard category picker — flitsmeister purple theme
             BrandedDialog(
                 isPresented: hazardReportViewModel.showCategoryPicker,
+                isFlitsStyle: true,
                 onDismiss: {
                     withAnimation(Design.Animation.quick) {
                         hazardReportViewModel.showCategoryPicker = false
