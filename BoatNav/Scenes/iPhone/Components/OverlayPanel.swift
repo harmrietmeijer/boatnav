@@ -36,35 +36,34 @@ struct OverlayPanel<Content: View>: View {
                 Spacer(minLength: 0)
 
                 VStack(spacing: 0) {
-                    // Drag handle + sticky close button
+                    // Handle + close
                     HStack {
                         Spacer()
-                        Capsule()
-                            .fill(.white.opacity(0.25))
-                            .frame(width: 40, height: 5)
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(Design.Colors.borderMd)
+                            .frame(width: 36, height: 3)
                         Spacer()
                     }
                     .overlay(alignment: .trailing) {
                         Button {
-                            withAnimation(Design.Animation.panel) {
-                                onDismiss()
-                            }
+                            Haptics.light()
+                            withAnimation(Design.Animation.panel) { onDismiss() }
                         } label: {
                             Image(systemName: "xmark")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(Design.Colors.text3)
                                 .frame(width: 28, height: 28)
-                                .background(.quaternary, in: Circle())
+                                .background(Design.Colors.bg, in: RoundedRectangle(cornerRadius: Design.Corner.sm, style: .continuous))
                         }
-                        .padding(.trailing, Design.Spacing.xl)
+                        .padding(.trailing, Design.Spacing.lg)
                     }
-                    .padding(.top, Design.Spacing.md)
-                    .padding(.bottom, Design.Spacing.sm)
+                    .padding(.top, 12)
+                    .padding(.bottom, 10)
 
                     // Content
                     ScrollView {
                         content()
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, 18)
                             .padding(.bottom, max(geometry.safeAreaInsets.bottom, 20))
                     }
                     .scrollDismissesKeyboard(.interactively)
@@ -72,22 +71,15 @@ struct OverlayPanel<Content: View>: View {
                 .frame(height: currentHeight)
                 .frame(maxWidth: .infinity)
                 .background(
-                    ZStack {
-                        RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                        RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous)
-                            .strokeBorder(
-                                LinearGradient(
-                                    colors: [.white.opacity(0.25), .white.opacity(0.05)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 0.5
-                            )
-                    }
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(Design.Colors.surface)
                 )
-                .shadow(color: .black.opacity(0.20), radius: 24, y: -6)
-                .clipShape(RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .strokeBorder(Design.Colors.border, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .shadow(color: .black.opacity(0.08), radius: 20, y: -4)
                 .simultaneousGesture(
                     DragGesture()
                         .updating($dragOffset) { value, state, _ in
@@ -98,7 +90,6 @@ struct OverlayPanel<Content: View>: View {
                         }
                 )
 
-                // Keyboard spacer: pushes panel above keyboard
                 if keyboardHeight > 0 {
                     Color.clear
                         .frame(height: keyboardHeight - geometry.safeAreaInsets.bottom)
@@ -126,8 +117,6 @@ struct OverlayPanel<Content: View>: View {
         }
     }
 
-    // dragHandle is now integrated in the main body with sticky close button
-
     private func height(for detent: PanelDetent, in maxHeight: CGFloat) -> CGFloat {
         switch detent {
         case .collapsed: return 80
@@ -139,40 +128,28 @@ struct OverlayPanel<Content: View>: View {
     private func handleDragEnd(translation: CGFloat, velocity: CGFloat, maxHeight: CGFloat) {
         let currentHeight = height(for: detent, in: maxHeight) - translation
 
-        // If dragged down significantly or with high velocity, dismiss or collapse
         if velocity > 800 || (translation > 100 && detent == .collapsed) {
-            withAnimation(Design.Animation.panel) {
-                onDismiss()
-            }
+            withAnimation(Design.Animation.panel) { onDismiss() }
             return
         }
 
-        // Snap to nearest detent
-        let collapsedH = height(for: .collapsed, in: maxHeight)
-        let halfH = height(for: .half, in: maxHeight)
-        let expandedH = height(for: .expanded, in: maxHeight)
-
         let distances: [(PanelDetent, CGFloat)] = [
-            (.collapsed, abs(currentHeight - collapsedH)),
-            (.half, abs(currentHeight - halfH)),
-            (.expanded, abs(currentHeight - expandedH))
+            (.collapsed, abs(currentHeight - height(for: .collapsed, in: maxHeight))),
+            (.half, abs(currentHeight - height(for: .half, in: maxHeight))),
+            (.expanded, abs(currentHeight - height(for: .expanded, in: maxHeight)))
         ]
 
         if let nearest = distances.min(by: { $0.1 < $1.1 }) {
-            withAnimation(Design.Animation.panel) {
-                detent = nearest.0
-            }
+            Haptics.selection()
+            withAnimation(Design.Animation.panel) { detent = nearest.0 }
         }
     }
 
     private var keyboardPublisher: AnyPublisher<CGFloat, Never> {
         let willShow = NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
             .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
-
         let willHide = NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)
             .map { _ in CGFloat(0) }
-
-        return willShow.merge(with: willHide)
-            .eraseToAnyPublisher()
+        return willShow.merge(with: willHide).eraseToAnyPublisher()
     }
 }

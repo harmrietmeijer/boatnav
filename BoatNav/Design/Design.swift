@@ -1,48 +1,133 @@
 import SwiftUI
 import UIKit
 
-// MARK: - Design System
+// MARK: - Design System — Bootnav
 
 enum Design {
 
-    // MARK: Colors
+    // MARK: - Palette (from design system document)
+
+    enum Ink {
+        static let primary   = Color(hex: 0x0B1929)
+        static let secondary = Color(hex: 0x0D2135)
+        static let tertiary  = Color(hex: 0x112840)
+    }
+
+    enum Blue {
+        static let b1 = Color(hex: 0x042C53)
+        static let b2 = Color(hex: 0x0C447C)
+        static let b3 = Color(hex: 0x185FA5)
+        static let b4 = Color(hex: 0x378ADD)
+        static let b5 = Color(hex: 0x85B7EB)
+        static let b6 = Color(hex: 0xB5D4F4)
+        static let b7 = Color(hex: 0xE6F1FB)
+    }
+
+    enum Green {
+        static let g1 = Color(hex: 0x04342C)
+        static let g2 = Color(hex: 0x085041)
+        static let g3 = Color(hex: 0x0F6E56)
+        static let g4 = Color(hex: 0x1D9E75)
+        static let g5 = Color(hex: 0x5DCAA5)
+        static let g6 = Color(hex: 0x9FE1CB)
+        static let g7 = Color(hex: 0xE1F5EE)
+    }
+
+    enum Amber {
+        static let a1 = Color(hex: 0x412402)
+        static let a2 = Color(hex: 0x633806)
+        static let a3 = Color(hex: 0x854F0B)
+        static let a4 = Color(hex: 0xBA7517)
+        static let a5 = Color(hex: 0xEF9F27)
+        static let a6 = Color(hex: 0xFAC775)
+        static let a7 = Color(hex: 0xFAEEDA)
+    }
+
+    enum Red {
+        static let r1 = Color(hex: 0x501313)
+        static let r2 = Color(hex: 0x791F1F)
+        static let r3 = Color(hex: 0xA32D2D)
+        static let r4 = Color(hex: 0xE24B4A)
+        static let r5 = Color(hex: 0xF09595)
+        static let r6 = Color(hex: 0xF7C1C1)
+        static let r7 = Color(hex: 0xFCEBEB)
+    }
+
+    enum Purple {
+        static let p1 = Color(hex: 0x26215C)
+        static let p2 = Color(hex: 0x3C3489)
+        static let p3 = Color(hex: 0x534AB7)
+        static let p4 = Color(hex: 0x7F77DD)
+        static let p5 = Color(hex: 0xAFA9EC)
+        static let p6 = Color(hex: 0xCECBF6)
+        static let p7 = Color(hex: 0xEEEDFE)
+    }
+
+    enum Gray {
+        static let g1 = Color(hex: 0x2C2C2A)
+        static let g2 = Color(hex: 0x444441)
+        static let g3 = Color(hex: 0x5F5E5A)
+        static let g4 = Color(hex: 0x888780)
+        static let g5 = Color(hex: 0xB4B2A9)
+        static let g6 = Color(hex: 0xD3D1C7)
+        static let g7 = Color(hex: 0xF1EFE8)
+    }
+
+    // MARK: - Semantic Colors
+
     enum Colors {
-        // Brand — vibrant ocean-to-cyan gradient
-        static let accent = Color(red: 0.0, green: 0.65, blue: 0.88)
+        static let bg       = Color(hex: 0xF7F6F2)
+        static let surface  = Color.white
+        static let border   = Color(hex: 0x0B1929).opacity(0.10)
+        static let borderMd = Color(hex: 0x0B1929).opacity(0.18)
+
+        static let text     = Color(hex: 0x0B1929)
+        static let text2    = Color(hex: 0x3A5070)
+        static let text3    = Color(hex: 0x7A90A8)
+
+        // Semantic
+        static let accent   = Blue.b4
+        static let success  = Green.g4
+        static let warning  = Amber.a4
+        static let danger   = Red.r4
+        static let flits    = Purple.p4
+
+        // Legacy aliases (for existing code that references these)
+        static let mint     = Green.g5
+        static let coral    = Red.r4
+        static let violet   = Purple.p4
+        static let amber    = Amber.a5
+        static let sky      = Blue.b5
+
+        // Accent gradient (subtle)
         static let accentGradient = LinearGradient(
-            colors: [
-                Color(red: 0.10, green: 0.70, blue: 0.95),
-                Color(red: 0.25, green: 0.45, blue: 0.95)
-            ],
+            colors: [Blue.b3, Blue.b4],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-        // Vivid secondary palette
-        static let mint = Color(red: 0.15, green: 0.85, blue: 0.72)
-        static let coral = Color(red: 1.0, green: 0.42, blue: 0.42)
-        static let violet = Color(red: 0.55, green: 0.35, blue: 0.95)
-        static let amber = Color(red: 1.0, green: 0.72, blue: 0.20)
-        static let sky = Color(red: 0.30, green: 0.78, blue: 1.0)
 
-        // Semantic
-        static let success = Color(red: 0.20, green: 0.82, blue: 0.55)
-        static let warning = Color(red: 1.0, green: 0.72, blue: 0.20)
-        static let danger = Color(red: 1.0, green: 0.38, blue: 0.38)
-
-        // Surface
-        static let cardBorder = Color.white.opacity(0.18)
-        static let cardBorderDark = Color.white.opacity(0.08)
+        // Card borders
+        static let cardBorder     = Color(hex: 0x0B1929).opacity(0.10)
+        static let cardBorderDark = Color(hex: 0x0B1929).opacity(0.18)
     }
 
-    // MARK: Corner Radius
+    // MARK: - Corner Radius
+
     enum Corner {
-        static let small: CGFloat = 12
-        static let medium: CGFloat = 16
-        static let large: CGFloat = 22
+        static let sm: CGFloat = 8
+        static let md: CGFloat = 12
+        static let lg: CGFloat = 18
+        static let xl: CGFloat = 24
         static let pill: CGFloat = 100
+
+        // Legacy aliases
+        static let small: CGFloat = 8
+        static let medium: CGFloat = 12
+        static let large: CGFloat = 18
     }
 
-    // MARK: Spacing
+    // MARK: - Spacing
+
     enum Spacing {
         static let xs: CGFloat = 4
         static let sm: CGFloat = 8
@@ -52,62 +137,84 @@ enum Design {
         static let xxl: CGFloat = 28
     }
 
-    // MARK: Animation
+    // MARK: - Animation
+
     enum Animation {
-        static let panel = SwiftUI.Animation.spring(duration: 0.4, bounce: 0.12)
-        static let quick = SwiftUI.Animation.spring(duration: 0.25, bounce: 0.1)
-        static let slow = SwiftUI.Animation.spring(duration: 0.5, bounce: 0.12)
+        static let panel = SwiftUI.Animation.spring(duration: 0.35, bounce: 0.12)
+        static let quick = SwiftUI.Animation.spring(duration: 0.2, bounce: 0.1)
+        static let slow  = SwiftUI.Animation.spring(duration: 0.5, bounce: 0.12)
     }
 
-    // MARK: Touch
+    // MARK: - Touch
+
     enum Touch {
         static let minimum: CGFloat = 44
     }
 }
 
-// MARK: - View Modifiers
+// MARK: - Color hex init
 
-struct GlassCard: ViewModifier {
-    var cornerRadius: CGFloat = Design.Corner.medium
-
-    func body(content: Content) -> some View {
-        content
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(
-                        LinearGradient(
-                            colors: [Design.Colors.cardBorder, Design.Colors.cardBorderDark],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.5
-                    )
-            )
-            .shadow(color: .black.opacity(0.15), radius: 16, y: 6)
+extension Color {
+    init(hex: UInt, alpha: Double = 1.0) {
+        self.init(
+            red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255,
+            opacity: alpha
+        )
     }
 }
 
-struct GroupedCard: ViewModifier {
-    var cornerRadius: CGFloat = Design.Corner.medium
+// MARK: - View Modifiers
+
+/// Clean white card with subtle border — the primary card style
+struct SurfaceCard: ViewModifier {
+    var cornerRadius: CGFloat = Design.Corner.md
 
     func body(content: Content) -> some View {
         content
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .background(Design.Colors.surface, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(Design.Colors.cardBorderDark, lineWidth: 0.5)
+                    .strokeBorder(Design.Colors.border, lineWidth: 1)
+            )
+    }
+}
+
+/// Dark-tinted pill/card for status elements (like the design system pills)
+struct TintedCard: ViewModifier {
+    let tint: Color
+    let borderColor: Color
+    var cornerRadius: CGFloat = Design.Corner.md
+
+    func body(content: Content) -> some View {
+        content
+            .background(tint, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(borderColor, lineWidth: 1)
             )
     }
 }
 
 extension View {
-    func glassCard(cornerRadius: CGFloat = Design.Corner.medium) -> some View {
-        modifier(GlassCard(cornerRadius: cornerRadius))
+    /// White surface card with 1px border
+    func surfaceCard(cornerRadius: CGFloat = Design.Corner.md) -> some View {
+        modifier(SurfaceCard(cornerRadius: cornerRadius))
     }
 
-    func groupedCard(cornerRadius: CGFloat = Design.Corner.medium) -> some View {
-        modifier(GroupedCard(cornerRadius: cornerRadius))
+    /// Dark-tinted card for status/accent elements
+    func tintedCard(tint: Color, border: Color, cornerRadius: CGFloat = Design.Corner.md) -> some View {
+        modifier(TintedCard(tint: tint, borderColor: border, cornerRadius: cornerRadius))
+    }
+
+    // Legacy modifiers — map to surfaceCard
+    func glassCard(cornerRadius: CGFloat = Design.Corner.md) -> some View {
+        modifier(SurfaceCard(cornerRadius: cornerRadius))
+    }
+
+    func groupedCard(cornerRadius: CGFloat = Design.Corner.md) -> some View {
+        modifier(SurfaceCard(cornerRadius: cornerRadius))
     }
 }
 
@@ -116,14 +223,113 @@ extension View {
 struct BoatNavButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .opacity(configuration.isPressed ? 0.8 : 1.0)
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(.spring(duration: 0.2, bounce: 0.4), value: configuration.isPressed)
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Navy button — dark background, colored text (the primary style from the design system)
+struct NavyButtonStyle: ButtonStyle {
+    var textColor: Color = Design.Blue.b5
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(textColor)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Design.Ink.secondary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Go button — dark green background, green text
+struct GoButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(Design.Green.g6)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color(hex: 0x073D1E), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Danger button — dark red background, red text
+struct DangerButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(Design.Red.r6)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color(hex: 0x3A0A0A), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Outline button — transparent with border
+struct OutlineButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(Design.Colors.text2)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Design.Colors.borderMd, lineWidth: 1)
+            )
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Flitsmeister button — deep purple
+struct FlitsButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(Design.Purple.p5)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color(hex: 0x1A0835), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Color(hex: 0x3C2875), lineWidth: 1)
+            )
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
     }
 }
 
 extension ButtonStyle where Self == BoatNavButtonStyle {
     static var boatNav: BoatNavButtonStyle { BoatNavButtonStyle() }
+}
+extension ButtonStyle where Self == NavyButtonStyle {
+    static var navy: NavyButtonStyle { NavyButtonStyle() }
+}
+extension ButtonStyle where Self == GoButtonStyle {
+    static var go: GoButtonStyle { GoButtonStyle() }
+}
+extension ButtonStyle where Self == DangerButtonStyle {
+    static var danger: DangerButtonStyle { DangerButtonStyle() }
+}
+extension ButtonStyle where Self == OutlineButtonStyle {
+    static var outline: OutlineButtonStyle { OutlineButtonStyle() }
+}
+extension ButtonStyle where Self == FlitsButtonStyle {
+    static var flits: FlitsButtonStyle { FlitsButtonStyle() }
 }
 
 // MARK: - Haptics
@@ -138,4 +344,13 @@ enum Haptics {
     static func light() { lightGenerator.impactOccurred() }
     static func medium() { mediumGenerator.impactOccurred() }
     static func warning() { warningGenerator.notificationOccurred(.warning) }
+}
+
+// MARK: - Mono text helper
+
+extension View {
+    /// Apply monospaced design for data values
+    func monoData() -> some View {
+        self.font(.system(.body, design: .monospaced).weight(.bold))
+    }
 }

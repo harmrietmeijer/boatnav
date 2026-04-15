@@ -5,7 +5,7 @@ struct MapButtonCluster: View {
     @EnvironmentObject var mapViewModel: MapViewModel
 
     var body: some View {
-        VStack(spacing: Design.Spacing.md) {
+        VStack(spacing: Design.Spacing.sm) {
             Spacer()
 
             MapButton(
@@ -29,7 +29,6 @@ struct MapButtonCluster: View {
             MapButton(
                 icon: "person.2.fill",
                 isActive: activePanel == .locationSharing,
-                accentColor: Design.Colors.mint,
                 action: { togglePanel(.locationSharing) }
             )
 
@@ -47,11 +46,7 @@ struct MapButtonCluster: View {
     private func togglePanel(_ panel: ActivePanel) {
         Haptics.selection()
         withAnimation(Design.Animation.panel) {
-            if activePanel == panel {
-                activePanel = .none
-            } else {
-                activePanel = panel
-            }
+            activePanel = activePanel == panel ? .none : panel
         }
     }
 }
@@ -59,35 +54,25 @@ struct MapButtonCluster: View {
 struct MapButton: View {
     let icon: String
     let isActive: Bool
-    var accentColor: Color = Design.Colors.accent
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(isActive ? .white : .primary)
-                .frame(width: Design.Touch.minimum, height: Design.Touch.minimum)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(isActive ? Design.Blue.b5 : Design.Colors.text2)
+                .frame(width: 42, height: 42)
                 .background(
-                    isActive
-                        ? AnyShapeStyle(
-                            LinearGradient(
-                                colors: [accentColor, accentColor.opacity(0.8)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                          )
-                        : AnyShapeStyle(.ultraThinMaterial),
-                    in: Circle()
+                    isActive ? Design.Ink.secondary : Design.Colors.surface,
+                    in: RoundedRectangle(cornerRadius: Design.Corner.md, style: .continuous)
                 )
                 .overlay(
-                    Circle()
+                    RoundedRectangle(cornerRadius: Design.Corner.md, style: .continuous)
                         .strokeBorder(
-                            isActive ? .white.opacity(0.25) : Design.Colors.cardBorderDark,
-                            lineWidth: 0.5
+                            isActive ? Design.Blue.b3 : Design.Colors.borderMd,
+                            lineWidth: 1
                         )
                 )
-                .shadow(color: .black.opacity(0.15), radius: 16, y: 6)
         }
         .buttonStyle(.boatNav)
     }

@@ -92,7 +92,7 @@ struct NavigationListView: View {
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "flag.fill")
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Design.Red.r4)
                                 .frame(width: 24)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Bestemming")
@@ -132,7 +132,7 @@ struct NavigationListView: View {
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "circle.fill")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(Design.Green.g5)
                                 .frame(width: 24)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Startlocatie")
@@ -198,7 +198,7 @@ struct NavigationListView: View {
             if let error = navigationViewModel.errorMessage {
                 Section {
                     Label(error, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Design.Red.r4)
                 }
             }
 
@@ -212,7 +212,7 @@ struct NavigationListView: View {
 
                     HStack {
                         Image(systemName: "circle.fill")
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Design.Green.g5)
                             .font(.caption)
 
                         if navigationViewModel.startSelection == .none {
@@ -262,7 +262,7 @@ struct NavigationListView: View {
 
                     HStack {
                         Image(systemName: "flag.fill")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Design.Red.r4)
                             .font(.caption)
 
                         if navigationViewModel.destinationSelection == .none {
@@ -369,7 +369,7 @@ struct NavigationListView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "star.fill")
-                                    .foregroundStyle(.yellow)
+                                    .foregroundStyle(Design.Amber.a5)
                                     .font(.caption)
                                 VStack(alignment: .leading) {
                                     Text(fav.name)
@@ -513,7 +513,7 @@ struct NavigationListView: View {
             switch type {
             case .depart:
                 Image(systemName: "location.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Design.Green.g5)
             case .turn(let direction):
                 switch direction {
                 case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Colors.accent)
@@ -524,13 +524,13 @@ struct NavigationListView: View {
                 }
             case .bridge:
                 Image(systemName: "arrow.up.and.down.square.fill")
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Design.Amber.a5)
             case .lock:
                 Image(systemName: "lock.rectangle")
-                    .foregroundStyle(.purple)
+                    .foregroundStyle(Design.Purple.p5)
             case .arrive:
                 Image(systemName: "flag.checkered")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Design.Red.r4)
             }
         }
     }

@@ -15,7 +15,7 @@ struct BoatProfilePanelContent: View {
             HStack {
                 Image(systemName: "sailboat.fill")
                     .font(.title2)
-                    .foregroundStyle(Design.Colors.accent)
+                    .foregroundStyle(Design.Blue.b4)
                 Text("Bootprofiel")
                     .font(.title2.bold())
                 Spacer()
@@ -29,16 +29,20 @@ struct BoatProfilePanelContent: View {
                             .resizable()
                             .scaledToFill()
                             .frame(width: 100, height: 100)
-                            .clipShape(RoundedRectangle(cornerRadius: Design.Corner.large))
+                            .clipShape(RoundedRectangle(cornerRadius: Design.Corner.xl))
                             .overlay(
-                                RoundedRectangle(cornerRadius: Design.Corner.large)
-                                    .stroke(.white.opacity(0.3), lineWidth: 2)
+                                RoundedRectangle(cornerRadius: Design.Corner.xl)
+                                    .stroke(Design.Colors.border, lineWidth: 1)
                             )
                     } else {
                         ZStack {
-                            RoundedRectangle(cornerRadius: Design.Corner.large)
-                                .fill(.ultraThinMaterial)
+                            RoundedRectangle(cornerRadius: Design.Corner.xl)
+                                .fill(Design.Colors.bg)
                                 .frame(width: 100, height: 100)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: Design.Corner.xl)
+                                        .stroke(Design.Colors.border, lineWidth: 1)
+                                )
                             VStack(spacing: 4) {
                                 Image(systemName: "camera.fill")
                                     .font(.title2)
@@ -57,7 +61,7 @@ struct BoatProfilePanelContent: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 TextField("Bijv. Zeemeeuw", text: $boatProfileVM.profile.name)
-                    .textFieldStyle(.plain).padding(Design.Spacing.md).groupedCard(cornerRadius: Design.Corner.small)
+                    .textFieldStyle(.plain).padding(Design.Spacing.md).surfaceCard(cornerRadius: Design.Corner.sm)
                     .font(.body)
                     .focused($focusedField, equals: .name)
                     .submitLabel(.next)
@@ -101,13 +105,13 @@ struct BoatProfilePanelContent: View {
                 )
             }
             .padding(Design.Spacing.lg)
-            .glassCard()
+            .surfaceCard()
 
             // Info
             if boatProfileVM.isConfigured {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Design.Colors.success)
+                        .foregroundStyle(Design.Green.g4)
                     Text("Afmetingen worden meegenomen in routeberekening")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -115,7 +119,7 @@ struct BoatProfilePanelContent: View {
             } else {
                 HStack {
                     Image(systemName: "info.circle")
-                        .foregroundStyle(Design.Colors.amber)
+                        .foregroundStyle(Design.Amber.a5)
                     Text("Vul afmetingen in voor brughoogte- en diepgangwaarschuwingen")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -143,7 +147,7 @@ struct BoatProfilePanelContent: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(Design.Colors.accent)
+                .foregroundStyle(Design.Blue.b4)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -161,7 +165,7 @@ struct BoatProfilePanelContent: View {
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 60)
-                    .textFieldStyle(.plain).padding(Design.Spacing.md).groupedCard(cornerRadius: Design.Corner.small)
+                    .textFieldStyle(.plain).padding(Design.Spacing.md).surfaceCard(cornerRadius: Design.Corner.sm)
                     .focused($focusedField, equals: field)
                 Text(unit)
                     .font(.subheadline)

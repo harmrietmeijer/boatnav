@@ -12,9 +12,13 @@ struct HazardReportButton: View {
         } label: {
             Image(systemName: "exclamationmark.bubble.fill")
                 .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(Design.Colors.amber)
-                .frame(width: Design.Touch.minimum + 8, height: Design.Touch.minimum + 8)
-                .glassCard(cornerRadius: Design.Corner.medium)
+                .foregroundStyle(Design.Purple.p5)
+                .frame(width: 52, height: 52)
+                .background(Design.Ink.primary, in: RoundedRectangle(cornerRadius: Design.Corner.lg, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Design.Corner.lg, style: .continuous)
+                        .strokeBorder(Color(hex: 0x3C2875), lineWidth: 1)
+                )
         }
         .buttonStyle(.boatNav)
     }
@@ -29,6 +33,7 @@ struct HazardCategoryPicker: View {
             HStack {
                 Text("Melding plaatsen")
                     .font(.headline)
+                    .foregroundStyle(Design.Purple.p5)
                 Spacer()
                 Button {
                     withAnimation(Design.Animation.quick) {
@@ -37,9 +42,9 @@ struct HazardCategoryPicker: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 26, height: 26)
-                        .background(.quaternary, in: Circle())
+                        .foregroundStyle(Design.Purple.p4)
+                        .frame(width: 28, height: 28)
+                        .background(Design.Purple.p3.opacity(0.15), in: RoundedRectangle(cornerRadius: Design.Corner.sm))
                 }
             }
             .padding(.horizontal, Design.Spacing.xl)
@@ -58,26 +63,28 @@ struct HazardCategoryPicker: View {
                     } label: {
                         HStack(spacing: Design.Spacing.lg) {
                             Image(systemName: category.iconName)
-                                .font(.system(size: 20))
+                                .font(.system(size: 18))
                                 .foregroundStyle(Color(hex: category.iconColorHex))
                                 .frame(width: 32)
 
                             Text(category.displayName)
                                 .font(.subheadline)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(Design.Purple.p5)
 
                             Spacer()
 
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(Design.Purple.p3)
                         }
                         .padding(.horizontal, Design.Spacing.xl)
                         .padding(.vertical, Design.Spacing.md)
                     }
 
                     if category != HazardReport.HazardCategory.allCases.last {
-                        Divider().padding(.leading, 66)
+                        Divider()
+                            .background(Design.Purple.p3.opacity(0.2))
+                            .padding(.leading, 66)
                     }
                 }
             }
@@ -86,7 +93,7 @@ struct HazardCategoryPicker: View {
     }
 }
 
-// MARK: - Color from hex
+// MARK: - Color from hex string (used by hazard categories)
 
 private extension Color {
     init(hex: String) {

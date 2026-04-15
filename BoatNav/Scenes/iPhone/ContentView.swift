@@ -259,7 +259,7 @@ struct ContentView: View {
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "flag.fill")
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Design.Red.r4)
                                 .frame(width: 24)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Bestemming")
@@ -299,7 +299,7 @@ struct ContentView: View {
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "circle.fill")
-                                .foregroundStyle(.green)
+                                .foregroundStyle(Design.Green.g4)
                                 .frame(width: 24)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Startlocatie")

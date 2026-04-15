@@ -9,7 +9,7 @@ struct SettingsPanelContent: View {
             // Panel header
             HStack(spacing: Design.Spacing.sm) {
                 Image(systemName: "gearshape.fill")
-                    .foregroundStyle(Design.Colors.accent)
+                    .foregroundStyle(Design.Colors.text2)
                 Text("Instellingen")
                     .font(.title3.weight(.bold))
                 Spacer()
@@ -30,19 +30,23 @@ struct SettingsPanelContent: View {
                             VStack(spacing: 8) {
                                 Image(systemName: style.iconName)
                                     .font(.system(size: 22))
-                                    .foregroundStyle(settingsViewModel.mapStyle == style ? .white : .primary)
+                                    .foregroundStyle(settingsViewModel.mapStyle == style ? Design.Blue.b5 : .primary)
 
                                 Text(style.displayName)
                                     .font(.caption.weight(.medium))
-                                    .foregroundStyle(settingsViewModel.mapStyle == style ? .white : .primary)
+                                    .foregroundStyle(settingsViewModel.mapStyle == style ? Design.Blue.b5 : .primary)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
+                            .padding(.vertical, Design.Spacing.lg)
                             .background(
                                 settingsViewModel.mapStyle == style
-                                    ? AnyShapeStyle(Design.Colors.accentGradient)
-                                    : AnyShapeStyle(.regularMaterial),
-                                in: RoundedRectangle(cornerRadius: Design.Corner.medium)
+                                    ? AnyShapeStyle(Design.Ink.secondary)
+                                    : AnyShapeStyle(Design.Colors.surface),
+                                in: RoundedRectangle(cornerRadius: Design.Corner.md)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Design.Corner.md)
+                                    .stroke(settingsViewModel.mapStyle == style ? Design.Blue.b3 : Design.Colors.border, lineWidth: 1)
                             )
                         }
                     }
@@ -54,33 +58,33 @@ struct SettingsPanelContent: View {
                 VStack(spacing: 0) {
                     settingsToggle(
                         icon: "circle.fill",
-                        iconColor: .red,
+                        iconColor: Design.Red.r4,
                         label: "Boeien en bakens",
                         isOn: $settingsViewModel.showBuoys
                     )
                     Divider().padding(.leading, 48)
                     settingsToggle(
                         icon: "arrow.up.and.down.square.fill",
-                        iconColor: .orange,
+                        iconColor: Design.Amber.a4,
                         label: "Brughoogtes",
                         isOn: $settingsViewModel.showBridges
                     )
                     Divider().padding(.leading, 48)
                     settingsToggle(
                         icon: "fork.knife",
-                        iconColor: .brown,
+                        iconColor: Design.Amber.a3,
                         label: "Restaurants aan het water",
                         isOn: $settingsViewModel.showRestaurants
                     )
                     Divider().padding(.leading, 48)
                     settingsToggle(
                         icon: "water.waves",
-                        iconColor: .blue,
+                        iconColor: Design.Blue.b4,
                         label: "Zeemerken (OpenSeaMap)",
                         isOn: $settingsViewModel.showSeamarks
                     )
                 }
-                .groupedCard()
+                .surfaceCard()
 
                 // Cruising speed section
                 sectionHeader("Kruissnelheid")
@@ -88,11 +92,11 @@ struct SettingsPanelContent: View {
                 VStack(spacing: 8) {
                     HStack {
                         Text(String(format: "%.0f km/h", settingsViewModel.cruisingSpeedKmh))
-                            .font(.subheadline.weight(.semibold))
+                            .font(.system(.subheadline, design: .monospaced).weight(.bold))
                         Spacer()
                         Text(String(format: "%.1f knopen", UnitConversion.kmhToKnots(settingsViewModel.cruisingSpeedKmh)))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(Design.Colors.text3)
                     }
 
                     Slider(
@@ -100,10 +104,10 @@ struct SettingsPanelContent: View {
                         in: 5...30,
                         step: 1
                     )
-                    .tint(Design.Colors.accent)
+                    .tint(Design.Blue.b4)
                 }
                 .padding(Design.Spacing.lg)
-                .groupedCard()
+                .surfaceCard()
 
                 // Subscription
                 sectionHeader("Abonnement")
@@ -113,7 +117,7 @@ struct SettingsPanelContent: View {
                 } label: {
                     HStack {
                         Image(systemName: SubscriptionManager.shared.isPro ? "crown.fill" : "star.fill")
-                            .foregroundStyle(Design.Colors.amber)
+                            .foregroundStyle(Design.Amber.a5)
                             .font(.system(size: 18))
                             .frame(width: 28)
 
@@ -133,7 +137,7 @@ struct SettingsPanelContent: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(Design.Spacing.lg)
-                    .groupedCard()
+                    .surfaceCard()
                 }
 
                 // About
@@ -144,7 +148,7 @@ struct SettingsPanelContent: View {
                     Divider().padding(.leading, 14)
                     infoRow(label: "Kaartdata", value: "PDOK / OpenSeaMap")
                 }
-                .groupedCard()
+                .surfaceCard()
 
                 Text("Kaartdata is afkomstig van PDOK (Rijkswaterstaat) en OpenSeaMap. Gebruik deze app niet als vervanging voor officiele vaarkaarten.")
                     .font(.caption2)
@@ -162,7 +166,7 @@ struct SettingsPanelContent: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Design.Colors.text3)
             .textCase(.uppercase)
             .tracking(0.5)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -183,7 +187,7 @@ struct SettingsPanelContent: View {
 
             Toggle("", isOn: isOn)
                 .labelsHidden()
-                .tint(Design.Colors.accent)
+                .tint(Design.Green.g4)
         }
         .padding(.horizontal, Design.Spacing.lg)
         .padding(.vertical, Design.Spacing.md)
@@ -199,6 +203,6 @@ struct SettingsPanelContent: View {
                 .foregroundStyle(.secondary)
         }
         .padding(.horizontal, Design.Spacing.lg)
-        .padding(.vertical, 12)
+        .padding(.vertical, Design.Spacing.md)
     }
 }

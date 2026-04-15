@@ -15,57 +15,52 @@ struct SpeedPill: View {
                     speedLimitBadge(limit: limit)
                 }
 
-                speedValue(
-                    value: speedViewModel.speedKmh,
+                dataValue(
+                    value: String(format: "%.1f", speedViewModel.speedKmh),
                     unit: "km/h",
-                    isValid: speedViewModel.isValid,
-                    isWarning: speedViewModel.isExceedingLimit,
-                    isPrimary: true
+                    isWarning: speedViewModel.isExceedingLimit
                 )
 
-                Capsule()
-                    .fill(.quaternary)
+                Rectangle()
+                    .fill(Design.Colors.border)
                     .frame(width: 1, height: 28)
 
-                speedValue(
-                    value: speedViewModel.speedKnots,
+                dataValue(
+                    value: String(format: "%.1f", speedViewModel.speedKnots),
                     unit: "kn",
-                    isValid: speedViewModel.isValid,
-                    isPrimary: false
+                    isWarning: false
                 )
             }
-            .padding(.horizontal, Design.Spacing.xxl)
-            .padding(.vertical, 14)
-            .glassCard(cornerRadius: Design.Corner.pill)
+            .padding(.horizontal, Design.Spacing.xl)
+            .padding(.vertical, Design.Spacing.md)
+            .surfaceCard(cornerRadius: Design.Corner.lg)
         }
         .buttonStyle(.boatNav)
-        .accessibilityLabel("Snelheid: \(String(format: "%.1f", speedViewModel.speedKmh)) kilometer per uur, \(String(format: "%.1f", speedViewModel.speedKnots)) knopen")
-        .accessibilityHint("Tik voor snelheidsdetails")
     }
 
     private func speedLimitBadge(limit: Double) -> some View {
         Text(String(format: "%.0f", limit))
-            .font(.system(size: 14, weight: .bold, design: .rounded))
-            .foregroundStyle(.red)
-            .frame(width: 32, height: 32)
+            .font(.system(size: 13, weight: .bold, design: .monospaced))
+            .foregroundStyle(Design.Red.r4)
+            .frame(width: 30, height: 30)
             .background(
                 Circle()
-                    .fill(.white)
-                    .overlay(Circle().stroke(.red, lineWidth: 2.5))
+                    .fill(Design.Colors.surface)
+                    .overlay(Circle().stroke(Design.Red.r3, lineWidth: 2.5))
             )
     }
 
-    private func speedValue(value: Double, unit: String, isValid: Bool, isWarning: Bool = false, isPrimary: Bool = true) -> some View {
-        HStack(spacing: Design.Spacing.xs + 2) {
-            Text(String(format: "%.1f", value))
-                .font(.system(size: isPrimary ? 26 : 22, weight: .bold, design: .rounded))
+    private func dataValue(value: String, unit: String, isWarning: Bool) -> some View {
+        HStack(spacing: 3) {
+            Text(value)
+                .font(.system(size: 24, weight: .bold, design: .monospaced))
                 .monospacedDigit()
-                .foregroundStyle(isWarning ? Color.red : (isValid ? (isPrimary ? Color.primary : Design.Colors.accent) : Color.secondary))
+                .foregroundStyle(isWarning ? Design.Red.r4 : Design.Colors.text)
 
             Text(unit)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .padding(.top, 4)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(Design.Colors.text3)
+                .padding(.top, 6)
         }
     }
 }

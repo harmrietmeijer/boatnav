@@ -9,7 +9,7 @@ struct LocationSharingPanelContent: View {
         VStack(spacing: 0) {
             HStack(spacing: Design.Spacing.sm) {
                 Image(systemName: "person.2.fill")
-                    .foregroundStyle(Design.Colors.mint)
+                    .foregroundStyle(Design.Green.g4)
                 Text("Locatie delen")
                     .font(.title3.weight(.bold))
                 Spacer()
@@ -25,9 +25,9 @@ struct LocationSharingPanelContent: View {
                     HStack(spacing: 12) {
                         Image(systemName: "person.fill")
                             .font(.system(size: 14))
-                            .foregroundStyle(Design.Colors.mint)
+                            .foregroundStyle(Design.Green.g4)
                             .frame(width: 28, height: 28)
-                            .background(Design.Colors.mint.opacity(0.12), in: Circle())
+                            .background(Design.Green.g4.opacity(0.12), in: Circle())
 
                         TextField("Naam (bijv. Harm's Boot)", text: $locationSharingViewModel.displayName)
                             .font(.subheadline)
@@ -42,9 +42,9 @@ struct LocationSharingPanelContent: View {
                     HStack(spacing: 12) {
                         Image(systemName: locationSharingViewModel.isSharing ? "location.fill" : "location.slash.fill")
                             .font(.system(size: 14))
-                            .foregroundStyle(locationSharingViewModel.isSharing ? Design.Colors.mint : .secondary)
+                            .foregroundStyle(locationSharingViewModel.isSharing ? Design.Green.g4 : .secondary)
                             .frame(width: 28, height: 28)
-                            .background((locationSharingViewModel.isSharing ? Design.Colors.mint : Color.gray).opacity(0.12), in: Circle())
+                            .background((locationSharingViewModel.isSharing ? Design.Green.g4 : Color.gray).opacity(0.12), in: Circle())
 
                         Text("Locatie delen")
                             .font(.subheadline)
@@ -65,7 +65,7 @@ struct LocationSharingPanelContent: View {
                                 }
                             ))
                             .labelsHidden()
-                            .tint(Design.Colors.mint)
+                            .tint(Design.Green.g4)
                         }
                     }
                     .padding(.horizontal, Design.Spacing.lg)
@@ -78,9 +78,9 @@ struct LocationSharingPanelContent: View {
                         HStack(spacing: 12) {
                             Image(systemName: "qrcode")
                                 .font(.system(size: 14))
-                                .foregroundStyle(Design.Colors.violet)
+                                .foregroundStyle(Design.Purple.p4)
                                 .frame(width: 28, height: 28)
-                                .background(Design.Colors.violet.opacity(0.12), in: Circle())
+                                .background(Design.Purple.p4.opacity(0.12), in: Circle())
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Mijn code")
@@ -97,14 +97,14 @@ struct LocationSharingPanelContent: View {
                             } label: {
                                 Image(systemName: "doc.on.doc")
                                     .font(.system(size: 14))
-                                    .foregroundStyle(Design.Colors.mint)
+                                    .foregroundStyle(Design.Blue.b4)
                             }
                         }
                         .padding(.horizontal, Design.Spacing.lg)
                         .padding(.vertical, Design.Spacing.md)
                     }
                 }
-                .groupedCard()
+                .surfaceCard()
 
                 // Add friend section
                 sectionHeader("Vriend toevoegen")
@@ -113,7 +113,7 @@ struct LocationSharingPanelContent: View {
                     HStack(spacing: 10) {
                         Image(systemName: "person.badge.plus")
                             .font(.system(size: 14))
-                            .foregroundStyle(Design.Colors.mint)
+                            .foregroundStyle(Design.Green.g4)
                             .frame(width: 28)
 
                         TextField("Voer code in", text: $locationSharingViewModel.searchCode)
@@ -130,10 +130,10 @@ struct LocationSharingPanelContent: View {
                             } else {
                                 Text("Zoek")
                                     .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(Design.Blue.b5)
                                     .padding(.horizontal, Design.Spacing.lg)
                                     .padding(.vertical, 6)
-                                    .background(Design.Colors.mint, in: Capsule())
+                                    .background(Design.Ink.secondary, in: Capsule())
                             }
                         }
                         .disabled(locationSharingViewModel.searchCode.count < 6)
@@ -148,7 +148,7 @@ struct LocationSharingPanelContent: View {
                         HStack(spacing: 12) {
                             Image(systemName: "person.crop.circle.fill")
                                 .font(.system(size: 22))
-                                .foregroundStyle(Design.Colors.mint)
+                                .foregroundStyle(Design.Green.g4)
 
                             Text(result.displayName)
                                 .font(.subheadline.weight(.medium))
@@ -160,23 +160,23 @@ struct LocationSharingPanelContent: View {
                             } label: {
                                 Text("Toevoegen")
                                     .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 12)
+                                    .foregroundStyle(Design.Green.g5)
+                                    .padding(.horizontal, Design.Spacing.md)
                                     .padding(.vertical, 6)
-                                    .background(Design.Colors.success, in: Capsule())
+                                    .background(Design.Green.g1, in: Capsule())
                             }
                         }
                         .padding(.horizontal, Design.Spacing.lg)
                         .padding(.vertical, Design.Spacing.md)
                     }
                 }
-                .groupedCard()
+                .surfaceCard()
 
                 // Error message
                 if let error = locationSharingViewModel.errorMessage {
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Design.Red.r4)
                 }
 
                 // Friends list
@@ -196,7 +196,7 @@ struct LocationSharingPanelContent: View {
                             friendRow(friend)
                         }
                     }
-                    .groupedCard()
+                    .surfaceCard()
                 }
 
                 Text("Deel je code met bekenden zodat zij jouw locatie kunnen zien. Locatie wordt alleen gedeeld zolang de schakelaar aan staat.")
@@ -216,7 +216,7 @@ struct LocationSharingPanelContent: View {
         HStack(spacing: 12) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 28))
-                .foregroundStyle(Design.Colors.mint)
+                .foregroundStyle(Design.Green.g4)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(friend.displayName)
@@ -238,7 +238,7 @@ struct LocationSharingPanelContent: View {
             } label: {
                 Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
                     .font(.system(size: 16))
-                    .foregroundStyle(Design.Colors.accent)
+                    .foregroundStyle(Design.Blue.b4)
             }
 
             // Delete button
@@ -262,7 +262,7 @@ struct LocationSharingPanelContent: View {
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
             .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Design.Colors.text3)
             .textCase(.uppercase)
             .tracking(0.5)
             .frame(maxWidth: .infinity, alignment: .leading)

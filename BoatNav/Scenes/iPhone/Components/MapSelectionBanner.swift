@@ -7,9 +7,7 @@ struct MapSelectionBanner: View {
     var body: some View {
         HStack(spacing: Design.Spacing.md) {
             Image(systemName: "mappin.and.ellipse")
-                .font(.system(size: 15, weight: .semibold))
-                .frame(width: 32, height: 32)
-                .background(.white.opacity(0.2), in: RoundedRectangle(cornerRadius: Design.Corner.small, style: .continuous))
+                .font(.system(size: 14, weight: .semibold))
 
             Text(isSelectingStart
                  ? "Tik op de kaart voor startlocatie"
@@ -22,23 +20,19 @@ struct MapSelectionBanner: View {
                 Haptics.light()
                 onCancel()
             }
-            .font(.subheadline.bold())
+            .font(.caption.weight(.semibold))
             .padding(.horizontal, Design.Spacing.md)
             .padding(.vertical, Design.Spacing.xs + 2)
-            .background(.white.opacity(0.2), in: Capsule())
+            .background(Design.Blue.b3.opacity(0.3), in: Capsule())
         }
         .padding(.horizontal, Design.Spacing.lg)
         .padding(.vertical, Design.Spacing.md)
-        .foregroundStyle(.white)
-        .background(
-            Design.Colors.accentGradient,
-            in: RoundedRectangle(cornerRadius: Design.Corner.medium, style: .continuous)
+        .foregroundStyle(Design.Blue.b5)
+        .tintedCard(
+            tint: Design.Ink.secondary,
+            border: Color(hex: 0x1E4060),
+            cornerRadius: Design.Corner.md
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: Design.Corner.medium, style: .continuous)
-                .strokeBorder(.white.opacity(0.2), lineWidth: 0.5)
-        )
-        .shadow(color: Design.Colors.accent.opacity(0.3), radius: 12, y: 4)
         .padding(.horizontal, Design.Spacing.lg)
     }
 }

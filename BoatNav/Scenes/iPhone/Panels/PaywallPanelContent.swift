@@ -21,7 +21,7 @@ struct PaywallPanelContent: View {
                 VStack(spacing: 8) {
                     Image(systemName: "sailboat.fill")
                         .font(.system(size: 48))
-                        .foregroundStyle(Design.Colors.violet)
+                        .foregroundStyle(Design.Purple.p4)
 
                     Text("Navigeer zorgeloos")
                         .font(.title2.weight(.bold))
@@ -50,7 +50,7 @@ struct PaywallPanelContent: View {
                     Divider().padding(.leading, 44)
                     featureRow(icon: "car.fill", title: "CarPlay weergave", free: false, pro: true)
                 }
-                .glassCard()
+                .surfaceCard()
 
                 // Purchase buttons
                 if let offerings = subscriptionManager.offerings?.current {
@@ -71,17 +71,17 @@ struct PaywallPanelContent: View {
                                     HStack {
                                         Text("7 dagen gratis proberen")
                                             .font(.caption)
-                                            .foregroundStyle(.white.opacity(0.8))
+                                            .foregroundStyle(Design.Purple.p5.opacity(0.7))
                                         Spacer()
                                         Text("/jaar")
                                             .font(.caption)
-                                            .foregroundStyle(.white.opacity(0.8))
+                                            .foregroundStyle(Design.Purple.p5.opacity(0.7))
                                     }
                                 }
                                 .padding(.vertical, Design.Spacing.lg)
                                 .padding(.horizontal, Design.Spacing.lg)
-                                .background(Design.Colors.violet, in: RoundedRectangle(cornerRadius: Design.Corner.medium))
-                                .foregroundStyle(.white)
+                                .background(Design.Ink.secondary, in: RoundedRectangle(cornerRadius: Design.Corner.md))
+                                .foregroundStyle(Design.Purple.p5)
                             }
                         }
 
@@ -102,7 +102,7 @@ struct PaywallPanelContent: View {
                                 }
                                 .padding(.vertical, Design.Spacing.lg)
                                 .padding(.horizontal, Design.Spacing.lg)
-                                .groupedCard()
+                                .surfaceCard()
                             }
                             .foregroundStyle(.primary)
                         }
@@ -116,13 +116,13 @@ struct PaywallPanelContent: View {
                 if let error = errorMessage {
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Design.Red.r4)
                 }
 
                 // Success
                 if showSuccess {
                     Label("Je bent nu Pro!", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(Design.Colors.success)
+                        .foregroundStyle(Design.Green.g4)
                         .font(.subheadline.weight(.semibold))
                 }
 
@@ -149,7 +149,7 @@ struct PaywallPanelContent: View {
                 ProgressView()
                     .scaleEffect(1.5)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.ultraThinMaterial)
+                    .background(Design.Colors.surface.opacity(0.9))
             }
         }
     }
@@ -158,7 +158,7 @@ struct PaywallPanelContent: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 14))
-                .foregroundStyle(Design.Colors.violet)
+                .foregroundStyle(Design.Purple.p4)
                 .frame(width: 24)
 
             Text(title)
@@ -167,17 +167,17 @@ struct PaywallPanelContent: View {
             Spacer()
 
             Image(systemName: free ? "checkmark.circle.fill" : "xmark.circle")
-                .foregroundStyle(free ? Design.Colors.success : Color(.quaternaryLabel))
+                .foregroundStyle(free ? Design.Green.g4 : Design.Gray.g5)
                 .font(.system(size: 14))
                 .frame(width: 36)
 
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(Design.Colors.violet)
+                .foregroundStyle(Design.Purple.p4)
                 .font(.system(size: 14))
                 .frame(width: 36)
         }
         .padding(.vertical, 10)
-        .padding(.horizontal, 12)
+        .padding(.horizontal, Design.Spacing.md)
     }
 
     private func purchase(_ package: Package) async {

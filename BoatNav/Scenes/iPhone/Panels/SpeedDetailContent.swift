@@ -5,12 +5,12 @@ struct SpeedDetailContent: View {
     @Binding var activePanel: ActivePanel
 
     private var speedColor: Color {
-        if speedViewModel.isExceedingLimit { return Design.Colors.danger }
+        if speedViewModel.isExceedingLimit { return Design.Red.r4 }
         let s = speedViewModel.speedKmh
-        if s < 6 { return Design.Colors.sky }
-        if s < 12 { return Design.Colors.mint }
-        if s < 20 { return Design.Colors.amber }
-        return Design.Colors.coral
+        if s < 6 { return Design.Blue.b5 }
+        if s < 12 { return Design.Green.g5 }
+        if s < 20 { return Design.Amber.a5 }
+        return Design.Red.r4
     }
 
     var body: some View {
@@ -18,7 +18,7 @@ struct SpeedDetailContent: View {
             // Panel header
             HStack(spacing: Design.Spacing.sm) {
                 Image(systemName: "gauge.open.with.lines.needle.33percent")
-                    .foregroundStyle(Design.Colors.accent)
+                    .foregroundStyle(Design.Blue.b4)
                 Text("Snelheid")
                     .font(.title3.weight(.bold))
                 Spacer()
@@ -29,39 +29,37 @@ struct SpeedDetailContent: View {
                 // Primary speed - km/h
                 ZStack {
                     Circle()
-                        .stroke(Design.Colors.accent.opacity(0.12), lineWidth: 10)
+                        .stroke(Design.Blue.b4.opacity(0.12), lineWidth: 8)
                         .frame(width: 190, height: 190)
                     Circle()
                         .trim(from: 0, to: min(speedViewModel.speedKmh / 30.0, 1.0))
                         .stroke(
-                            speedColor,
-                            style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                            Design.Blue.b4,
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
                         )
                         .frame(width: 190, height: 190)
                         .rotationEffect(.degrees(-90))
                         .animation(Design.Animation.slow, value: speedViewModel.speedKmh)
                     VStack(spacing: Design.Spacing.xs) {
                         Text(String(format: "%.1f", speedViewModel.speedKmh))
-                            .font(.system(size: 56, weight: .bold, design: .rounded))
-                            .monospacedDigit()
+                            .font(.system(size: 72, weight: .bold, design: .monospaced))
                             .foregroundStyle(speedViewModel.isValid ? .primary : .secondary)
                             .contentTransition(.numericText())
                         Text("km/h")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Design.Colors.text3)
                     }
                 }
 
                 // Secondary speed - knots
                 VStack(spacing: 4) {
                     Text(String(format: "%.1f", speedViewModel.speedKnots))
-                        .font(.system(size: 48, weight: .semibold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(speedViewModel.isValid ? Design.Colors.sky : .secondary)
+                        .font(.system(size: 48, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(speedViewModel.isValid ? Design.Blue.b5 : .secondary)
 
                     Text("knopen")
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Design.Colors.text3)
                 }
 
                 if !speedViewModel.isValid {
@@ -73,7 +71,7 @@ struct SpeedDetailContent: View {
                     }
                     .foregroundStyle(.secondary)
                     .padding(Design.Spacing.md)
-                    .groupedCard(cornerRadius: Design.Corner.small)
+                    .surfaceCard(cornerRadius: Design.Corner.sm)
                 }
 
                 Spacer(minLength: 20)
