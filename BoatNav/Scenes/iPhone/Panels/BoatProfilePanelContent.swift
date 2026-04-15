@@ -15,7 +15,7 @@ struct BoatProfilePanelContent: View {
             HStack {
                 Image(systemName: "sailboat.fill")
                     .font(.title2)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(Design.Colors.accent)
                 Text("Bootprofiel")
                     .font(.title2.bold())
                 Spacer()
@@ -29,14 +29,14 @@ struct BoatProfilePanelContent: View {
                             .resizable()
                             .scaledToFill()
                             .frame(width: 100, height: 100)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .clipShape(RoundedRectangle(cornerRadius: Design.Corner.large))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 20)
+                                RoundedRectangle(cornerRadius: Design.Corner.large)
                                     .stroke(.white.opacity(0.3), lineWidth: 2)
                             )
                     } else {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
+                            RoundedRectangle(cornerRadius: Design.Corner.large)
                                 .fill(.ultraThinMaterial)
                                 .frame(width: 100, height: 100)
                             VStack(spacing: 4) {
@@ -57,7 +57,7 @@ struct BoatProfilePanelContent: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 TextField("Bijv. Zeemeeuw", text: $boatProfileVM.profile.name)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(.plain).padding(Design.Spacing.md).groupedCard(cornerRadius: Design.Corner.small)
                     .font(.body)
                     .focused($focusedField, equals: .name)
                     .submitLabel(.next)
@@ -100,14 +100,14 @@ struct BoatProfilePanelContent: View {
                     nextField: nil
                 )
             }
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+            .padding(Design.Spacing.lg)
+            .glassCard()
 
             // Info
             if boatProfileVM.isConfigured {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Design.Colors.success)
                     Text("Afmetingen worden meegenomen in routeberekening")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -115,7 +115,7 @@ struct BoatProfilePanelContent: View {
             } else {
                 HStack {
                     Image(systemName: "info.circle")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Design.Colors.amber)
                     Text("Vul afmetingen in voor brughoogte- en diepgangwaarschuwingen")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -124,7 +124,7 @@ struct BoatProfilePanelContent: View {
 
             Spacer()
         }
-        .padding(.horizontal)
+        .padding(.horizontal, Design.Spacing.lg)
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
@@ -143,7 +143,7 @@ struct BoatProfilePanelContent: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(.blue)
+                .foregroundStyle(Design.Colors.accent)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -161,7 +161,7 @@ struct BoatProfilePanelContent: View {
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 60)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(.plain).padding(Design.Spacing.md).groupedCard(cornerRadius: Design.Corner.small)
                     .focused($focusedField, equals: field)
                 Text(unit)
                     .font(.subheadline)

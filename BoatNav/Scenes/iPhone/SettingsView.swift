@@ -25,7 +25,7 @@ struct SettingsView: View {
 
                             if settingsViewModel.mapStyle == style {
                                 Image(systemName: "checkmark")
-                                    .foregroundStyle(.blue)
+                                    .foregroundStyle(Design.Colors.accent)
                                     .fontWeight(.semibold)
                             }
                         }

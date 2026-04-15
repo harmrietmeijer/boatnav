@@ -7,12 +7,14 @@ struct SettingsPanelContent: View {
     var body: some View {
         VStack(spacing: 0) {
             // Panel header
-            HStack {
+            HStack(spacing: Design.Spacing.sm) {
+                Image(systemName: "gearshape.fill")
+                    .foregroundStyle(Design.Colors.accent)
                 Text("Instellingen")
                     .font(.title3.weight(.bold))
                 Spacer()
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, Design.Spacing.xl)
 
             VStack(spacing: 20) {
                 // Map style section
@@ -38,9 +40,9 @@ struct SettingsPanelContent: View {
                             .padding(.vertical, 16)
                             .background(
                                 settingsViewModel.mapStyle == style
-                                    ? AnyShapeStyle(Color.blue.gradient)
+                                    ? AnyShapeStyle(Design.Colors.accentGradient)
                                     : AnyShapeStyle(.regularMaterial),
-                                in: RoundedRectangle(cornerRadius: 14)
+                                in: RoundedRectangle(cornerRadius: Design.Corner.medium)
                             )
                         }
                     }
@@ -78,7 +80,7 @@ struct SettingsPanelContent: View {
                         isOn: $settingsViewModel.showSeamarks
                     )
                 }
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                .groupedCard()
 
                 // Cruising speed section
                 sectionHeader("Kruissnelheid")
@@ -98,10 +100,10 @@ struct SettingsPanelContent: View {
                         in: 5...30,
                         step: 1
                     )
-                    .tint(.blue)
+                    .tint(Design.Colors.accent)
                 }
-                .padding(14)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                .padding(Design.Spacing.lg)
+                .groupedCard()
 
                 // Subscription
                 sectionHeader("Abonnement")
@@ -111,7 +113,7 @@ struct SettingsPanelContent: View {
                 } label: {
                     HStack {
                         Image(systemName: SubscriptionManager.shared.isPro ? "crown.fill" : "star.fill")
-                            .foregroundStyle(.yellow)
+                            .foregroundStyle(Design.Colors.amber)
                             .font(.system(size: 18))
                             .frame(width: 28)
 
@@ -130,8 +132,8 @@ struct SettingsPanelContent: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
-                    .padding(14)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .padding(Design.Spacing.lg)
+                    .groupedCard()
                 }
 
                 // About
@@ -142,13 +144,13 @@ struct SettingsPanelContent: View {
                     Divider().padding(.leading, 14)
                     infoRow(label: "Kaartdata", value: "PDOK / OpenSeaMap")
                 }
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                .groupedCard()
 
                 Text("Kaartdata is afkomstig van PDOK (Rijkswaterstaat) en OpenSeaMap. Gebruik deze app niet als vervanging voor officiele vaarkaarten.")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                     .multilineTextAlignment(.center)
-                    .padding(.top, 4)
+                    .padding(.top, Design.Spacing.xs)
 
                 Spacer(minLength: 20)
             }
@@ -162,6 +164,7 @@ struct SettingsPanelContent: View {
             .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
             .textCase(.uppercase)
+            .tracking(0.5)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -180,10 +183,10 @@ struct SettingsPanelContent: View {
 
             Toggle("", isOn: isOn)
                 .labelsHidden()
-                .tint(.blue)
+                .tint(Design.Colors.accent)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Design.Spacing.lg)
+        .padding(.vertical, Design.Spacing.md)
     }
 
     private func infoRow(label: String, value: String) -> some View {
@@ -195,7 +198,7 @@ struct SettingsPanelContent: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, Design.Spacing.lg)
         .padding(.vertical, 12)
     }
 }

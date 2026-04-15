@@ -30,14 +30,14 @@ struct MapPreviewView: View {
                 )
                 .ignoresSafeArea(edges: .top)
 
-                VStack(spacing: 8) {
+                VStack(spacing: Design.Spacing.sm) {
                     // Map selection banner
                     if navigationViewModel.isSelectingOnMap {
                         mapSelectionBanner
                     }
 
                     // Speed overlay
-                    HStack(spacing: 20) {
+                    HStack(spacing: Design.Spacing.xl) {
                         VStack {
                             Text(String(format: "%.1f", speedViewModel.speedKmh))
                                 .font(.system(size: 36, weight: .bold, design: .rounded))
@@ -57,9 +57,9 @@ struct MapPreviewView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    .padding(.bottom, 8)
+                    .padding(Design.Spacing.lg)
+                    .glassCard(cornerRadius: Design.Corner.medium)
+                    .padding(.bottom, Design.Spacing.sm)
                 }
             }
             .navigationTitle("BoatNav")
@@ -82,11 +82,13 @@ struct MapPreviewView: View {
             }
             .font(.subheadline.bold())
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(.blue.opacity(0.9))
+        .padding(.horizontal, Design.Spacing.lg)
+        .padding(.vertical, Design.Spacing.md)
         .foregroundStyle(.white)
-        .cornerRadius(12)
-        .padding(.horizontal)
+        .background(
+            Design.Colors.accentGradient,
+            in: RoundedRectangle(cornerRadius: Design.Corner.small, style: .continuous)
+        )
+        .padding(.horizontal, Design.Spacing.lg)
     }
 }

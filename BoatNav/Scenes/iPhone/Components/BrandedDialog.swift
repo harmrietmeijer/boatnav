@@ -11,23 +11,22 @@ struct BrandedDialog<Content: View>: View {
                 // Dimmed background
                 Color.black.opacity(0.35)
                     .ignoresSafeArea()
-                    .onTapGesture { onDismiss() }
+                    .onTapGesture {
+                        Haptics.light()
+                        onDismiss()
+                    }
 
                 // Dialog card
                 VStack(spacing: 0) {
                     content()
                 }
                 .frame(maxWidth: 340)
-                .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: .black.opacity(0.15), radius: 30, y: 10)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .padding(.horizontal, 28)
+                .glassCard(cornerRadius: Design.Corner.large)
+                .clipShape(RoundedRectangle(cornerRadius: Design.Corner.large, style: .continuous))
+                .padding(.horizontal, Design.Spacing.xxl)
                 .transition(.scale(scale: 0.85).combined(with: .opacity))
             }
-            .animation(.spring(duration: 0.3, bounce: 0.15), value: isPresented)
+            .animation(Design.Animation.quick, value: isPresented)
         }
     }
 }
@@ -42,12 +41,12 @@ struct BrandedAlertContent: View {
     let buttons: [BrandedAlertButton]
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Design.Spacing.lg) {
             // Icon
             Image(systemName: icon)
                 .font(.system(size: 36))
                 .foregroundStyle(iconColor)
-                .padding(.top, 24)
+                .padding(.top, Design.Spacing.xxl)
 
             // Title
             Text(title)
@@ -59,12 +58,13 @@ struct BrandedAlertContent: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Design.Spacing.xl)
 
             // Buttons
-            VStack(spacing: 8) {
+            VStack(spacing: Design.Spacing.sm) {
                 ForEach(Array(buttons.enumerated()), id: \.offset) { _, button in
                     Button {
+                        Haptics.selection()
                         button.action()
                     } label: {
                         Text(button.title)
@@ -73,22 +73,22 @@ struct BrandedAlertContent: View {
                             .padding(.vertical, 13)
                             .background(
                                 button.style == .primary
-                                    ? AnyShapeStyle(.blue)
+                                    ? AnyShapeStyle(Design.Colors.accent)
                                     : button.style == .destructive
-                                        ? AnyShapeStyle(.red.opacity(0.1))
+                                        ? AnyShapeStyle(Design.Colors.danger.opacity(0.1))
                                         : AnyShapeStyle(.quaternary),
-                                in: RoundedRectangle(cornerRadius: 12)
+                                in: RoundedRectangle(cornerRadius: Design.Corner.small)
                             )
                             .foregroundStyle(
                                 button.style == .primary ? .white
-                                    : button.style == .destructive ? .red
+                                    : button.style == .destructive ? Design.Colors.danger
                                     : .primary
                             )
                     }
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+            .padding(.horizontal, Design.Spacing.xl)
+            .padding(.bottom, Design.Spacing.xl)
         }
     }
 }

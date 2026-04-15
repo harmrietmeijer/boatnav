@@ -5,18 +5,18 @@ struct HazardReportButton: View {
 
     var body: some View {
         Button {
-            withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+            Haptics.medium()
+            withAnimation(Design.Animation.quick) {
                 hazardReportViewModel.showCategoryPicker = true
             }
         } label: {
             Image(systemName: "exclamationmark.bubble.fill")
-                .font(.system(size: 20, weight: .medium))
-                .foregroundStyle(.white)
-                .frame(width: 52, height: 52)
-                .background(Color.orange, in: Circle())
-                .shadow(color: .black.opacity(0.2), radius: 10, y: 4)
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(Design.Colors.amber)
+                .frame(width: Design.Touch.minimum + 8, height: Design.Touch.minimum + 8)
+                .glassCard(cornerRadius: Design.Corner.medium)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.boatNav)
     }
 }
 
@@ -31,7 +31,7 @@ struct HazardCategoryPicker: View {
                     .font(.headline)
                 Spacer()
                 Button {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         hazardReportViewModel.showCategoryPicker = false
                     }
                 } label: {
@@ -42,20 +42,21 @@ struct HazardCategoryPicker: View {
                         .background(.quaternary, in: Circle())
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 12)
+            .padding(.horizontal, Design.Spacing.xl)
+            .padding(.top, Design.Spacing.xl)
+            .padding(.bottom, Design.Spacing.md)
 
             // Categories
             VStack(spacing: 2) {
                 ForEach(HazardReport.HazardCategory.allCases, id: \.self) { category in
                     Button {
+                        Haptics.selection()
                         hazardReportViewModel.addReport(category: category)
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        withAnimation(Design.Animation.quick) {
                             hazardReportViewModel.showCategoryPicker = false
                         }
                     } label: {
-                        HStack(spacing: 14) {
+                        HStack(spacing: Design.Spacing.lg) {
                             Image(systemName: category.iconName)
                                 .font(.system(size: 20))
                                 .foregroundStyle(Color(hex: category.iconColorHex))
@@ -71,8 +72,8 @@ struct HazardCategoryPicker: View {
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, Design.Spacing.xl)
+                        .padding(.vertical, Design.Spacing.md)
                     }
 
                     if category != HazardReport.HazardCategory.allCases.last {
@@ -80,7 +81,7 @@ struct HazardCategoryPicker: View {
                     }
                 }
             }
-            .padding(.bottom, 16)
+            .padding(.bottom, Design.Spacing.lg)
         }
     }
 }

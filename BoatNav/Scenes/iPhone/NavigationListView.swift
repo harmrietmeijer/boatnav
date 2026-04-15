@@ -21,7 +21,7 @@ struct NavigationListView: View {
                 BrandedDialog(
                     isPresented: navigationViewModel.showAddFavoriteSheet,
                     onDismiss: {
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        withAnimation(Design.Animation.quick) {
                             favoriteName = ""
                             favoriteDescription = ""
                             navigationViewModel.showAddFavoriteSheet = false
@@ -42,7 +42,7 @@ struct NavigationListView: View {
                     .font(.headline)
                 Spacer()
                 Button {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         favoriteName = ""
                         favoriteDescription = ""
                         navigationViewModel.showAddFavoriteSheet = false
@@ -64,12 +64,12 @@ struct NavigationListView: View {
                 TextField("Naam (bijv. Jachthaven Westergoot)", text: $favoriteName)
                     .font(.subheadline)
                     .padding(12)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: Design.Corner.small))
 
                 TextField("Omschrijving (optioneel)", text: $favoriteDescription)
                     .font(.subheadline)
                     .padding(12)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: Design.Corner.small))
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 16)
@@ -84,7 +84,7 @@ struct NavigationListView: View {
                             description: favoriteDescription,
                             coordinate: coord
                         )
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        withAnimation(Design.Animation.quick) {
                             favoriteName = ""
                             favoriteDescription = ""
                             navigationViewModel.showAddFavoriteSheet = false
@@ -104,7 +104,7 @@ struct NavigationListView: View {
                             }
                             Spacer()
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Design.Colors.accent)
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
@@ -124,7 +124,7 @@ struct NavigationListView: View {
                             description: favoriteDescription,
                             coordinate: coord
                         )
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        withAnimation(Design.Animation.quick) {
                             favoriteName = ""
                             favoriteDescription = ""
                             navigationViewModel.showAddFavoriteSheet = false
@@ -144,7 +144,7 @@ struct NavigationListView: View {
                             }
                             Spacer()
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Design.Colors.accent)
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
@@ -155,7 +155,7 @@ struct NavigationListView: View {
                 Divider().padding(.leading, 56)
 
                 Button {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         navigationViewModel.showAddFavoriteSheet = false
                     }
                     navigationViewModel.mapSelectingFor = .destination
@@ -165,7 +165,7 @@ struct NavigationListView: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "mappin.and.ellipse")
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Design.Colors.accent)
                             .frame(width: 24)
                         Text("Kies op kaart")
                             .font(.subheadline.weight(.medium))
@@ -249,7 +249,7 @@ struct NavigationListView: View {
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Design.Colors.accent)
                         }
                     }
                 }
@@ -293,7 +293,7 @@ struct NavigationListView: View {
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Design.Colors.accent)
                         }
                     }
                 }
@@ -516,11 +516,11 @@ struct NavigationListView: View {
                     .foregroundStyle(.green)
             case .turn(let direction):
                 switch direction {
-                case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(.blue)
-                case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(.blue)
-                case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(.blue)
-                case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(.blue)
-                case .straight: Image(systemName: "arrow.up").foregroundStyle(.blue)
+                case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Colors.accent)
+                case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(Design.Colors.accent)
+                case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(Design.Colors.accent)
+                case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(Design.Colors.accent)
+                case .straight: Image(systemName: "arrow.up").foregroundStyle(Design.Colors.accent)
                 }
             case .bridge:
                 Image(systemName: "arrow.up.and.down.square.fill")

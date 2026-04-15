@@ -40,7 +40,7 @@ struct ContentView: View {
             VStack {
                 // Weather bar
                 WeatherBarView()
-                    .padding(.top, 4)
+                    .padding(.top, Design.Spacing.xs)
 
                 // Map selection banner
                 if navigationViewModel.isSelectingOnMap {
@@ -48,13 +48,13 @@ struct ContentView: View {
                         isSelectingStart: navigationViewModel.mapSelectingFor == .start,
                         onCancel: {
                             navigationViewModel.cancelMapSelection()
-                            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                            withAnimation(Design.Animation.panel) {
                                 activePanel = .navigation
                                 panelDetent = .half
                             }
                         }
                     )
-                    .padding(.top, 8)
+                    .padding(.top, Design.Spacing.sm)
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
@@ -63,12 +63,12 @@ struct ContentView: View {
                    let route = navigationViewModel.currentRoute,
                    activePanel != .navigation {
                     ActiveNavigationStrip(route: route) {
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        withAnimation(Design.Animation.panel) {
                             activePanel = .navigation
                             panelDetent = .half
                         }
                     }
-                    .padding(.top, navigationViewModel.isSelectingOnMap ? 4 : 8)
+                    .padding(.top, navigationViewModel.isSelectingOnMap ? Design.Spacing.xs : Design.Spacing.sm)
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
@@ -80,7 +80,7 @@ struct ContentView: View {
                 Spacer()
                 HStack {
                     HazardReportButton()
-                        .padding(.leading, 16)
+                        .padding(.leading, Design.Spacing.lg)
                         .padding(.bottom, 100)
                     Spacer()
                 }
@@ -93,12 +93,12 @@ struct ContentView: View {
                 VStack {
                     Spacer()
                     SpeedPill(speedViewModel: speedViewModel) {
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        withAnimation(Design.Animation.panel) {
                             activePanel = .speedDetail
                             panelDetent = .half
                         }
                     }
-                    .padding(.bottom, 24)
+                    .padding(.bottom, Design.Spacing.xxl)
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -106,7 +106,7 @@ struct ContentView: View {
             // Layer 4: Overlay panel
             if activePanel != .none {
                 OverlayPanel(detent: $panelDetent) {
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                    withAnimation(Design.Animation.panel) {
                         activePanel = .none
                     }
                 } content: {
@@ -133,13 +133,13 @@ struct ContentView: View {
                 .transition(.move(edge: .bottom))
             }
         }
-        .animation(.spring(duration: 0.35, bounce: 0.15), value: activePanel)
-        .animation(.spring(duration: 0.35, bounce: 0.15), value: navigationViewModel.isSelectingOnMap)
-        .animation(.spring(duration: 0.35, bounce: 0.15), value: navigationViewModel.isNavigating)
+        .animation(Design.Animation.panel, value: activePanel)
+        .animation(Design.Animation.panel, value: navigationViewModel.isSelectingOnMap)
+        .animation(Design.Animation.panel, value: navigationViewModel.isNavigating)
         // Auto-open navigation panel after map selection
         .onChange(of: navigationViewModel.isSelectingOnMap) { wasSelecting, isSelecting in
             if wasSelecting && !isSelecting {
-                withAnimation(.spring(duration: 0.4, bounce: 0.15)) {
+                withAnimation(Design.Animation.panel) {
                     activePanel = .navigation
                     panelDetent = .half
                 }
@@ -150,7 +150,7 @@ struct ContentView: View {
             BrandedDialog(
                 isPresented: hazardReportViewModel.showCategoryPicker,
                 onDismiss: {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         hazardReportViewModel.showCategoryPicker = false
                     }
                 }
@@ -164,7 +164,7 @@ struct ContentView: View {
             BrandedDialog(
                 isPresented: navigationViewModel.showAddFavoriteSheet,
                 onDismiss: {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         favoriteName = ""
                         favoriteDescription = ""
                         navigationViewModel.showAddFavoriteSheet = false
@@ -182,7 +182,7 @@ struct ContentView: View {
                 ) {
                     BrandedAlertContent(
                         icon: "exclamationmark.triangle.fill",
-                        iconColor: .orange,
+                        iconColor: Design.Colors.amber,
                         title: "Melding in de buurt",
                         message: "\(report.category.displayName) gemeld op deze locatie. Is dit er nog?",
                         buttons: [
@@ -211,7 +211,7 @@ struct ContentView: View {
                     .font(.headline)
                 Spacer()
                 Button {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         favoriteName = ""
                         favoriteDescription = ""
                         navigationViewModel.showAddFavoriteSheet = false
@@ -224,23 +224,23 @@ struct ContentView: View {
                         .background(.quaternary, in: Circle())
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 16)
+            .padding(.horizontal, Design.Spacing.xl)
+            .padding(.top, Design.Spacing.xl)
+            .padding(.bottom, Design.Spacing.lg)
 
             VStack(spacing: 10) {
                 TextField("Naam (bijv. Jachthaven Westergoot)", text: $favoriteName)
                     .font(.subheadline)
                     .padding(12)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: Design.Corner.small))
 
                 TextField("Omschrijving (optioneel)", text: $favoriteDescription)
                     .font(.subheadline)
                     .padding(12)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: Design.Corner.small))
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 16)
+            .padding(.horizontal, Design.Spacing.xl)
+            .padding(.bottom, Design.Spacing.lg)
 
             VStack(spacing: 2) {
                 if navigationViewModel.destinationSelection != .none {
@@ -251,7 +251,7 @@ struct ContentView: View {
                             description: favoriteDescription,
                             coordinate: coord
                         )
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        withAnimation(Design.Animation.quick) {
                             favoriteName = ""
                             favoriteDescription = ""
                             navigationViewModel.showAddFavoriteSheet = false
@@ -271,9 +271,9 @@ struct ContentView: View {
                             }
                             Spacer()
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Design.Colors.accent)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Design.Spacing.xl)
                         .padding(.vertical, 12)
                     }
                     .foregroundStyle(.primary)
@@ -291,7 +291,7 @@ struct ContentView: View {
                             description: favoriteDescription,
                             coordinate: coord
                         )
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                        withAnimation(Design.Animation.quick) {
                             favoriteName = ""
                             favoriteDescription = ""
                             navigationViewModel.showAddFavoriteSheet = false
@@ -311,9 +311,9 @@ struct ContentView: View {
                             }
                             Spacer()
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(Design.Colors.accent)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, Design.Spacing.xl)
                         .padding(.vertical, 12)
                     }
                     .foregroundStyle(.primary)
@@ -322,17 +322,17 @@ struct ContentView: View {
                 Divider().padding(.leading, 56)
 
                 Button {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    withAnimation(Design.Animation.quick) {
                         navigationViewModel.showAddFavoriteSheet = false
                     }
                     navigationViewModel.startMapSelection(for: .destination)
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                    withAnimation(Design.Animation.panel) {
                         panelDetent = .collapsed
                     }
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "mappin.and.ellipse")
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Design.Colors.accent)
                             .frame(width: 24)
                         Text("Kies op kaart")
                             .font(.subheadline.weight(.medium))
@@ -341,19 +341,19 @@ struct ContentView: View {
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Design.Spacing.xl)
                     .padding(.vertical, 12)
                 }
                 .foregroundStyle(.primary)
             }
-            .padding(.bottom, 16)
+            .padding(.bottom, Design.Spacing.lg)
 
             Text("Selecteer eerst een bestemming via zoeken of de kaart, en voeg die dan toe als favoriet.")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
+                .padding(.horizontal, Design.Spacing.xl)
+                .padding(.bottom, Design.Spacing.xl)
         }
     }
 }

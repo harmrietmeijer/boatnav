@@ -10,12 +10,14 @@ struct NavigationPanelContent: View {
     var body: some View {
         VStack(spacing: 0) {
             // Panel header
-            HStack {
+            HStack(spacing: Design.Spacing.sm) {
+                Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
+                    .foregroundStyle(Design.Colors.accent)
                 Text("Navigatie")
                     .font(.title3.weight(.bold))
                 Spacer()
             }
-            .padding(.bottom, 16)
+            .padding(.bottom, Design.Spacing.lg)
 
             if navigationViewModel.isNavigating, let route = navigationViewModel.currentRoute {
                 activeNavigationContent(route: route)
@@ -33,14 +35,14 @@ struct NavigationPanelContent: View {
             if let error = navigationViewModel.errorMessage {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Design.Colors.amber)
                     Text(error)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                .padding(12)
+                .padding(Design.Spacing.md)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: Design.Corner.small))
             }
 
             // Start location card
@@ -69,7 +71,7 @@ struct NavigationPanelContent: View {
 
                     Button {
                         navigationViewModel.startMapSelection(for: .start)
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        withAnimation(Design.Animation.panel) {
                             panelDetent = .collapsed
                         }
                     } label: {
@@ -98,7 +100,7 @@ struct NavigationPanelContent: View {
 
                     Button {
                         navigationViewModel.startMapSelection(for: .destination)
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        withAnimation(Design.Animation.panel) {
                             panelDetent = .collapsed
                         }
                     } label: {
@@ -132,7 +134,7 @@ struct NavigationPanelContent: View {
                     Spacer()
                 }
                 .padding(.vertical, 14)
-                .background(.blue.gradient, in: RoundedRectangle(cornerRadius: 14))
+                .background(Design.Colors.accentGradient, in: RoundedRectangle(cornerRadius: Design.Corner.medium))
                 .foregroundStyle(.white)
             }
             .disabled(
@@ -158,7 +160,7 @@ struct NavigationPanelContent: View {
                         Spacer()
                     }
                     .padding(.vertical, 12)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .groupedCard()
                 }
             }
 
@@ -190,7 +192,7 @@ struct NavigationPanelContent: View {
                         }
                     }
                 }
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Design.Corner.small))
             }
 
             // Favorites
@@ -249,7 +251,7 @@ struct NavigationPanelContent: View {
             }
         }
         .padding(14)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .groupedCard()
     }
 
     private var searchField: some View {
@@ -284,8 +286,8 @@ struct NavigationPanelContent: View {
                     }
                 }
             }
-            .padding(12)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+            .padding(Design.Spacing.md)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Design.Corner.small))
 
             if navigationViewModel.isSearching {
                 ProgressView()
@@ -304,9 +306,9 @@ struct NavigationPanelContent: View {
                 } label: {
                     Image(systemName: "plus")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Design.Colors.accent)
                         .frame(width: 28, height: 28)
-                        .background(.blue.opacity(0.1), in: Circle())
+                        .background(Design.Colors.accent.opacity(0.1), in: Circle())
                 }
             }
 
@@ -355,7 +357,7 @@ struct NavigationPanelContent: View {
                         }
                     }
                 }
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Design.Corner.small))
             }
         }
     }
@@ -403,7 +405,7 @@ struct NavigationPanelContent: View {
                             .padding(.vertical, 10)
                         }
                     }
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Design.Corner.small))
                 }
             }
         }
@@ -414,6 +416,7 @@ struct NavigationPanelContent: View {
             .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
             .textCase(.uppercase)
+            .tracking(0.5)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -423,10 +426,10 @@ struct NavigationPanelContent: View {
         VStack(spacing: 16) {
             // Route summary cards
             HStack(spacing: 10) {
-                statCard(value: route.distanceString, label: "Afstand")
-                statCard(value: route.timeString, label: "Tijd")
-                statCard(value: "\(route.bridges.count)", label: "Bruggen")
-                statCard(value: "\(route.locks.count)", label: "Sluizen")
+                statCard(value: route.distanceString, label: "Afstand", color: Design.Colors.accent)
+                statCard(value: route.timeString, label: "Tijd", color: Design.Colors.sky)
+                statCard(value: "\(route.bridges.count)", label: "Bruggen", color: Design.Colors.amber)
+                statCard(value: "\(route.locks.count)", label: "Sluizen", color: Design.Colors.violet)
             }
 
             // Speed limit
@@ -463,8 +466,8 @@ struct NavigationPanelContent: View {
                 .background(
                     speedViewModel.isExceedingLimit
                         ? Color.red.opacity(0.08)
-                        : Color.blue.opacity(0.05),
-                    in: RoundedRectangle(cornerRadius: 14)
+                        : Design.Colors.accent.opacity(0.05),
+                    in: RoundedRectangle(cornerRadius: Design.Corner.medium)
                 )
             }
 
@@ -473,10 +476,10 @@ struct NavigationPanelContent: View {
                 VStack(spacing: 6) {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Design.Colors.amber)
                         Text("Waarschuwingen (\(route.warnings.count))")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Design.Colors.amber)
                         Spacer()
                     }
 
@@ -497,7 +500,7 @@ struct NavigationPanelContent: View {
                     }
                 }
                 .padding(14)
-                .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+                .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: Design.Corner.medium))
             }
 
             // Maneuvers
@@ -527,7 +530,7 @@ struct NavigationPanelContent: View {
                     .padding(.vertical, 10)
                 }
             }
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Design.Corner.small))
 
             // Stop navigation button
             Button(role: .destructive) {
@@ -540,7 +543,7 @@ struct NavigationPanelContent: View {
                     Spacer()
                 }
                 .padding(.vertical, 14)
-                .background(.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
+                .background(.red.opacity(0.1), in: RoundedRectangle(cornerRadius: Design.Corner.medium))
                 .foregroundStyle(.red)
             }
 
@@ -548,10 +551,11 @@ struct NavigationPanelContent: View {
         }
     }
 
-    private func statCard(value: String, label: String) -> some View {
+    private func statCard(value: String, label: String, color: Color = Design.Colors.accent) -> some View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.subheadline.weight(.bold))
+                .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(label)
@@ -560,28 +564,28 @@ struct NavigationPanelContent: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Design.Corner.small))
     }
 
     @ViewBuilder
     private func maneuverIcon(for type: RouteManeuver.ManeuverType) -> some View {
         switch type {
         case .depart:
-            Image(systemName: "location.fill").foregroundStyle(.green)
+            Image(systemName: "location.fill").foregroundStyle(Design.Colors.success)
         case .turn(let direction):
             switch direction {
-            case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(.blue)
-            case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(.blue)
-            case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(.blue)
-            case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(.blue)
-            case .straight: Image(systemName: "arrow.up").foregroundStyle(.blue)
+            case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Colors.accent)
+            case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(Design.Colors.accent)
+            case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(Design.Colors.accent)
+            case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(Design.Colors.accent)
+            case .straight: Image(systemName: "arrow.up").foregroundStyle(Design.Colors.accent)
             }
         case .bridge:
-            Image(systemName: "arrow.up.and.down.square.fill").foregroundStyle(.orange)
+            Image(systemName: "arrow.up.and.down.square.fill").foregroundStyle(Design.Colors.amber)
         case .lock:
-            Image(systemName: "door.left.hand.closed").foregroundStyle(.purple)
+            Image(systemName: "door.left.hand.closed").foregroundStyle(Design.Colors.violet)
         case .arrive:
-            Image(systemName: "flag.checkered").foregroundStyle(.red)
+            Image(systemName: "flag.checkered").foregroundStyle(Design.Colors.coral)
         }
     }
 
