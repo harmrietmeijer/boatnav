@@ -257,14 +257,10 @@ class NavigationViewModel: ObservableObject {
             let allBridges = try await pdokClient.fetchBridges(for: routeRegion)
             let allLocks = try await pdokClient.fetchLocks(for: routeRegion)
 
-            // Build route coordinates — start from actual origin, snap onto water
-            var coordinates = [origin]
-            // Add snap point if it's significantly different from origin
-            let snapDist = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
-                .distance(from: CLLocation(latitude: result.originSnapPoint.latitude, longitude: result.originSnapPoint.longitude))
-            if snapDist > 5 {
-                coordinates.append(result.originSnapPoint)
-            }
+            // Build route coordinates — start ON the waterway at the snap point.
+            // Never draw a straight line from user origin to the snap point because
+            // that line could cross land (e.g. when departing from a harbour on land).
+            var coordinates: [CLLocationCoordinate2D] = [result.originSnapPoint]
             for (i, edge) in result.edges.enumerated() {
                 var segCoords = edge.segment.coordinates
                 // Check if segment needs to be reversed based on path direction
@@ -295,7 +291,9 @@ class NavigationViewModel: ObservableObject {
                 }
                 coordinates.append(contentsOf: segCoords)
             }
-            // Ensure route ends exactly at the destination snap point
+            // Ensure route ends exactly at the destination snap point (on water).
+            // Never append the actual destination coordinate because it may be on land
+            // (e.g. a harbour point picked by the user).
             if let last = coordinates.last {
                 let distToSnap = CLLocation(latitude: last.latitude, longitude: last.longitude)
                     .distance(from: CLLocation(latitude: result.destinationSnapPoint.latitude,
@@ -303,12 +301,6 @@ class NavigationViewModel: ObservableObject {
                 if distToSnap > 5 {
                     coordinates.append(result.destinationSnapPoint)
                 }
-            }
-            // Add actual destination if different from snap point
-            let destSnapDist = CLLocation(latitude: dest.latitude, longitude: dest.longitude)
-                .distance(from: CLLocation(latitude: result.destinationSnapPoint.latitude, longitude: result.destinationSnapPoint.longitude))
-            if destSnapDist > 5 {
-                coordinates.append(dest)
             }
 
             // Filter to only bridges/locks actually near the route path (within 250m)
