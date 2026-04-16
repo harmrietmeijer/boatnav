@@ -338,9 +338,10 @@ class NavigationViewModel: ObservableObject {
             let cruisingSpeedMs = 10.0 / 3.6
             let estimatedTime = result.totalDistance / cruisingSpeedMs
 
-            // Generate warnings based on boat profile
+            // Generate warnings based on boat profile — Pro only
             var warnings: [RouteWarning] = []
-            if let profile = boatProfileViewModel?.profile, profile.height > 0 {
+            if FeatureGating.canViewRouteWarnings,
+               let profile = boatProfileViewModel?.profile, profile.height > 0 {
                 for bridge in bridges where bridge.clearanceHeight > 0 && bridge.clearanceHeight < profile.height {
                     warnings.append(RouteWarning(
                         type: .bridgeTooLow,
@@ -350,7 +351,8 @@ class NavigationViewModel: ObservableObject {
                     ))
                 }
             }
-            if let profile = boatProfileViewModel?.profile, profile.beam > 0 {
+            if FeatureGating.canViewRouteWarnings,
+               let profile = boatProfileViewModel?.profile, profile.beam > 0 {
                 for lock in locks {
                     if let lockWidth = lock.width, lockWidth > 0, lockWidth < profile.beam {
                         warnings.append(RouteWarning(
@@ -362,7 +364,8 @@ class NavigationViewModel: ObservableObject {
                     }
                 }
             }
-            if let profile = boatProfileViewModel?.profile, profile.draft > 0 {
+            if FeatureGating.canViewRouteWarnings,
+               let profile = boatProfileViewModel?.profile, profile.draft > 0 {
                 for lock in locks {
                     if let lockDepth = lock.depth, lockDepth > 0, lockDepth < profile.draft {
                         warnings.append(RouteWarning(

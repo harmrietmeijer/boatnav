@@ -33,5 +33,8 @@ enum FeatureGating {
 
     static var canSaveUnlimitedFavorites: Bool { isProCached }
     static var canSaveRoutes: Bool { isProCached }
+    static var canViewRouteWarnings: Bool { isProCached }
+    static var canNavigate: Bool { isProCached }
+    static var canUseCarPlay: Bool { isProCached }
     static var maxFreeFavorites: Int { 1 }
 }

@@ -22,6 +22,23 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
+        // Pro-only feature: show paywall message if not subscribed
+        guard FeatureGating.canUseCarPlay else {
+            window.rootViewController = Self.makePaywallViewController()
+            let info = CPInformationTemplate(
+                title: "BoatNav Pro vereist",
+                layout: .leading,
+                items: [
+                    CPInformationItem(title: "CarPlay-weergave", detail: "is alleen beschikbaar voor BoatNav Pro abonnees.")
+                ],
+                actions: [
+                    CPTextButton(title: "Open BoatNav op je iPhone", textStyle: .confirm) { _ in }
+                ]
+            )
+            interfaceController.setRootTemplate(info, animated: true, completion: nil)
+            return
+        }
+
         // Create map view controller
         let mapVC = CarPlayMapViewController(
             mapViewModel: appDelegate.mapViewModel,
@@ -124,6 +141,30 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         )
 
         interfaceController.pushTemplate(listTemplate, animated: true, completion: nil)
+    }
+}
+
+// MARK: - Paywall fallback
+
+extension CarPlaySceneDelegate {
+    static func makePaywallViewController() -> UIViewController {
+        let vc = UIViewController()
+        vc.view.backgroundColor = UIColor(red: 0.043, green: 0.098, blue: 0.161, alpha: 1) // ink
+        let label = UILabel()
+        label.text = "BoatNav Pro vereist voor CarPlay"
+        label.textColor = UIColor(red: 0.52, green: 0.72, blue: 0.92, alpha: 1) // blue.b5
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 18, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        vc.view.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: vc.view.centerYAnchor),
+            label.leadingAnchor.constraint(equalTo: vc.view.leadingAnchor, constant: 32),
+            label.trailingAnchor.constraint(equalTo: vc.view.trailingAnchor, constant: -32)
+        ])
+        return vc
     }
 }
 
