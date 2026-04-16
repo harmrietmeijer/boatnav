@@ -257,31 +257,13 @@ class NavigationViewModel: ObservableObject {
             let allBridges = try await pdokClient.fetchBridges(for: routeRegion)
             let allLocks = try await pdokClient.fetchLocks(for: routeRegion)
 
-            // Max distance for which we draw a direct connector between the user's
-            // point and the nearest waterway. Short connectors (e.g. inside a harbour
-            // where PDOK data ends at the harbour mouth) are useful. Longer ones
-            // would cut across land and are omitted.
-            let maxConnectorMeters: CLLocationDistance = 300
-
-            // Build route coordinates.
-            // If origin is close to the snap point (e.g. inside a harbour), start
-            // at the origin and include a short straight connector to the snap
-            // point. Otherwise start directly on the water to avoid drawing a
-            // line across land.
-            var coordinates: [CLLocationCoordinate2D] = []
-            let originToSnap = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
-                .distance(from: CLLocation(
-                    latitude: result.originSnapPoint.latitude,
-                    longitude: result.originSnapPoint.longitude))
-
-            if originToSnap <= maxConnectorMeters {
-                coordinates.append(origin)
-                if originToSnap > 5 {
-                    coordinates.append(result.originSnapPoint)
-                }
-            } else {
-                coordinates.append(result.originSnapPoint)
-            }
+            // The route line only follows actual waterways (PDOK data).
+            // Drawing straight connectors from origin/destination to the snap
+            // point would cut across land, because harbours typically are not
+            // covered in PDOK. The start/destination pin markers already show
+            // where the user departs from and where they arrive; the route line
+            // shows only the navigable stretch.
+            var coordinates: [CLLocationCoordinate2D] = [result.originSnapPoint]
             for (i, edge) in result.edges.enumerated() {
                 var segCoords = edge.segment.coordinates
                 // Check if segment needs to be reversed based on path direction
@@ -322,15 +304,8 @@ class NavigationViewModel: ObservableObject {
                 }
             }
 
-            // Short connector from snap point to actual destination — only when
-            // the destination is close to the waterway (harbour entrance).
-            let destToSnap = CLLocation(latitude: dest.latitude, longitude: dest.longitude)
-                .distance(from: CLLocation(
-                    latitude: result.destinationSnapPoint.latitude,
-                    longitude: result.destinationSnapPoint.longitude))
-            if destToSnap > 5 && destToSnap <= maxConnectorMeters {
-                coordinates.append(dest)
-            }
+            // No straight connector from snap point to the actual destination —
+            // see comment above.
 
             // Filter to only bridges/locks actually near the route path (within 250m)
             let bridges = allBridges.filter { bridge in
