@@ -59,7 +59,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             // DEBUG: seed test friend in Biesbosch — remove after testing
             let cloudService = CloudKitLocationService()
             if let result = await cloudService.seedTestFriend() {
+                #if DEBUG
                 print("[DEBUG] Test friend created — zoek met code: \(result.shareCode)")
+                #endif
             }
         }
     }

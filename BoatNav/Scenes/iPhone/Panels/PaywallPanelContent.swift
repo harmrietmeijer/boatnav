@@ -126,18 +126,39 @@ struct PaywallPanelContent: View {
                         .font(.subheadline.weight(.semibold))
                 }
 
-                // Restore
-                Button("Aankopen herstellen") {
+                // Restore — prominent for App Review
+                Button {
                     Task { await restore() }
+                } label: {
+                    Label("Eerder gekocht? Aankopen herstellen", systemImage: "arrow.clockwise")
+                        .font(.subheadline.weight(.medium))
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .buttonStyle(.outline)
 
-                // Legal
-                Text("Abonnement verlengt automatisch. Opzeggen kan via Instellingen → Apple ID.")
-                    .font(.caption2)
-                    .foregroundStyle(.quaternary)
-                    .multilineTextAlignment(.center)
+                // Manage subscription (Apple guideline 3.1.2)
+                if subscriptionManager.isPro {
+                    Link(destination: URL(string: "https://apps.apple.com/account/subscriptions")!) {
+                        Label("Abonnement beheren", systemImage: "person.crop.circle")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(Design.Colors.text2)
+                    }
+                    .padding(.top, 4)
+                }
+
+                // Legal — links naar terms en privacy verplicht voor subscriptions
+                VStack(spacing: 6) {
+                    Text("Abonnement verlengt automatisch tenzij je het minimaal 24u voor afloop opzegt. Opzeggen via Instellingen → Apple ID → Abonnementen.")
+                        .font(.caption2)
+                        .foregroundStyle(Design.Colors.text3)
+                        .multilineTextAlignment(.center)
+
+                    HStack(spacing: 16) {
+                        Link("Privacy", destination: URL(string: "https://boatnav.nl/privacy.html")!)
+                        Link("Voorwaarden", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                    }
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(Design.Blue.b3)
+                }
             }
             .padding(.horizontal)
         }

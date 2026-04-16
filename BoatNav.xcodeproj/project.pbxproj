@@ -52,6 +52,7 @@
 		889B7E0815EE95576670B7E6 /* BoatProfilePanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6285C9B725C1EBF17D974E36 /* BoatProfilePanelContent.swift */; };
 		8DDBAA0AD42105C6BC3D3A49 /* UnitConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA92C22118D378A1C6F38F6F /* UnitConversion.swift */; };
 		9110A059E98A38558E22AE18 /* Bridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75249D3973549424E8BE25A6 /* Bridge.swift */; };
+		976B728F01DED308D65D012C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E496BDF633D708648FADE61B /* PrivacyInfo.xcprivacy */; };
 		99EEA1B24234A8462BFA17C1 /* HazardReportButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA5507A89B9F6734D0CF99E /* HazardReportButton.swift */; };
 		9B9C63939691C570207AC7CA /* NavigationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242441DD792F47B2BA02BB /* NavigationListView.swift */; };
 		9E6E55A1BE29187DB59AC775 /* SavedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8463A6F18E68F97F176A8B99 /* SavedRoute.swift */; };
@@ -168,6 +169,7 @@
 		DA5E85A8710EB99351B7F062 /* WaterwayRouterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterwayRouterTests.swift; sourceTree = "<group>"; };
 		E0A79F53462CF566579CDC55 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		E4356770A7536DDC21ECBADF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E496BDF633D708648FADE61B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E4D78AFC4D590B28BC9CC0D2 /* FeatureGating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureGating.swift; sourceTree = "<group>"; };
 		E7DE2BDAF4F0B6AB79DE10B7 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		E9EAD99A6F4AE739812A4E89 /* UnitConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionTests.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 				5D4F1EA32D7623142F757C72 /* Assets.xcassets */,
 				10BB218BC49F43B77C352F51 /* BoatNav.entitlements */,
 				CF38F51FE5C7EE95AA9D2B6E /* Info.plist */,
+				E496BDF633D708648FADE61B /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -603,6 +606,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C0B27CA1DB20244FDE433B0 /* Assets.xcassets in Resources */,
+				976B728F01DED308D65D012C /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

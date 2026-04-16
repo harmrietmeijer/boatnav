@@ -172,7 +172,9 @@ class LocationSharingViewModel: ObservableObject {
                 isSearching = false
             }
         } catch {
+            #if DEBUG
             print("[LocationShare] Search failed: \(error)")
+            #endif
             await MainActor.run {
                 errorMessage = "Zoeken mislukt: \(error.localizedDescription)"
                 isSearching = false
@@ -225,7 +227,9 @@ class LocationSharingViewModel: ObservableObject {
                 rebuildAnnotations()
             }
         } catch {
+            #if DEBUG
             print("[LocationShare] Fetch friends failed: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -235,7 +239,9 @@ class LocationSharingViewModel: ObservableObject {
         do {
             userID = try await cloudService.fetchCurrentUserID()
         } catch {
+            #if DEBUG
             print("[LocationShare] Could not resolve user ID: \(error.localizedDescription)")
+            #endif
         }
     }
 

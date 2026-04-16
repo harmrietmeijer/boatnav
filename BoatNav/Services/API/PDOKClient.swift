@@ -43,7 +43,9 @@ class PDOKClient {
         if let cached = cachedBridgesAndLocks, let cb = cachedOverpassBbox,
            minLat >= cb.minLat && maxLat <= cb.maxLat &&
            minLon >= cb.minLon && maxLon <= cb.maxLon {
+            #if DEBUG
             print("[Overpass] Using cache (\(cached.bridges.count) bridges, \(cached.locks.count) locks)")
+            #endif
             return cached
         }
 
@@ -143,7 +145,9 @@ class PDOKClient {
             }
         }
 
+        #if DEBUG
         print("[Overpass] Parsed \(bridges.count) bridges → \(uniqueBridges.count) unique, \(locks.count) locks → \(uniqueLocks.count) unique")
+        #endif
 
         let result = BridgesAndLocks(bridges: uniqueBridges, locks: uniqueLocks)
         // Only cache non-empty results to avoid persisting failures
@@ -151,7 +155,9 @@ class PDOKClient {
             cachedBridgesAndLocks = result
             cachedOverpassBbox = (fetchMinLat, fetchMinLon, fetchMaxLat, fetchMaxLon)
         } else {
+            #if DEBUG
             print("[Overpass] Empty result — not caching")
+            #endif
         }
         return result
     }
@@ -190,7 +196,9 @@ class PDOKClient {
         for (i, endpoint) in overpassEndpoints.enumerated() {
             // Stop retrying if the Task was cancelled
             if Task.isCancelled {
+                #if DEBUG
                 print("[Overpass] Task cancelled, aborting")
+                #endif
                 return []
             }
 
@@ -202,36 +210,50 @@ class PDOKClient {
             request.timeoutInterval = 20
 
             let label = i == 0 ? "primary" : "mirror \(i)"
+            #if DEBUG
             print("[Overpass] Fetching (\(label)): \(query.prefix(80))...")
+            #endif
 
             do {
                 let (data, response) = try await session.data(for: request)
                 guard let http = response as? HTTPURLResponse else { continue }
 
                 if (200...299).contains(http.statusCode) {
+                    #if DEBUG
                     print("[Overpass] Response (\(label)): \(data.count) bytes")
+                    #endif
                     guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                           let elements = json["elements"] as? [[String: Any]] else {
                         return []
                     }
+                    #if DEBUG
                     print("[Overpass] Elements: \(elements.count)")
+                    #endif
                     return elements
                 }
 
+                #if DEBUG
                 print("[Overpass] HTTP \(http.statusCode) from \(label)")
+                #endif
                 // 429/504/503 → try next mirror
                 if [429, 503, 504].contains(http.statusCode) { continue }
                 return [] // Other errors, don't retry
             } catch is CancellationError {
+                #if DEBUG
                 print("[Overpass] \(label) cancelled")
+                #endif
                 return [] // Don't retry mirrors on cancellation
             } catch {
+                #if DEBUG
                 print("[Overpass] \(label) failed: \(error.localizedDescription)")
+                #endif
                 continue // Network error → try next mirror
             }
         }
 
+        #if DEBUG
         print("[Overpass] All endpoints failed")
+        #endif
         return []
     }
 
@@ -318,7 +340,9 @@ class PDOKClient {
             if !isDuplicate { unique.append(r) }
         }
 
+        #if DEBUG
         print("[Overpass] Fetched \(elements.count) waterside restaurants → \(unique.count) unique")
+        #endif
 
         if !unique.isEmpty {
             cachedRestaurants = unique
@@ -561,17 +585,23 @@ class PDOKClient {
     // MARK: - Private
 
     private func fetch(_ url: URL) async throws -> Data {
+        #if DEBUG
         print("[PDOK] Fetching: \(url.absoluteString)")
+        #endif
         let (data, response) = try await session.data(from: url)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw PDOKError.httpError(statusCode: -1)
         }
+        #if DEBUG
         print("[PDOK] Response: \(httpResponse.statusCode), bytes: \(data.count)")
+        #endif
 
         guard (200...299).contains(httpResponse.statusCode) else {
             if let body = String(data: data, encoding: .utf8)?.prefix(200) {
+                #if DEBUG
                 print("[PDOK] Error body: \(body)")
+                #endif
             }
             throw PDOKError.httpError(statusCode: httpResponse.statusCode)
         }

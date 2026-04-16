@@ -147,13 +147,23 @@ struct NavigationPanelContent: View {
                 ? 0.5 : 1
             )
 
-            // Save route button
+            // Save route button — Pro only
             if navigationViewModel.startSelection != .none && navigationViewModel.destinationSelection != .none {
                 Button {
-                    navigationViewModel.saveCurrentRoute()
+                    if SubscriptionManager.shared.canSaveRoutes {
+                        navigationViewModel.saveCurrentRoute()
+                    } else {
+                        activePanel = .paywall
+                    }
                 } label: {
-                    Label("Route opslaan", systemImage: "bookmark")
-                        .font(.subheadline.weight(.medium))
+                    HStack(spacing: 6) {
+                        Label("Route opslaan", systemImage: "bookmark")
+                            .font(.subheadline.weight(.medium))
+                        if !SubscriptionManager.shared.canSaveRoutes {
+                            Image(systemName: "lock.fill")
+                                .font(.caption)
+                        }
+                    }
                 }
                 .buttonStyle(.routeOutline)
             }
@@ -298,9 +308,13 @@ struct NavigationPanelContent: View {
                 sectionHeader("Favorieten")
                 Spacer()
                 Button {
-                    navigationViewModel.showAddFavoriteSheet = true
+                    if navigationViewModel.canAddMoreFavorites {
+                        navigationViewModel.showAddFavoriteSheet = true
+                    } else {
+                        activePanel = .paywall
+                    }
                 } label: {
-                    Image(systemName: "plus")
+                    Image(systemName: navigationViewModel.canAddMoreFavorites ? "plus" : "lock.fill")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Design.Route.text2)
                         .frame(width: 28, height: 28)

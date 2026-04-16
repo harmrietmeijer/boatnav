@@ -123,7 +123,9 @@ class HazardReportViewModel: ObservableObject {
                 mergeCloudReports(cloudReports)
             }
         } catch {
+            #if DEBUG
             print("[HazardVM] Cloud fetch failed: \(error.localizedDescription)")
+            #endif
         }
     }
 

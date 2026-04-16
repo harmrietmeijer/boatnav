@@ -42,7 +42,9 @@ class SpeedViewModel: ObservableObject {
         // Update speed limit for current position
         let limit = speedLimitService.speedLimit(at: location.coordinate)
         if currentSpeedLimit != limit {
+            #if DEBUG
             print("[Speed] Limit changed: \(limit.map { "\($0) km/h" } ?? "nil") at \(String(format: "%.4f, %.4f", location.coordinate.latitude, location.coordinate.longitude))")
+            #endif
         }
         currentSpeedLimit = limit
         isExceedingLimit = limit != nil && reading.isValid && reading.kmh > limit!

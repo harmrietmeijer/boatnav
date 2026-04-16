@@ -12,11 +12,15 @@ class CloudKitHazardService {
         let record = report.toCKRecord()
         do {
             try await publicDB.save(record)
+            #if DEBUG
             print("[CloudKit] Saved report \(report.id)")
+            #endif
         } catch let error as CKError {
             handleError(error, context: "saveReport")
         } catch {
+            #if DEBUG
             print("[CloudKit] Save failed: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -38,7 +42,9 @@ class CloudKitHazardService {
             }
         }
 
+        #if DEBUG
         print("[CloudKit] Fetched \(reports.count) reports")
+        #endif
         return reports
     }
 
@@ -51,16 +57,22 @@ class CloudKitHazardService {
             if newVotes >= 2 {
                 // Report should be removed
                 try await publicDB.deleteRecord(withID: recordID)
+                #if DEBUG
                 print("[CloudKit] Deleted report \(reportID) (votes >= 2)")
+                #endif
             } else {
                 let record = try await publicDB.record(for: recordID)
                 record["votes"] = NSNumber(value: newVotes)
                 try await publicDB.save(record)
+                #if DEBUG
                 print("[CloudKit] Updated votes for \(reportID) to \(newVotes)")
+                #endif
             }
         } catch let error as CKError where error.code == .unknownItem {
             // Record already deleted by another user — fine
+            #if DEBUG
             print("[CloudKit] Report \(reportID) already deleted")
+            #endif
         } catch let error as CKError where error.code == .serverRecordChanged {
             // Conflict — re-fetch and merge with higher vote count
             if let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
@@ -76,7 +88,9 @@ class CloudKitHazardService {
         } catch let error as CKError {
             handleError(error, context: "updateRemovalVotes")
         } catch {
+            #if DEBUG
             print("[CloudKit] Update votes failed: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -85,13 +99,17 @@ class CloudKitHazardService {
     func deleteReport(recordID: String) async {
         do {
             try await publicDB.deleteRecord(withID: CKRecord.ID(recordName: recordID))
+            #if DEBUG
             print("[CloudKit] Deleted report \(recordID)")
+            #endif
         } catch let error as CKError where error.code == .unknownItem {
             // Already gone
         } catch let error as CKError {
             handleError(error, context: "deleteReport")
         } catch {
+            #if DEBUG
             print("[CloudKit] Delete failed: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -100,13 +118,21 @@ class CloudKitHazardService {
     private func handleError(_ error: CKError, context: String) {
         switch error.code {
         case .networkUnavailable, .networkFailure:
+            #if DEBUG
             print("[CloudKit] \(context): offline — using local cache")
+            #endif
         case .quotaExceeded:
+            #if DEBUG
             print("[CloudKit] \(context): quota exceeded")
+            #endif
         case .notAuthenticated:
+            #if DEBUG
             print("[CloudKit] \(context): not signed in to iCloud")
+            #endif
         default:
+            #if DEBUG
             print("[CloudKit] \(context): \(error.localizedDescription)")
+            #endif
         }
     }
 }

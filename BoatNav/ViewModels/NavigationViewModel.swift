@@ -96,7 +96,9 @@ class NavigationViewModel: ObservableObject {
     // MARK: - Waterway graph
 
     func loadWaterwayGraph() async {
+        #if DEBUG
         print("[Nav] loadWaterwayGraph started, speedLimitService is \(speedLimitService == nil ? "nil" : "set")")
+        #endif
         do {
             let segments = try await pdokClient.fetchWaterways(
                 for: .init(
@@ -112,14 +114,18 @@ class NavigationViewModel: ObservableObject {
 
             let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
             let withCemt = segments.filter { $0.cemtClass != nil && !$0.cemtClass!.isEmpty }.count
+            #if DEBUG
             print("[Nav] Loaded \(segments.count) segments, \(withSpeed) with speed, \(withCemt) with CEMT, speedLimitService is \(speedLimitService == nil ? "nil!" : "set")")
+            #endif
 
             await MainActor.run {
                 self.speedLimitService?.update(segments: segments)
                 self.errorMessage = nil
             }
         } catch {
+            #if DEBUG
             print("[Nav] loadWaterwayGraph FAILED: \(error.localizedDescription)")
+            #endif
             await MainActor.run {
                 self.errorMessage = "Kan vaarwegdata niet laden: \(error.localizedDescription)"
             }
@@ -176,10 +182,22 @@ class NavigationViewModel: ObservableObject {
         }
     }
 
-    func addFavorite(name: String, description: String = "", coordinate: CLLocationCoordinate2D) {
+    /// Returns true if the favorite was added, false if the free-tier limit was reached.
+    @discardableResult
+    func addFavorite(name: String, description: String = "", coordinate: CLLocationCoordinate2D) -> Bool {
+        if !FeatureGating.canSaveUnlimitedFavorites,
+           favorites.count >= FeatureGating.maxFreeFavorites {
+            return false
+        }
         let fav = FavoriteLocation(name: name, description: description, coordinate: coordinate)
         favorites.append(fav)
         FavoriteLocation.saveAll(favorites)
+        return true
+    }
+
+    var canAddMoreFavorites: Bool {
+        FeatureGating.canSaveUnlimitedFavorites
+            || favorites.count < FeatureGating.maxFreeFavorites
     }
 
     func deleteFavorite(at offsets: IndexSet) {
@@ -412,8 +430,11 @@ class NavigationViewModel: ObservableObject {
 
     // MARK: - Saved routes
 
-    func saveCurrentRoute() {
-        guard destinationSelection != .none else { return }
+    /// Returns true on success, false if Pro is required.
+    @discardableResult
+    func saveCurrentRoute() -> Bool {
+        guard destinationSelection != .none else { return false }
+        guard FeatureGating.canSaveRoutes else { return false }
 
         let route = SavedRoute(
             name: "\(startSelection.displayName) → \(destinationSelection.displayName)",
@@ -425,6 +446,7 @@ class NavigationViewModel: ObservableObject {
 
         savedRoutes.append(route)
         SavedRoute.saveAll(savedRoutes)
+        return true
     }
 
     func deleteSavedRoute(at offsets: IndexSet) {

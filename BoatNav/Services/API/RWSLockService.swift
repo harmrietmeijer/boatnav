@@ -90,9 +90,13 @@ class RWSLockService {
                 )
             }
 
+            #if DEBUG
             print("[RWSLock] Loaded \(cachedLocks.count) locks from ArcGIS")
+            #endif
         } catch {
+            #if DEBUG
             print("[RWSLock] Failed to fetch lock metadata: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -130,9 +134,13 @@ class RWSLockService {
             }
 
             cachedStatuses = statuses
+            #if DEBUG
             print("[RWSLock] Live status: \(statuses.count) chambers")
+            #endif
         } catch {
+            #if DEBUG
             print("[RWSLock] Failed to fetch live status: \(error.localizedDescription)")
+            #endif
         }
     }
 

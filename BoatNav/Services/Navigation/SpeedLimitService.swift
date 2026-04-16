@@ -8,7 +8,9 @@ class SpeedLimitService {
         self.segments = segments
         let withExplicit = segments.filter { $0.maxSpeedKmh != nil }.count
         let withCemt = segments.filter { $0.cemtClass != nil && !$0.cemtClass!.isEmpty }.count
+        #if DEBUG
         print("[SpeedLimit] Updated with \(segments.count) segments (\(withExplicit) explicit speed, \(withCemt) with CEMT)")
+        #endif
     }
 
     /// Find the speed limit for the nearest waterway segment to the given location.
@@ -41,7 +43,9 @@ class SpeedLimitService {
 
         // Fallback: derive speed limit from CEMT class (Binnenvaartpolitiereglement)
         let limit = speedLimitFromCEMT(segment.cemtClass)
+        #if DEBUG
         print("[SpeedLimit] Nearest: \"\(segment.name)\" cemt=\"\(segment.cemtClass ?? "nil")\" → \(limit.map { "\($0) km/h" } ?? "nil") (dist: \(String(format: "%.0f", bestDistance))m)")
+        #endif
         return limit
     }
 

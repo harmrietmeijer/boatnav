@@ -13,7 +13,7 @@ class SubscriptionManager: ObservableObject {
     @Published var isLoading: Bool = false
 
     private let entitlementID = "BoatNav Pro"
-    private let apiKey = "test_HvdoegnVXDKqJHCSJvIlgBRlzvz"
+    private let apiKey = "appl_HBGJTqaccQQnVPdwtbPIESriWIg"
 
     // Cached status (used when offline / before first RevenueCat fetch)
     private let proStatusKey = "cached_pro_status"
@@ -52,7 +52,9 @@ class SubscriptionManager: ObservableObject {
             let info = try await Purchases.shared.customerInfo()
             updateProStatus(from: info)
         } catch {
+            #if DEBUG
             print("[Subscription] Error checking entitlement: \(error)")
+            #endif
         }
     }
 
@@ -61,7 +63,9 @@ class SubscriptionManager: ObservableObject {
         do {
             offerings = try await Purchases.shared.offerings()
         } catch {
+            #if DEBUG
             print("[Subscription] Error loading offerings: \(error)")
+            #endif
         }
         isLoading = false
     }
@@ -86,7 +90,9 @@ class SubscriptionManager: ObservableObject {
     /// Triggered by a hidden 5x-tap gesture on the sailboat icon.
     func activateOwnerBypass() {
         guard let deviceID = UIDevice.current.identifierForVendor?.uuidString else {
+            #if DEBUG
             print("[Subscription] No IDFV available; cannot bind bypass")
+            #endif
             return
         }
         let timestamp = ISO8601DateFormatter().string(from: Date())
@@ -103,7 +109,9 @@ class SubscriptionManager: ObservableObject {
             "bypass_device_id": deviceID
         ])
 
+        #if DEBUG
         print("[Subscription] Owner bypass activated for device \(deviceID)")
+        #endif
     }
 
     /// Clears the bypass on this device.
