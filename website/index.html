@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoatNav — Navigatie voor Nederlandse vaarwegen</title>
+<meta name="description" content="Navigeer slim op Nederlandse binnenwateren met actuele waterkaarten, brughoogtes, snelheidslimieten en realtime weer. Open source data van PDOK en OpenSeaMap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/" class="nav-logo">boat<span>nav</span>.nl</a>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Functies</a>
+    <a href="#pro" class="nav-link">Pro</a>
+    <a href="support.html" class="nav-link">Support</a>
+    <a href="privacy.html" class="nav-link">Privacy</a>
+  </div>
+  <div class="nav-spacer"></div>
+  <a href="#download" class="nav-cta">Download</a>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">Navigatie · binnenwateren · open data</div>
+        <h1 class="hero-title">Gebouwd voor<br><strong>open water</strong></h1>
+        <p class="hero-desc">BoatNav toont actuele waterkaarten, brughoogtes, snelheidslimieten en weer — allemaal gebaseerd op open data van PDOK en OpenSeaMap. Geen abonnement voor het kijken. Pro voor wie écht navigeert.</p>
+        <div class="hero-ctas" id="download">
+          <a href="#" class="btn btn-appstore">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+            Download op App Store
+          </a>
+          <a href="#features" class="btn btn-outline-light">Bekijk functies</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-device" style="display:flex;flex-direction:column">
+          <div class="hero-device-notch"></div>
+          <div class="hero-device-map">
+            <svg style="position:absolute;inset:0;width:100%;height:100%">
+              <line x1="0" y1="20%" x2="100%" y2="20%" stroke="#0D2840" stroke-width="0.5"/>
+              <line x1="0" y1="40%" x2="100%" y2="40%" stroke="#0D2840" stroke-width="0.5"/>
+              <line x1="0" y1="60%" x2="100%" y2="60%" stroke="#0D2840" stroke-width="0.5"/>
+              <line x1="0" y1="80%" x2="100%" y2="80%" stroke="#0D2840" stroke-width="0.5"/>
+              <line x1="25%" y1="0" x2="25%" y2="100%" stroke="#0D2840" stroke-width="0.5"/>
+              <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#0D2840" stroke-width="0.5"/>
+              <line x1="75%" y1="0" x2="75%" y2="100%" stroke="#0D2840" stroke-width="0.5"/>
+              <path d="M 10 160 Q 60 140 100 150 Q 140 160 180 145" fill="none" stroke="#378ADD" stroke-width="1.5" opacity=".6"/>
+              <path d="M 100 150 Q 140 130 190 120" fill="none" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="5 3" opacity=".35"/>
+            </svg>
+            <div class="hero-depth">2.4 m</div>
+            <div class="hero-vessel"></div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><span class="hero-sv">6.2</span><span class="hero-sl">kn</span></div>
+            <div class="hero-stat"><span class="hero-sv">147°</span><span class="hero-sl">koers</span></div>
+            <div class="hero-stat"><span class="hero-sv">4.8</span><span class="hero-sl">nm rest</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">01 — Functies</div>
+    <h2 class="section-title">Alles wat je nodig hebt op het water</h2>
+    <p class="section-sub">Van realtime snelheid tot brughoogte-waarschuwingen. Alle data komt uit betrouwbare open bronnen — Rijkswaterstaat, PDOK en OpenSeaMap.</p>
+
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        </div>
+        <h3>Waterkaart</h3>
+        <p>PDOK topografische basiskaart met boeien, bakens en dieptecontouren van OpenSeaMap. Altijd actueel, altijd accuraat.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+        </div>
+        <h3>GPS-snelheid</h3>
+        <p>Real-time snelheid in km/h en knopen. Monospace getallen zodat je ze leest als een instrumentenpaneel.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 22h20L12 2z"/><path d="M12 9v6M12 18v.5"/></svg>
+        </div>
+        <h3>Brughoogtes</h3>
+        <p>Waarschuwingen op basis van je bootprofiel. Voer je doorvaarthoogte in en BoatNav flagt elke brug die te laag is.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l3 3 7-7 5 5M3 19h18"/></svg>
+        </div>
+        <h3>Route-navigatie</h3>
+        <p>A* pathfinding over het Nederlandse waterwegennet. Van startpunt naar bestemming via vaarwegen, niet over land.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+        </div>
+        <h3>Meldingen delen</h3>
+        <p>Meld politie, drijvend vuil, ondiepte of kapotte betonning. Andere vaarders zien jouw waarschuwingen op de kaart.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11a4 4 0 108 0 4 4 0 00-8 0zM2 21v-2a4 4 0 014-4h4M16 21v-2a4 4 0 014-4"/></svg>
+        </div>
+        <h3>Vrienden op de kaart</h3>
+        <p>Deel je locatie met een persoonlijke code. Zie waar je maten varen en navigeer direct naar hun positie.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 15c0-2 2-3 4-3s4 1 4 3M13 15c0-2 2-3 4-3s4 1 4 3M3 9c0-2 2-3 4-3s4 1 4 3"/><path d="M3 21h18"/></svg>
+        </div>
+        <h3>Weer & wind</h3>
+        <p>Temperatuur, windsterkte in Beaufort, windrichting en neerslag. Realtime uit Open-Meteo, direct zichtbaar op de kaart.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h3>Snelheidslimieten</h3>
+        <p>Automatische detectie per vaarweg. BoatNav waarschuwt als je te hard vaart — belangrijk in havens en beschermde gebieden.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20M6 14h2"/></svg>
+        </div>
+        <h3>CarPlay</h3>
+        <p>Voor onderweg naar je boot of tijdens rustig varen — BoatNav werkt in je auto via Apple CarPlay.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRO -->
+  <section id="pro" class="pro-section">
+    <div class="pro-grid">
+      <div>
+        <div class="pro-eyebrow">★ BoatNav Pro</div>
+        <h2 class="pro-title">Upgrade voor<br>serieuze vaarders</h2>
+        <p class="pro-desc">Basisfuncties zijn gratis — voor wie dagelijks vaart zijn er een paar dingen extra. Volledige route-navigatie, onbeperkt favorieten en CarPlay.</p>
+
+        <div class="pro-features">
+          <div class="pro-feature">
+            <div class="pro-feature-icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
+            </div>
+            <div class="pro-feature-text">
+              <div class="pro-feature-title">Route-navigatie tussen waypoints</div>
+              <div class="pro-feature-desc">Turn-by-turn over de vaarwegen, met bruggen en sluizen onderweg</div>
+            </div>
+          </div>
+          <div class="pro-feature">
+            <div class="pro-feature-icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
+            </div>
+            <div class="pro-feature-text">
+              <div class="pro-feature-title">Onbeperkt favorieten</div>
+              <div class="pro-feature-desc">Sla alle havens, ankerplaatsen en bestemmingen op die je wilt</div>
+            </div>
+          </div>
+          <div class="pro-feature">
+            <div class="pro-feature-icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
+            </div>
+            <div class="pro-feature-text">
+              <div class="pro-feature-title">Routes opslaan</div>
+              <div class="pro-feature-desc">Herhaal je favoriete vaartochten met één tap</div>
+            </div>
+          </div>
+          <div class="pro-feature">
+            <div class="pro-feature-icon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l3 3 7-7"/></svg>
+            </div>
+            <div class="pro-feature-text">
+              <div class="pro-feature-title">CarPlay-weergave</div>
+              <div class="pro-feature-desc">Grotere kaart, volgende brug in beeld, bedienbaar vanaf het dashboard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;justify-content:center">
+        <div class="price-card">
+          <div class="price-card-header">
+            <span class="price-card-label">Aanbevolen</span>
+          </div>
+          <div class="price-card-name">Jaarabonnement</div>
+          <div class="price-card-price">€29.99<span class="price-card-price-unit"> / jaar</span></div>
+          <div class="price-card-trial">7 dagen gratis proberen</div>
+          <div class="price-card-divider"></div>
+          <div class="price-alt">
+            <span>Lifetime</span>
+            <span class="price-alt-val">€79.99 eenmalig</span>
+          </div>
+        </div>
+        <a href="#download" class="btn btn-navy" style="width:100%;justify-content:center;padding:14px">Begin je proefperiode</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA NOTE -->
+  <section>
+    <div class="section-label">02 — Databronnen</div>
+    <h2 class="section-title">Open data, altijd actueel</h2>
+    <p class="section-sub">BoatNav gebruikt geen eigen kaartenuitgever. We halen direct bij de bron — zodat jij altijd de meest actuele informatie hebt.</p>
+
+    <div class="features" style="grid-template-columns:repeat(4,1fr)">
+      <div class="feature-card" style="padding:20px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Kaart</div>
+        <h3 style="margin-bottom:4px">PDOK</h3>
+        <p style="font-size:13px">Rijkswaterstaat NWB Vaarwegen, topografische basis</p>
+      </div>
+      <div class="feature-card" style="padding:20px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Boeien</div>
+        <h3 style="margin-bottom:4px">OpenSeaMap</h3>
+        <p style="font-size:13px">Boeien, bakens, zeemarks uit OSM</p>
+      </div>
+      <div class="feature-card" style="padding:20px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Weer</div>
+        <h3 style="margin-bottom:4px">Open-Meteo</h3>
+        <p style="font-size:13px">Realtime weer, wind en neerslag</p>
+      </div>
+      <div class="feature-card" style="padding:20px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Sync</div>
+        <h3 style="margin-bottom:4px">Apple CloudKit</h3>
+        <p style="font-size:13px">Meldingen en vriendenlocaties, versleuteld</p>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--text-3);margin-top:24px;max-width:700px">
+      <strong style="color:var(--amber-4)">Let op:</strong> BoatNav is geen vervanging voor officiële vaarkaarten. Gebruik altijd actuele Berichten aan Zeevarenden (BaZ) en houd je aan de Binnenvaartpolitiereglement (BPR).
+    </p>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-logo">boat<span>nav</span>.nl</div>
+  <div class="footer-links">
+    <a href="support.html">Support</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="mailto:hello@boatnav.nl">Contact</a>
+  </div>
+  <div class="footer-meta">v1.0 · Innovation.haus · 2026</div>
+</footer>
+
+</body>
+</html>

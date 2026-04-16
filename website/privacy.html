@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacybeleid — BoatNav</title>
+<meta name="description" content="Privacybeleid van BoatNav. Welke data wordt verzameld, waarvoor, en hoe wordt deze beschermd.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="/" class="nav-logo">boat<span>nav</span>.nl</a>
+  <div class="nav-links">
+    <a href="index.html#features" class="nav-link">Functies</a>
+    <a href="index.html#pro" class="nav-link">Pro</a>
+    <a href="support.html" class="nav-link">Support</a>
+    <a href="privacy.html" class="nav-link active">Privacy</a>
+  </div>
+  <div class="nav-spacer"></div>
+  <a href="index.html#download" class="nav-cta">Download</a>
+</nav>
+
+<div class="page-narrow content-page">
+
+  <div class="section-label">Privacy</div>
+  <h1>Privacybeleid</h1>
+  <p class="subtitle">BoatNav is ontworpen met privacy als uitgangspunt. We verzamelen alleen wat nodig is voor de functie en we verkopen nooit data aan derden.</p>
+  <div class="updated">Laatst bijgewerkt · 16 april 2026</div>
+
+  <h2>Samenvatting</h2>
+  <ul>
+    <li><strong>Je locatie</strong> blijft op je telefoon, tenzij je actief locatie-delen aanzet met vrienden.</li>
+    <li><strong>Je bootprofiel, favorieten en opgeslagen routes</strong> staan alleen lokaal op je toestel.</li>
+    <li><strong>Aankopen</strong> worden verwerkt door Apple en RevenueCat — we zien alleen of je Pro bent.</li>
+    <li><strong>Meldingen</strong> (Flitsmeister) zijn anoniem — gekoppeld aan een willekeurige ID, niet aan je persoon.</li>
+    <li><strong>Vriendenlocaties</strong> zijn versleuteld via Apple CloudKit en alleen zichtbaar voor mensen aan wie jij je code geeft.</li>
+    <li>We gebruiken <strong>geen trackers</strong>, <strong>geen advertenties</strong> en <strong>geen analytics-SDKs</strong> van derden.</li>
+  </ul>
+
+  <h2>Verwerkingsverantwoordelijke</h2>
+  <p>BoatNav wordt ontwikkeld door Innovation.haus. Voor privacyvragen: <a href="mailto:privacy@boatnav.nl">privacy@boatnav.nl</a></p>
+
+  <h2>Welke data verzamelen we?</h2>
+
+  <h3>Locatie (GPS)</h3>
+  <p>We gebruiken je precieze locatie om je positie op de kaart te tonen, je snelheid te berekenen en routes voor te bereiden. <strong>Locatie blijft op je toestel.</strong> We sturen hem niet naar een server, behalve in twee duidelijk afgebakende gevallen:</p>
+  <ul>
+    <li><strong>Locatie delen met vrienden</strong> — alleen als jij de schakelaar "Locatie delen" aan hebt gezet. Zodra je hem uit zet stopt het delen direct.</li>
+    <li><strong>Een melding plaatsen</strong> — de coördinaten van de melding worden opgeslagen, niet je eigen identiteit.</li>
+  </ul>
+  <p>Voor navigatie heeft BoatNav toegang nodig ook als de app op de achtergrond draait. Dit is alleen om je positie te blijven tracken tijdens het varen; er gaat geen data naar derden.</p>
+
+  <h3>Bootprofiel</h3>
+  <p>De naam, foto en afmetingen van je boot (hoogte, breedte, diepgang) worden <strong>alleen lokaal op je toestel</strong> opgeslagen. Dit wordt nooit gedeeld.</p>
+
+  <h3>Favorieten en routes</h3>
+  <p>Opgeslagen locaties en routes staan lokaal in de app. Bij een iCloud-backup worden ze versleuteld mee-gebackupt volgens Apple's standaard beveiliging.</p>
+
+  <h3>Aankoopgeschiedenis</h3>
+  <p>Aankopen van BoatNav Pro worden afgehandeld door Apple en geregistreerd bij RevenueCat (onze subscription-provider). We zien:</p>
+  <ul>
+    <li>Of je een actief Pro-abonnement hebt (ja/nee)</li>
+    <li>Welk abonnement (jaarlijks of lifetime)</li>
+    <li>Een anonieme gebruikers-ID van RevenueCat</li>
+  </ul>
+  <p>We zien <strong>geen</strong> naam, emailadres of betaalgegevens. Die kennen alleen Apple.</p>
+
+  <h3>Meldingen (Flitsmeister)</h3>
+  <p>Wanneer je een melding plaatst (politie, ondiepte, drijvend vuil, etc.), slaan we op:</p>
+  <ul>
+    <li>Coördinaten van de melding</li>
+    <li>Categorie</li>
+    <li>Een willekeurige gebruikers-ID (niet gekoppeld aan je persoon)</li>
+    <li>Tijdstempel</li>
+  </ul>
+  <p>Meldingen worden na 24 uur automatisch verwijderd. Als twee andere gebruikers aangeven dat de melding niet meer klopt, wordt hij direct verwijderd.</p>
+
+  <h3>Locatie delen met vrienden</h3>
+  <p>Bij het delen van locatie wordt opgeslagen:</p>
+  <ul>
+    <li>Je laatst bekende positie (lat/lon)</li>
+    <li>Een door jou gekozen weergavenaam (bijv. voornaam of bootnaam)</li>
+    <li>Een persoonlijke deelcode die jij zelf deelt met wie je wil</li>
+    <li>Een tijdstempel</li>
+  </ul>
+  <p>Alleen mensen aan wie jij je code geeft kunnen je locatie zien. Zet de schakelaar uit en de data verdwijnt direct.</p>
+
+  <h2>Waar staat die data?</h2>
+  <p>Alle data die niet lokaal op je toestel blijft, wordt opgeslagen in <strong>Apple CloudKit</strong> in datacenters in de Europese Unie. CloudKit is versleuteld tijdens transport en opslag.</p>
+
+  <h2>Data van derde partijen</h2>
+  <p>Voor kaartweergave en functionaliteit gebruikt BoatNav open data-bronnen. Bij het openen van de kaart verstuurt je toestel verzoeken naar:</p>
+  <ul>
+    <li><strong>PDOK (Rijkswaterstaat)</strong> — kaartdata en vaarweg-informatie (open data)</li>
+    <li><strong>OpenSeaMap</strong> — boeien, bakens en zeemarks (open data)</li>
+    <li><strong>Open-Meteo</strong> — actueel weer (open data, geen tracking)</li>
+    <li><strong>Overpass / OpenStreetMap</strong> — bruggen en sluizen (open data)</li>
+    <li><strong>Apple Maps</strong> — basis kaart tiles voor gebieden waar geen Nederlandse data beschikbaar is</li>
+  </ul>
+  <p>Deze diensten zien bij het laden van een kaart-gedeelte welk gebied je bekijkt (niet wie je bent). We geven geen persoonlijke data door.</p>
+
+  <h2>Wat we niet doen</h2>
+  <ul>
+    <li>Geen advertentienetwerken</li>
+    <li>Geen third-party analytics (geen Google Analytics, Firebase Analytics, etc.)</li>
+    <li>Geen tracking-cookies — BoatNav is een native app zonder webcomponenten</li>
+    <li>Geen doorverkoop van data</li>
+    <li>Geen profielen bouwen op basis van je vaargedrag</li>
+  </ul>
+
+  <h2>Jouw rechten (AVG)</h2>
+  <p>Onder de Algemene Verordening Gegevensbescherming heb je het recht om:</p>
+  <ul>
+    <li>Je data in te zien</li>
+    <li>Je data te corrigeren</li>
+    <li>Je data te laten verwijderen</li>
+    <li>Je toestemming in te trekken</li>
+    <li>Een klacht in te dienen bij de Autoriteit Persoonsgegevens</li>
+  </ul>
+  <p>Omdat de meeste data lokaal op je toestel staat, kun je dit meestal zelf doen door de app te verwijderen. Voor CloudKit-data (meldingen en vriendenlocaties): stuur een mail naar <a href="mailto:privacy@boatnav.nl">privacy@boatnav.nl</a> met je gebruikers-ID (te vinden onder Instellingen → Over → Gebruikers-ID).</p>
+
+  <h2>Kinderen</h2>
+  <p>BoatNav is niet specifiek gericht op kinderen onder de 13 jaar. We verzamelen niet bewust data van kinderen.</p>
+
+  <h2>Wijzigingen aan dit beleid</h2>
+  <p>Als we dit privacybeleid aanpassen, zie je dat bovenaan deze pagina ("Laatst bijgewerkt"). Bij belangrijke wijzigingen vragen we opnieuw je toestemming in de app.</p>
+
+  <div class="contact-card">
+    <h2>Vragen over privacy?</h2>
+    <p>We beantwoorden privacyvragen binnen 30 dagen, zoals de AVG voorschrijft.</p>
+    <p style="margin-top:16px"><a href="mailto:privacy@boatnav.nl">privacy@boatnav.nl</a></p>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-logo">boat<span>nav</span>.nl</div>
+  <div class="footer-links">
+    <a href="support.html">Support</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="mailto:hello@boatnav.nl">Contact</a>
+  </div>
+  <div class="footer-meta">v1.0 · Innovation.haus · 2026</div>
+</footer>
+
+</body>
+</html>
