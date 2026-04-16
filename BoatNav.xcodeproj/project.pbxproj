@@ -18,6 +18,7 @@
 		0EA38034E958312A6CC828F6 /* SpeedDetailContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797DA785F95BAB2268F67D61 /* SpeedDetailContent.swift */; };
 		12BC59DDDC9931B5A1352358 /* WaterwayGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C0C571731156E3ECC8D4D5 /* WaterwayGraph.swift */; };
 		1543A4E1793EE821CE8AF902 /* HazardReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89A4934B6FBA7618708FAF0 /* HazardReport.swift */; };
+		2073832C5D88684B99F99798 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93B160C2D8DFF700B664B6B /* KeychainStore.swift */; };
 		2D0AE24031FD076D4AE0F757 /* WaterwayRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B75D73750CD520D5594321 /* WaterwayRouter.swift */; };
 		338016AFAC5D721BD15A8BBA /* BuoyAnnotationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADBF9B26026C2CD8B17B8C5 /* BuoyAnnotationProvider.swift */; };
 		36EEE65DD39D4C76C8EAB6EF /* BoatProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2815D31CEF65C3EB2715D8 /* BoatProfile.swift */; };
@@ -156,6 +157,7 @@
 		B60CD9D63C58D4ABFE81583D /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		B783D7F81DBD4241F4529007 /* TileOverlayProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileOverlayProvider.swift; sourceTree = "<group>"; };
 		B88F4559ED2A241123D65E49 /* ActiveNavigationStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveNavigationStrip.swift; sourceTree = "<group>"; };
+		B93B160C2D8DFF700B664B6B /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitHazardService.swift; sourceTree = "<group>"; };
 		C9D8621EC967D5D1182A85E6 /* SeamarkAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamarkAnnotation.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 			isa = PBXGroup;
 			children = (
 				E4D78AFC4D590B28BC9CC0D2 /* FeatureGating.swift */,
+				B93B160C2D8DFF700B664B6B /* KeychainStore.swift */,
 				757E93065870D6E5E4210A40 /* SubscriptionManager.swift */,
 			);
 			path = Subscription;
@@ -636,6 +639,7 @@
 				1543A4E1793EE821CE8AF902 /* HazardReport.swift in Sources */,
 				99EEA1B24234A8462BFA17C1 /* HazardReportButton.swift in Sources */,
 				CA2496093834175384B8347B /* HazardReportViewModel.swift in Sources */,
+				2073832C5D88684B99F99798 /* KeychainStore.swift in Sources */,
 				80BABDD4F9311E253FCB0EF7 /* LocationService.swift in Sources */,
 				701E2D21ACA5D06A053D087F /* LocationSharingPanelContent.swift in Sources */,
 				552EB77B2A2FF45ADBA1D40A /* LocationSharingViewModel.swift in Sources */,

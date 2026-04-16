@@ -5,6 +5,11 @@ struct BoatProfilePanelContent: View {
     @EnvironmentObject var boatProfileVM: BoatProfileViewModel
     @FocusState private var focusedField: Field?
 
+    // Owner-bypass hidden activation — count taps within a short window
+    @State private var secretTapCount: Int = 0
+    @State private var secretTapTimer: Timer?
+    @State private var showBypassConfirmation = false
+
     enum Field: Hashable {
         case name, height, beam, draft
     }
@@ -16,9 +21,16 @@ struct BoatProfilePanelContent: View {
                 Image(systemName: "sailboat.fill")
                     .font(.title2)
                     .foregroundStyle(Design.Blue.b4)
+                    .contentShape(Rectangle())
+                    .onTapGesture { handleSecretTap() }
                 Text("Bootprofiel")
                     .font(.title2.weight(.regular))
                 Spacer()
+            }
+            .alert("Pro-toegang geactiveerd", isPresented: $showBypassConfirmation) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Alle Pro-functies zijn ontgrendeld op dit apparaat.")
             }
 
             // Avatar
@@ -136,6 +148,28 @@ struct BoatProfilePanelContent: View {
                     focusedField = nil
                 }
                 .fontWeight(.semibold)
+            }
+        }
+    }
+
+    // MARK: - Hidden Pro bypass
+
+    /// Counts taps on the sailboat icon. 5 taps within 3 seconds
+    /// activates the owner bypass for this device.
+    private func handleSecretTap() {
+        secretTapCount += 1
+        secretTapTimer?.invalidate()
+        secretTapTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
+            Task { @MainActor in secretTapCount = 0 }
+        }
+
+        if secretTapCount >= 5 {
+            secretTapCount = 0
+            secretTapTimer?.invalidate()
+            Haptics.medium()
+            Task { @MainActor in
+                SubscriptionManager.shared.activateOwnerBypass()
+                showBypassConfirmation = true
             }
         }
     }

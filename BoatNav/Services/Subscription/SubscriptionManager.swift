@@ -1,6 +1,7 @@
 import Foundation
 import RevenueCat
 import Combine
+import UIKit
 
 @MainActor
 class SubscriptionManager: ObservableObject {
@@ -14,25 +15,26 @@ class SubscriptionManager: ObservableObject {
     private let entitlementID = "BoatNav Pro"
     private let apiKey = "test_HvdoegnVXDKqJHCSJvIlgBRlzvz"
 
+    // Cached status (used when offline / before first RevenueCat fetch)
     private let proStatusKey = "cached_pro_status"
 
+    // Owner bypass — obfuscated keychain keys so they're less grep-able
+    // in a reverse-engineered binary. Do NOT rename without a migration.
+    private let bypassKey = "com.boatnav.dev.feature_flag_7c2a"
+    private let bypassDeviceKey = "com.boatnav.dev.feature_flag_7c2a_device"
+
     private init() {
-        // Check owner bypass first, then cached status
-        if UserDefaults.standard.bool(forKey: "owner_bypass") {
-            isPro = true
-        } else {
-            isPro = UserDefaults.standard.bool(forKey: proStatusKey)
-        }
+        refreshProStatusFromLocal()
     }
+
+    // MARK: - RevenueCat
 
     func configure() {
         Purchases.logLevel = .warn
         Purchases.configure(withAPIKey: apiKey)
 
-        // Check entitlement on launch
         Task { await checkEntitlement() }
 
-        // Listen for customer info changes
         Purchases.shared.delegate = PurchasesDelegateHandler.shared
         PurchasesDelegateHandler.shared.onChange = { [weak self] info in
             Task { @MainActor in
@@ -42,12 +44,10 @@ class SubscriptionManager: ObservableObject {
     }
 
     func checkEntitlement() async {
-        // Owner bypass
-        if UserDefaults.standard.bool(forKey: "owner_bypass") {
+        if isBypassActiveForThisDevice() {
             isPro = true
             return
         }
-
         do {
             let info = try await Purchases.shared.customerInfo()
             updateProStatus(from: info)
@@ -69,7 +69,6 @@ class SubscriptionManager: ObservableObject {
     func purchase(package: Package) async throws {
         isLoading = true
         defer { isLoading = false }
-
         let result = try await Purchases.shared.purchase(package: package)
         updateProStatus(from: result.customerInfo)
     }
@@ -77,21 +76,65 @@ class SubscriptionManager: ObservableObject {
     func restorePurchases() async throws {
         isLoading = true
         defer { isLoading = false }
-
         let info = try await Purchases.shared.restorePurchases()
         updateProStatus(from: info)
     }
 
-    /// 5x tap on logo activates owner bypass
+    // MARK: - Owner bypass
+
+    /// Activates Pro access for the current device only.
+    /// Triggered by a hidden 5x-tap gesture on the sailboat icon.
     func activateOwnerBypass() {
-        UserDefaults.standard.set(true, forKey: "owner_bypass")
+        guard let deviceID = UIDevice.current.identifierForVendor?.uuidString else {
+            print("[Subscription] No IDFV available; cannot bind bypass")
+            return
+        }
+        let timestamp = ISO8601DateFormatter().string(from: Date())
+
+        KeychainStore.set("1", for: bypassKey)
+        KeychainStore.set(deviceID, for: bypassDeviceKey)
         isPro = true
-        print("[Subscription] Owner bypass activated")
+
+        // Mark this device in RevenueCat subscriber attributes.
+        // Allows monitoring in the RevenueCat dashboard: sudden growth of
+        // `bypass_activated_at` attributes indicates the gesture has leaked.
+        Purchases.shared.attribution.setAttributes([
+            "bypass_activated_at": timestamp,
+            "bypass_device_id": deviceID
+        ])
+
+        print("[Subscription] Owner bypass activated for device \(deviceID)")
+    }
+
+    /// Clears the bypass on this device.
+    func deactivateOwnerBypass() {
+        KeychainStore.remove(bypassKey)
+        KeychainStore.remove(bypassDeviceKey)
+        Task { await checkEntitlement() }
+    }
+
+    /// True only when the bypass was activated on THIS specific device.
+    /// A keychain backup copied to another device will fail the IDFV match.
+    private func isBypassActiveForThisDevice() -> Bool {
+        guard KeychainStore.get(bypassKey) == "1" else { return false }
+        guard let boundID = KeychainStore.get(bypassDeviceKey),
+              let currentID = UIDevice.current.identifierForVendor?.uuidString
+        else { return false }
+        return boundID == currentID
+    }
+
+    // MARK: - Private
+
+    private func refreshProStatusFromLocal() {
+        if isBypassActiveForThisDevice() {
+            isPro = true
+        } else {
+            isPro = UserDefaults.standard.bool(forKey: proStatusKey)
+        }
     }
 
     private func updateProStatus(from info: CustomerInfo) {
-        // Owner bypass takes precedence
-        if UserDefaults.standard.bool(forKey: "owner_bypass") {
+        if isBypassActiveForThisDevice() {
             isPro = true
             return
         }
