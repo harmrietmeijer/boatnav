@@ -28,3 +28,9 @@ Package.resolved
 Pods/
 *.xcuserstate
 .claude/
+
+# Fastlane secrets
+fastlane/api_key.json
+fastlane/*.p8
+fastlane/report.xml
+build/
