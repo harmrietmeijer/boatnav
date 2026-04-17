@@ -1,0 +1,23 @@
+BoatNav is dé navigatie-app voor Nederlandse binnenwateren. Actuele waterkaarten van PDOK en OpenSeaMap, brughoogte-waarschuwingen, snelheidslimieten per vaarweg, en realtime weer.
+
+FUNCTIES
+• Waterkaart met boeien, bakens en dieptecontouren
+• Route-navigatie tussen havens, sluizen en bruggen
+• GPS-snelheid in km/h en knopen
+• Brughoogte- en diepgangwaarschuwingen op basis van je bootprofiel
+• Weer met windsterkte, beaufort en neerslag
+• Meldingen delen: politie, drijvend vuil, ondiepte, kapotte betonning, waterplanten
+• Locatie delen met vrienden via een persoonlijke code
+• Sluis- en brughoogtes op de kaart
+
+BOATNAV PRO
+Upgrade naar Pro voor:
+• Route-navigatie tussen waypoints
+• Onbeperkt favorieten en opgeslagen routes
+• Brughoogte-waarschuwingen op basis van je bootprofiel
+• CarPlay-weergave
+
+DATA
+Kaartdata van PDOK (Rijkswaterstaat binnenwateren) en OpenSeaMap. Realtime weer via Open-Meteo. Meldingen en vriendenlocaties worden versleuteld opgeslagen via Apple CloudKit.
+
+Gebruik BoatNav niet als vervanging voor officiële vaarkaarten.

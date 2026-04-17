@@ -1,0 +1,4 @@
+app_identifier("nl.boatnav.app")
+apple_id(ENV["APPLE_ID"] || "")
+team_id("3TZFTAC2SR")
+itc_team_id(ENV["ITC_TEAM_ID"] || "")

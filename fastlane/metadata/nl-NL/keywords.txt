@@ -1,0 +1,1 @@
+bootnavigatie,vaarweg,waterkaart,binnenwater,sluis,brug,GPS,knopen,vaarroute,boot,haven,zeilen

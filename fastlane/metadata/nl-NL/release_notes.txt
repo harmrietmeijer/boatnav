@@ -1,0 +1,1 @@
+Eerste release van BoatNav. Navigeer op Nederlandse binnenwateren met actuele waterkaarten, brughoogtes en snelheidslimieten.

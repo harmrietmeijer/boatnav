@@ -1,0 +1,8 @@
+BoatNav is a navigation app for Dutch inland waterways. No login required.
+
+Test hazard reporting: tap the purple hazard button (left side, above map).
+Test location sharing: open Friends panel via the map buttons on the right.
+Test in-app purchase: Settings → Upgrade to Pro. Use sandbox account.
+Waterway data is fetched from PDOK (Dutch government open data).
+
+The app uses background location to maintain GPS speed and navigation while the user is on the water with the screen off.
