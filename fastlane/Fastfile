@@ -8,6 +8,12 @@ platform :ios do
 
   desc "Build, archive, and upload to TestFlight"
   lane :beta do
+    api_key = app_store_connect_api_key(
+      key_id: "B9UDCQDB4M",
+      issuer_id: "a1706321-12dc-4e95-8895-d0ddd2d63d11",
+      key_filepath: "fastlane/AuthKey_B9UDCQDB4M.p8"
+    )
+
     increment_build_number(
       xcodeproj: "BoatNav.xcodeproj"
     )
@@ -20,15 +26,16 @@ platform :ios do
       output_name: "BoatNav.ipa",
       export_method: "app-store",
       export_options: {
-        provisioningProfiles: {
-          "nl.boatnav.app" => "match AppStore nl.boatnav.app"
-        }
-      }
+        signingStyle: "automatic",
+        teamID: "3TZFTAC2SR"
+      },
+      xcodebuild_formatter: "",
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath '#{File.expand_path("AuthKey_B9UDCQDB4M.p8", __dir__)}' -authenticationKeyID B9UDCQDB4M -authenticationKeyIssuerID a1706321-12dc-4e95-8895-d0ddd2d63d11"
     )
 
     upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-      api_key_path: "fastlane/api_key.json"
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
     )
   end
 
@@ -46,9 +53,8 @@ platform :ios do
       output_name: "BoatNav.ipa",
       export_method: "app-store",
       export_options: {
-        provisioningProfiles: {
-          "nl.boatnav.app" => "match AppStore nl.boatnav.app"
-        }
+        signingStyle: "automatic",
+        teamID: "3TZFTAC2SR"
       }
     )
 

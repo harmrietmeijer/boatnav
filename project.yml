@@ -39,6 +39,9 @@ targets:
         DEVELOPMENT_TEAM: "3TZFTAC2SR"
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_ENTITLEMENTS: BoatNav/Resources/BoatNav.entitlements
+        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.0.0"
+        VERSIONING_SYSTEM: "apple-generic"
 
   BoatNavTests:
     type: bundle.unit-test
