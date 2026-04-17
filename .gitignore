@@ -34,3 +34,5 @@ fastlane/api_key.json
 fastlane/*.p8
 fastlane/report.xml
 build/
+AuthKey_B9UDCQDB4M.p8
+*.mobileprovision
