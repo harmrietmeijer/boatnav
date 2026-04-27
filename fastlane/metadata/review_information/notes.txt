@@ -1,8 +1,14 @@
-BoatNav is a navigation app for Dutch inland waterways. No login required.
+BoatNav is a navigation app for Dutch inland waterways. No login required. iPhone only.
 
-Test hazard reporting: tap the purple hazard button (left side, above map).
-Test location sharing: open Friends panel via the map buttons on the right.
-Test in-app purchase: Settings → Upgrade to Pro. Use sandbox account.
-Waterway data is fetched from PDOK (Dutch government open data).
+BACKGROUND LOCATION — how to test:
+1. Tap the navigation button (diamond icon, right side of map)
+2. The Navigation panel opens. Tap "Kies startlocatie" → select "Huidige locatie"
+3. Tap "Kies bestemming" → "Zoek locatie" → search for "Dordrecht" → select a result
+4. Tap "Bereken route" (requires Pro — use sandbox purchase or tap the sailboat icon in Boat Profile 5 times quickly to activate Pro bypass)
+5. Once a route is calculated and navigation starts, the app uses background location to continuously track the user's GPS position, update speed readings (km/h and knots), and provide turn-by-turn navigation — even when the screen is off or the app is in the background.
 
-The app uses background location to maintain GPS speed and navigation while the user is on the water with the screen off.
+Without background location, GPS speed would freeze and navigation instructions would stop updating when the user locks their phone while on the water.
+
+HAZARD REPORTING: tap the purple button (left side, above map) to report obstacles.
+LOCATION SHARING: open Friends panel via map buttons on the right.
+IN-APP PURCHASE: see note below — both subscriptions are included in this submission.
