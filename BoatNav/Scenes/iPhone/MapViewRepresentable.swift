@@ -30,10 +30,15 @@ struct MapViewRepresentable: UIViewRepresentable {
         // Set initial region to Dordrecht/Biesbosch
         mapView.setRegion(mapViewModel.currentRegion, animated: false)
 
-        // Add tile overlays
-        let brtOverlay = mapViewModel.tileOverlayProvider.createBRTOverlay(style: mapStyle)
-        mapView.addOverlay(brtOverlay, level: .aboveLabels)
-        context.coordinator.currentBRTOverlay = brtOverlay
+        // Add tile overlays — use PDOK BRT in NL, OSM tiles elsewhere
+        let center = mapViewModel.currentRegion.center
+        let baseOverlay = mapViewModel.tileOverlayProvider.createBaseOverlay(
+            style: mapStyle,
+            latitude: center.latitude,
+            longitude: center.longitude
+        )
+        mapView.addOverlay(baseOverlay, level: .aboveLabels)
+        context.coordinator.currentBRTOverlay = baseOverlay
         context.coordinator.currentMapStyle = mapStyle
 
         if showSeamarks {
@@ -62,14 +67,23 @@ struct MapViewRepresentable: UIViewRepresentable {
             }
         }
 
-        // Swap BRT tile overlay if map style changed
-        if mapStyle != context.coordinator.currentMapStyle {
+        // Swap base tile overlay if map style changed or region crossed NL border
+        let centerLat = mapView.region.center.latitude
+        let centerLon = mapView.region.center.longitude
+        let wasInNL = context.coordinator.lastBaseWasNL
+        let nowInNL = TileOverlayProvider.isInNetherlands(centerLat, centerLon)
+        let needsSwap = mapStyle != context.coordinator.currentMapStyle || wasInNL != nowInNL
+
+        if needsSwap {
             if let old = context.coordinator.currentBRTOverlay {
                 mapView.removeOverlay(old)
             }
-            let newBRT = mapViewModel.tileOverlayProvider.createBRTOverlay(style: mapStyle)
-            mapView.insertOverlay(newBRT, at: 0, level: .aboveLabels)
-            context.coordinator.currentBRTOverlay = newBRT
+            let newBase = mapViewModel.tileOverlayProvider.createBaseOverlay(
+                style: mapStyle, latitude: centerLat, longitude: centerLon
+            )
+            mapView.insertOverlay(newBase, at: 0, level: .aboveLabels)
+            context.coordinator.currentBRTOverlay = newBase
+            context.coordinator.lastBaseWasNL = nowInNL
             context.coordinator.currentMapStyle = mapStyle
         }
 
@@ -195,6 +209,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         var currentSeamarkOverlay: MKTileOverlay?
         var currentMapStyle: MapStyle = .standaard
         var showSeamarks: Bool = true
+        var lastBaseWasNL: Bool = true
 
         init(mapViewModel: MapViewModel, navigationViewModel: NavigationViewModel, rwsLockService: RWSLockService) {
             self.mapViewModel = mapViewModel
