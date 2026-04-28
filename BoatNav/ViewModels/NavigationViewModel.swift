@@ -79,6 +79,7 @@ class NavigationViewModel: ObservableObject {
     // MARK: - Dependencies
 
     let pdokClient: PDOKClient
+    let waterwayProvider: WaterwayProvider
     weak var locationService: LocationService?
     weak var boatProfileViewModel: BoatProfileViewModel?
     weak var speedLimitService: SpeedLimitService?
@@ -87,35 +88,60 @@ class NavigationViewModel: ObservableObject {
     private var maneuverGenerator = ManeuverGenerator()
     private var searchTask: Task<Void, Never>?
 
+    /// The region the graph was last loaded for. Used to detect when the
+    /// user has moved far enough to need a new graph.
+    private var loadedGraphRegion: MKCoordinateRegion?
+
     init(pdokClient: PDOKClient) {
         self.pdokClient = pdokClient
+        self.waterwayProvider = WaterwayProvider(pdokClient: pdokClient)
         self.savedRoutes = SavedRoute.loadAll()
         self.favorites = FavoriteLocation.loadAll()
     }
 
     // MARK: - Waterway graph
 
+    /// Load the waterway graph for the current user location.
+    /// Uses PDOK in NL, OSM internationally, or a hybrid at the border.
     func loadWaterwayGraph() async {
-        #if DEBUG
-        print("[Nav] loadWaterwayGraph started, speedLimitService is \(speedLimitService == nil ? "nil" : "set")")
-        #endif
-        do {
-            let segments = try await pdokClient.fetchWaterways(
-                for: .init(
-                    center: CLLocationCoordinate2D(latitude: 51.78, longitude: 4.7),
-                    span: .init(latitudeDelta: 0.3, longitudeDelta: 0.4)
-                )
+        // Determine the region to load: user location or default (NL)
+        let region: MKCoordinateRegion
+        if let userLoc = locationService?.currentLocation?.coordinate {
+            region = MKCoordinateRegion(
+                center: userLoc,
+                span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.4)
             )
+        } else {
+            // Default: Dordrecht / Biesbosch area
+            region = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 51.78, longitude: 4.7),
+                span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.4)
+            )
+        }
+
+        await loadWaterwayGraph(for: region)
+    }
+
+    /// Load the waterway graph for a specific region.
+    func loadWaterwayGraph(for region: MKCoordinateRegion) async {
+        let source = waterwayProvider.bestSource(for: region)
+
+        #if DEBUG
+        print("[Nav] loadWaterwayGraph for \(region.center.latitude),\(region.center.longitude) via \(source.rawValue)")
+        #endif
+
+        do {
+            let segments = try await waterwayProvider.fetchWaterways(for: region)
 
             let graph = WaterwayGraph()
             graph.build(from: segments)
             self.waterwayGraph = graph
             self.router = WaterwayRouter(graph: graph)
+            self.loadedGraphRegion = region
 
-            let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
-            let withCemt = segments.filter { $0.cemtClass != nil && !$0.cemtClass!.isEmpty }.count
             #if DEBUG
-            print("[Nav] Loaded \(segments.count) segments, \(withSpeed) with speed, \(withCemt) with CEMT, speedLimitService is \(speedLimitService == nil ? "nil!" : "set")")
+            let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
+            print("[Nav] Loaded \(segments.count) segments (\(source.rawValue)), \(withSpeed) with speed limits")
             #endif
 
             await MainActor.run {
@@ -129,6 +155,28 @@ class NavigationViewModel: ObservableObject {
             await MainActor.run {
                 self.errorMessage = "Kan vaarwegdata niet laden: \(error.localizedDescription)"
             }
+        }
+    }
+
+    /// Reload the graph if the user has moved significantly from the
+    /// region the graph was originally loaded for. Call this when the
+    /// user pans the map far away or starts a route to a distant destination.
+    func reloadGraphIfNeeded(for coordinate: CLLocationCoordinate2D) async {
+        guard let loaded = loadedGraphRegion else {
+            await loadWaterwayGraph()
+            return
+        }
+
+        let distance = CLLocation(latitude: loaded.center.latitude, longitude: loaded.center.longitude)
+            .distance(from: CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude))
+
+        // Reload if user is >15km from the center of the loaded region
+        if distance > 15_000 {
+            let newRegion = MKCoordinateRegion(
+                center: coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.4)
+            )
+            await loadWaterwayGraph(for: newRegion)
         }
     }
 
@@ -236,6 +284,11 @@ class NavigationViewModel: ObservableObject {
     // MARK: - Route calculation
 
     func calculateRoute() async {
+        // Ensure graph covers the destination area
+        if let dest = destinationSelection.coordinate {
+            await reloadGraphIfNeeded(for: dest)
+        }
+
         guard let router else {
             await MainActor.run { errorMessage = RoutingError.graphNotReady.localizedDescription }
             return

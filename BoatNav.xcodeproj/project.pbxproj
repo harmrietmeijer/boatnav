@@ -25,6 +25,7 @@
 		389D047F413DE40D20D6193B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706CE6177AF3F586318EE2AB /* AppDelegate.swift */; };
 		3B26E70DFDF4377B9FE864C6 /* MapButtonCluster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AAAB7DCC0DDC8AAED884C2 /* MapButtonCluster.swift */; };
 		3C0B27CA1DB20244FDE433B0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D4F1EA32D7623142F757C72 /* Assets.xcassets */; };
+		3C5B6ADED6B12536D69D1B64 /* OSMWaterwayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A291A27B071AB35C1366C /* OSMWaterwayClient.swift */; };
 		408AFB6EE3115F20033AF83E /* SeamarkAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D8621EC967D5D1182A85E6 /* SeamarkAnnotation.swift */; };
 		4748ED7EAE6A035E817D1F65 /* SpeedCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D33D240C0C6656C68D1A283 /* SpeedCalculator.swift */; };
 		4923DBF377DA8372A513013D /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA7CA0736DC107BE9F83DD36 /* Design.swift */; };
@@ -78,6 +79,7 @@
 		E28526D1E130975630BCC386 /* SpeedDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278832E55517ED80A2D5D484 /* SpeedDashboardView.swift */; };
 		EC383080FED750E6E1A9BB0D /* FavoriteLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */; };
 		EC852DF1066622AD536A92CB /* UnitConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EAD99A6F4AE739812A4E89 /* UnitConversionTests.swift */; };
+		EFB5E99E981E34417E65EB1E /* WaterwayProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AF11146661331ECB4B27F6 /* WaterwayProvider.swift */; };
 		F0C8B5B0DDED659824B0E0FC /* TileOverlayProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B783D7F81DBD4241F4529007 /* TileOverlayProvider.swift */; };
 		F2EC4525B4F6CCEA57A02FE1 /* GeoJSONDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A81BDE224C21EAB1C902084 /* GeoJSONDecoder.swift */; };
 		F8934F62F23AF57B55F56998 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0BDA15B6E0E3535202D40A8 /* SettingsViewModel.swift */; };
@@ -107,11 +109,13 @@
 		0ADBF9B26026C2CD8B17B8C5 /* BuoyAnnotationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuoyAnnotationProvider.swift; sourceTree = "<group>"; };
 		0EE51B723FBC5E7AFDC58D7C /* MapPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPreviewView.swift; sourceTree = "<group>"; };
 		10BB218BC49F43B77C352F51 /* BoatNav.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BoatNav.entitlements; sourceTree = "<group>"; };
+		130A291A27B071AB35C1366C /* OSMWaterwayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSMWaterwayClient.swift; sourceTree = "<group>"; };
 		18B75D73750CD520D5594321 /* WaterwayRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterwayRouter.swift; sourceTree = "<group>"; };
 		1A59A5975C0ABCC9CA5E297F /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		1A81BDE224C21EAB1C902084 /* GeoJSONDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoJSONDecoder.swift; sourceTree = "<group>"; };
 		1B72455E4B52C9D4EC432E3B /* BoatNavUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatNavUITests.swift; sourceTree = "<group>"; };
 		1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitLocationService.swift; sourceTree = "<group>"; };
+		23AF11146661331ECB4B27F6 /* WaterwayProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterwayProvider.swift; sourceTree = "<group>"; };
 		254A4AB0F7AD23A00F2D8BC9 /* Waypoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waypoint.swift; sourceTree = "<group>"; };
 		267E45C70DC65B3F19E92EA6 /* OverlayPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPanel.swift; sourceTree = "<group>"; };
 		278832E55517ED80A2D5D484 /* SpeedDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedDashboardView.swift; sourceTree = "<group>"; };
@@ -282,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				1A81BDE224C21EAB1C902084 /* GeoJSONDecoder.swift */,
+				130A291A27B071AB35C1366C /* OSMWaterwayClient.swift */,
 				F2C7879367950A876E84519D /* PDOKClient.swift */,
 				D7BE10126150D8CAE76D9E79 /* PDOKEndpoints.swift */,
 				F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */,
@@ -315,6 +320,7 @@
 				50C1CFCC9420C06AF84A7AC9 /* ManeuverGenerator.swift */,
 				6306F6BA2DF6259990541CC0 /* SpeedLimitService.swift */,
 				50C0C571731156E3ECC8D4D5 /* WaterwayGraph.swift */,
+				23AF11146661331ECB4B27F6 /* WaterwayProvider.swift */,
 				18B75D73750CD520D5594321 /* WaterwayRouter.swift */,
 			);
 			path = Navigation;
@@ -658,6 +664,7 @@
 				5E9B9887C91A4573A8AEDD1E /* NavigationPanelContent.swift in Sources */,
 				D7D54D6C2B008865A99BD78E /* NavigationViewModel.swift in Sources */,
 				B0D857CD8CCE570BFF91227A /* NowPlayingService.swift in Sources */,
+				3C5B6ADED6B12536D69D1B64 /* OSMWaterwayClient.swift in Sources */,
 				011E65980143FB97F0F1F450 /* OverlayPanel.swift in Sources */,
 				5410EC0EAB7E32D39E2383A1 /* PDOKClient.swift in Sources */,
 				D9EB25036AECCA4DD8F30FAE /* PDOKEndpoints.swift in Sources */,
@@ -680,6 +687,7 @@
 				8DDBAA0AD42105C6BC3D3A49 /* UnitConversion.swift in Sources */,
 				C0EEE732C7A4A1DA016CABCD /* Waterway.swift in Sources */,
 				12BC59DDDC9931B5A1352358 /* WaterwayGraph.swift in Sources */,
+				EFB5E99E981E34417E65EB1E /* WaterwayProvider.swift in Sources */,
 				2D0AE24031FD076D4AE0F757 /* WaterwayRouter.swift in Sources */,
 				AE5E060DEB650A7E0648EAD7 /* Waypoint.swift in Sources */,
 				D7FBCC805C07D9E3D4BFE826 /* WeatherBarView.swift in Sources */,
@@ -764,7 +772,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -877,7 +885,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
