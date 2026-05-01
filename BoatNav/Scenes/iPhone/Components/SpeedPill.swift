@@ -40,15 +40,16 @@ struct SpeedPill: View {
                         // Speed limit if present
                         if let limit = speedViewModel.currentSpeedLimit {
                             statusPill(
-                                text: String(format: "%.0f km/h", limit),
+                                text: String(format: "Max %.0f", limit),
                                 dotColor: speedViewModel.isExceedingLimit ? Design.Red.r5 : Design.Blue.b5,
-                                textColor: speedViewModel.isExceedingLimit ? Design.Red.r5 : Design.Blue.b5,
+                                textColor: speedViewModel.isExceedingLimit ? Design.Red.r5 : .white,
                                 bg: speedViewModel.isExceedingLimit
                                     ? Color(hex: 0x200505)
                                     : Design.Ink.secondary,
                                 border: speedViewModel.isExceedingLimit
                                     ? Color(hex: 0x3A0A0A)
-                                    : Color(hex: 0x1E4060)
+                                    : Color(hex: 0x1E4060),
+                                fontSize: 13
                             )
                         }
                     }
@@ -103,13 +104,13 @@ struct SpeedPill: View {
 
     // MARK: - Status pill
 
-    private func statusPill(text: String, dotColor: Color, textColor: Color, bg: Color, border: Color) -> some View {
+    private func statusPill(text: String, dotColor: Color, textColor: Color, bg: Color, border: Color, fontSize: CGFloat = 11) -> some View {
         HStack(spacing: 6) {
             Circle()
                 .fill(dotColor)
                 .frame(width: 5, height: 5)
             Text(text)
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: fontSize, weight: .semibold))
                 .foregroundStyle(textColor)
         }
         .padding(.horizontal, 10)

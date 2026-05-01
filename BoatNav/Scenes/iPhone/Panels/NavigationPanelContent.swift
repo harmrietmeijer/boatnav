@@ -444,25 +444,25 @@ struct NavigationPanelContent: View {
 
             // Speed limit
             if let limit = speedViewModel.currentSpeedLimit {
-                HStack(spacing: 12) {
+                HStack(spacing: 16) {
                     // Speed limit sign
                     Text(String(format: "%.0f", limit))
-                        .font(.system(size: 18, weight: .bold, design: .monospaced))
+                        .font(.system(size: 32, weight: .bold, design: .monospaced))
                         .foregroundStyle(Design.Red.r4)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 72, height: 72)
                         .background(
                             Circle()
                                 .fill(.white)
-                                .overlay(Circle().stroke(Design.Red.r4, lineWidth: 3))
+                                .overlay(Circle().stroke(Design.Red.r4, lineWidth: 5))
                         )
 
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("Max. snelheid")
-                            .font(.caption)
-                            .foregroundStyle(Design.Nav.labelText)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(Design.Colors.text2)
                         Text(String(format: "%.0f km/h", limit))
-                            .font(.system(.subheadline, design: .monospaced).weight(.semibold))
-                            .foregroundStyle(Design.Nav.dataText)
+                            .font(.system(size: 22, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Design.Colors.text)
                     }
 
                     Spacer()
