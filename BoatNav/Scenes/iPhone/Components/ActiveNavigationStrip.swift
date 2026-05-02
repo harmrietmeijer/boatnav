@@ -30,14 +30,14 @@ struct ActiveNavigationStrip: View {
                     }
                     Text(route.distanceString + " · " + route.timeString)
                         .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(Design.Blue.b5)
+                        .foregroundStyle(Design.Blue.b6)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.down")
                     .font(.caption2.weight(.bold))
-                    .foregroundStyle(Design.Gray.g4)
+                    .foregroundStyle(Design.Gray.g5)
             }
             .padding(.horizontal, Design.Spacing.lg)
             .padding(.vertical, Design.Spacing.md)
@@ -58,11 +58,11 @@ struct ActiveNavigationStrip: View {
             Image(systemName: "location.fill").foregroundStyle(Design.Green.g5)
         case .turn(let direction):
             switch direction {
-            case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Blue.b5)
-            case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(Design.Blue.b5)
-            case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(Design.Blue.b5)
-            case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(Design.Blue.b5)
-            case .straight: Image(systemName: "arrow.up").foregroundStyle(Design.Blue.b5)
+            case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Blue.b6)
+            case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(Design.Blue.b6)
+            case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(Design.Blue.b6)
+            case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(Design.Blue.b6)
+            case .straight: Image(systemName: "arrow.up").foregroundStyle(Design.Blue.b6)
             }
         case .bridge:
             Image(systemName: "arrow.up.and.down.square.fill").foregroundStyle(Design.Amber.a5)

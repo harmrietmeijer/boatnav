@@ -424,7 +424,7 @@ struct NavigationPanelContent: View {
     private func sectionHeader(_ title: String, nav: Bool = false) -> some View {
         Text(title)
             .font(.system(.caption, design: .monospaced))
-            .foregroundStyle(nav ? Design.Blue.b5.opacity(0.7) : Design.Route.text3)
+            .foregroundStyle(nav ? Design.Blue.b6 : Design.Route.text3)
             .textCase(.uppercase)
             .tracking(1.5)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -536,7 +536,7 @@ struct NavigationPanelContent: View {
                             if maneuver.distanceFromPrevious > 0 {
                                 Text(String(format: "%.0f m", maneuver.distanceFromPrevious))
                                     .font(.system(.caption, design: .monospaced))
-                                    .foregroundStyle(Design.Blue.b5)
+                                    .foregroundStyle(Design.Blue.b6)
                             }
                         }
 
@@ -585,11 +585,11 @@ struct NavigationPanelContent: View {
             Image(systemName: "location.fill").foregroundStyle(Design.Green.g5)
         case .turn(let direction):
             switch direction {
-            case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Blue.b5)
-            case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(Design.Blue.b5)
-            case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(Design.Blue.b5)
-            case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(Design.Blue.b5)
-            case .straight: Image(systemName: "arrow.up").foregroundStyle(Design.Blue.b5)
+            case .left: Image(systemName: "arrow.turn.up.left").foregroundStyle(Design.Blue.b6)
+            case .right: Image(systemName: "arrow.turn.up.right").foregroundStyle(Design.Blue.b6)
+            case .slightLeft: Image(systemName: "arrow.up.left").foregroundStyle(Design.Blue.b6)
+            case .slightRight: Image(systemName: "arrow.up.right").foregroundStyle(Design.Blue.b6)
+            case .straight: Image(systemName: "arrow.up").foregroundStyle(Design.Blue.b6)
             }
         case .bridge:
             Image(systemName: "arrow.up.and.down.square.fill").foregroundStyle(Design.Amber.a5)

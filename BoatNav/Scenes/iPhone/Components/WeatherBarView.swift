@@ -13,7 +13,7 @@ struct WeatherBarView: View {
                         .symbolRenderingMode(.multicolor)
                     Text(String(format: "%.0f°", w.temperature))
                         .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Design.Blue.b5)
+                        .foregroundStyle(Design.Blue.b6)
                 }
 
                 divider
@@ -25,14 +25,14 @@ struct WeatherBarView: View {
                         .foregroundStyle(Design.Blue.b4)
                     Text("Bft \(w.beaufort)")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Design.Blue.b5)
+                        .foregroundStyle(Design.Blue.b6)
                     Image(systemName: "arrow.up")
                         .font(.system(size: 8, weight: .bold))
                         .rotationEffect(.degrees(w.windDirection))
-                        .foregroundStyle(Design.Gray.g4)
+                        .foregroundStyle(Design.Gray.g5)
                     Text(w.windDirectionLabel)
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(Design.Gray.g4)
+                        .foregroundStyle(Design.Gray.g5)
                 }
 
                 divider
@@ -61,7 +61,7 @@ struct WeatherBarView: View {
 
     private var divider: some View {
         Rectangle()
-            .fill(Color.white.opacity(0.1))
+            .fill(Color.white.opacity(0.2))
             .frame(width: 1, height: 14)
     }
 }

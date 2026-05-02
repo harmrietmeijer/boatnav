@@ -114,9 +114,9 @@ enum Design {
     // MARK: - Theme: Navigation (dark overlays on map)
 
     enum Nav {
-        static let statBg    = Color.white.opacity(0.04)
+        static let statBg    = Color.white.opacity(0.10)
         static let dataText  = Color(hex: 0xE8F4FF)
-        static let labelText = Blue.b5.opacity(0.7)
+        static let labelText = Blue.b6
     }
 
     // MARK: - Theme: Flitsmeister (deep purple)
@@ -180,7 +180,7 @@ enum Design {
         var closeButtonFg: Color {
             switch self {
             case .standard: return Colors.text3
-            case .navigation: return Blue.b5
+            case .navigation: return Blue.b6
             case .flits: return Purple.p4
             case .route: return Route.text3
             }
@@ -328,7 +328,7 @@ struct BoatNavButtonStyle: ButtonStyle {
 
 /// Navy button — dark background, colored text (the primary style from the design system)
 struct NavyButtonStyle: ButtonStyle {
-    var textColor: Color = Design.Blue.b5
+    var textColor: Color = Design.Blue.b6
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
