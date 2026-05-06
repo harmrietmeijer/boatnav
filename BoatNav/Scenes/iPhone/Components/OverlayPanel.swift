@@ -81,6 +81,7 @@ struct OverlayPanel<Content: View>: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .shadow(color: .black.opacity(0.08), radius: 20, y: -4)
+                .environment(\.colorScheme, theme == .standard ? .light : .dark)
                 .simultaneousGesture(
                     DragGesture()
                         .updating($dragOffset) { value, state, _ in
