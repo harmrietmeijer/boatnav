@@ -50,6 +50,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         locationSharingViewModel.navigationViewModel = navigationViewModel
         locationService.startUpdating()
         SubscriptionManager.shared.configure()
+        SubscriptionManager.shared.syncBypassStatus()
 
         // Load waterway graph for routing and speed limits
         Task {

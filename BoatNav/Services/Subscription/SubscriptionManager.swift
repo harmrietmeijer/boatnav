@@ -1,5 +1,6 @@
 import Foundation
 import RevenueCat
+import CloudKit
 import Combine
 import UIKit
 
@@ -22,6 +23,10 @@ class SubscriptionManager: ObservableObject {
     // in a reverse-engineered binary. Do NOT rename without a migration.
     private let bypassKey = "com.boatnav.dev.feature_flag_7c2a"
     private let bypassDeviceKey = "com.boatnav.dev.feature_flag_7c2a_device"
+
+    // CloudKit — remote bypass management
+    private let cloudContainer = CKContainer(identifier: "iCloud.nl.boatnav.app")
+    private let bypassRecordType = "OwnerBypass"
 
     private init() {
         refreshProStatusFromLocal()
@@ -102,12 +107,13 @@ class SubscriptionManager: ObservableObject {
         isPro = true
 
         // Mark this device in RevenueCat subscriber attributes.
-        // Allows monitoring in the RevenueCat dashboard: sudden growth of
-        // `bypass_activated_at` attributes indicates the gesture has leaked.
         Purchases.shared.attribution.setAttributes([
             "bypass_activated_at": timestamp,
             "bypass_device_id": deviceID
         ])
+
+        // Log to CloudKit so we can see who activated and remotely deactivate
+        saveBypassToCloud(deviceID: deviceID, timestamp: timestamp)
 
         #if DEBUG
         print("[Subscription] Owner bypass activated for device \(deviceID)")
@@ -119,6 +125,66 @@ class SubscriptionManager: ObservableObject {
         KeychainStore.remove(bypassKey)
         KeychainStore.remove(bypassDeviceKey)
         Task { await checkEntitlement() }
+    }
+
+    /// Check CloudKit if this device's bypass has been remotely deactivated.
+    /// Call on app launch after configure().
+    func syncBypassStatus() {
+        guard isBypassActiveForThisDevice(),
+              let deviceID = UIDevice.current.identifierForVendor?.uuidString
+        else { return }
+
+        let predicate = NSPredicate(format: "deviceID == %@", deviceID)
+        let query = CKQuery(recordType: bypassRecordType, predicate: predicate)
+        let db = cloudContainer.publicCloudDatabase
+
+        Task {
+            do {
+                let (results, _) = try await db.records(matching: query, resultsLimit: 1)
+                let records = results.compactMap { try? $0.1.get() }
+
+                if let record = records.first {
+                    let active = record["active"] as? Int64 ?? 1
+                    if active == 0 {
+                        // Remotely deactivated
+                        await MainActor.run {
+                            deactivateOwnerBypass()
+                        }
+                        #if DEBUG
+                        print("[Subscription] Bypass remotely deactivated for \(deviceID)")
+                        #endif
+                    }
+                }
+            } catch {
+                #if DEBUG
+                print("[Subscription] CloudKit bypass sync failed: \(error.localizedDescription)")
+                #endif
+            }
+        }
+    }
+
+    // MARK: - CloudKit bypass logging
+
+    private func saveBypassToCloud(deviceID: String, timestamp: String) {
+        let record = CKRecord(recordType: bypassRecordType)
+        record["deviceID"] = deviceID
+        record["activatedAt"] = timestamp
+        record["active"] = 1 as Int64
+        record["deviceName"] = UIDevice.current.name
+
+        let db = cloudContainer.publicCloudDatabase
+        Task {
+            do {
+                try await db.save(record)
+                #if DEBUG
+                print("[Subscription] Bypass logged to CloudKit")
+                #endif
+            } catch {
+                #if DEBUG
+                print("[Subscription] CloudKit save failed: \(error.localizedDescription)")
+                #endif
+            }
+        }
     }
 
     /// True only when the bypass was activated on THIS specific device.
