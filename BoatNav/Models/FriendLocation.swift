@@ -34,15 +34,20 @@ struct FriendLocation {
 
     init?(from record: CKRecord) {
         guard let userID = record["userID"] as? String,
-              let displayName = record["displayName"] as? String,
-              let latitude = record["latitude"] as? Double,
-              let longitude = record["longitude"] as? Double else { return nil }
+              let displayName = record["displayName"] as? String else { return nil }
+
+        let latitude = (record["latitude"] as? NSNumber)?.doubleValue
+            ?? (record["latitude"] as? Double)
+        let longitude = (record["longitude"] as? NSNumber)?.doubleValue
+            ?? (record["longitude"] as? Double)
+
+        guard let lat = latitude, let lon = longitude else { return nil }
 
         self.userID = userID
         self.displayName = displayName
-        self.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        self.heading = (record["heading"] as? Double) ?? 0
+        self.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        self.heading = (record["heading"] as? NSNumber)?.doubleValue ?? 0
         self.lastUpdated = (record["lastUpdated"] as? Date) ?? record.creationDate ?? Date()
-        self.isSharing = ((record["isSharing"] as? Int) ?? 1) != 0
+        self.isSharing = ((record["isSharing"] as? NSNumber)?.intValue ?? 1) != 0
     }
 }

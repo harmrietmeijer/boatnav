@@ -455,9 +455,6 @@ class NavigationViewModel: ObservableObject {
                 self.currentRoute = finalRoute
                 self.isNavigating = true
                 self.isLoadingRoute = false
-                #if canImport(UIKit)
-                UIApplication.shared.isIdleTimerDisabled = true
-                #endif
             }
         } catch {
             await MainActor.run {
@@ -483,9 +480,6 @@ class NavigationViewModel: ObservableObject {
     func stopNavigation() {
         isNavigating = false
         currentRoute = nil
-        #if canImport(UIKit)
-        UIApplication.shared.isIdleTimerDisabled = false
-        #endif
     }
 
     func setDestinationFromFriend(name: String, coordinate: CLLocationCoordinate2D) {

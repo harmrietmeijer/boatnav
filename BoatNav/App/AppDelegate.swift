@@ -52,6 +52,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         SubscriptionManager.shared.configure()
         SubscriptionManager.shared.syncBypassStatus()
 
+        // Keep screen on while app is active — essential for navigation and speed display
+        UIApplication.shared.isIdleTimerDisabled = true
+
         // Load waterway graph for routing and speed limits
         Task {
             await navigationViewModel.loadWaterwayGraph()

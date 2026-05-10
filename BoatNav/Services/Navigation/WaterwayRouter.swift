@@ -58,7 +58,16 @@ class WaterwayRouter {
             }
         }
 
-        if let result = bestResult {
+        if var result = bestResult {
+            // Add snap distances (origin → first node, last node → destination)
+            // to get the true total distance
+            result = RouteResult(
+                path: result.path,
+                edges: result.edges,
+                totalDistance: bestTotalCost,
+                originSnapPoint: result.originSnapPoint,
+                destinationSnapPoint: result.destinationSnapPoint
+            )
             return result
         }
 

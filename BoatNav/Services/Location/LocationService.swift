@@ -19,6 +19,7 @@ class LocationService: NSObject, ObservableObject {
         locationManager.activityType = .otherNavigation
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.showsBackgroundLocationIndicator = true
+        locationManager.pausesLocationUpdatesAutomatically = false
     }
 
     func requestPermission() {
