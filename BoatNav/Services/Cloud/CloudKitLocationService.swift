@@ -99,29 +99,71 @@ class CloudKitLocationService {
         print("[LocationShare] Searching for shareCode: \(upperCode)")
         #endif
 
+        // Primary: indexed query on shareCode
         let predicate = NSPredicate(format: "shareCode == %@", upperCode)
         let query = CKQuery(recordType: FriendLocation.recordType, predicate: predicate)
 
-        let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
+        do {
+            let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
+            #if DEBUG
+            print("[LocationShare] Query returned \(results.count) results")
+            #endif
+
+            for (_, result) in results {
+                switch result {
+                case .success(let record):
+                    #if DEBUG
+                    print("[LocationShare] Record fields: \(record.allKeys())")
+                    if let sc = record["shareCode"] as? String {
+                        print("[LocationShare] Record shareCode: \(sc)")
+                    }
+                    #endif
+                    if let loc = FriendLocation(from: record) {
+                        #if DEBUG
+                        print("[LocationShare] Found user: \(loc.displayName)")
+                        #endif
+                        return loc
+                    } else {
+                        #if DEBUG
+                        print("[LocationShare] FriendLocation init returned nil for record")
+                        #endif
+                    }
+                case .failure(let error):
+                    #if DEBUG
+                    print("[LocationShare] Record decode failed: \(error)")
+                    #endif
+                }
+            }
+        } catch {
+            #if DEBUG
+            print("[LocationShare] Indexed query failed: \(error.localizedDescription)")
+            print("[LocationShare] Falling back to scan query")
+            #endif
+        }
+
+        // Fallback: fetch all profiles and filter locally
+        // (works even without a queryable index on shareCode)
+        let allPredicate = NSPredicate(value: true)
+        let fallbackQuery = CKQuery(recordType: FriendLocation.recordType, predicate: allPredicate)
+
+        let (allResults, _) = try await publicDB.records(matching: fallbackQuery, resultsLimit: 200)
         #if DEBUG
-        print("[LocationShare] Query returned \(results.count) results")
+        print("[LocationShare] Fallback scan returned \(allResults.count) records")
         #endif
 
-        for (_, result) in results {
-            switch result {
-            case .success(let record):
-                if let loc = FriendLocation(from: record) {
-                    #if DEBUG
-                    print("[LocationShare] Found user: \(loc.displayName)")
-                    #endif
-                    return loc
+        for (_, result) in allResults {
+            if case .success(let record) = result {
+                if let sc = record["shareCode"] as? String, sc.uppercased() == upperCode {
+                    if let loc = FriendLocation(from: record) {
+                        #if DEBUG
+                        print("[LocationShare] Fallback found user: \(loc.displayName)")
+                        #endif
+                        return loc
+                    }
                 }
-            case .failure(let error):
-                #if DEBUG
-                print("[LocationShare] Record decode failed: \(error)")
-                #endif
             }
         }
+
         return nil
     }
 
