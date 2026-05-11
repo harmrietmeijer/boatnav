@@ -77,29 +77,39 @@ class LocationSharingViewModel: ObservableObject {
             self.userID = uid
 
             // Generate share code if needed
-            await MainActor.run {
+            let code: String = await MainActor.run {
                 if shareCode.isEmpty {
                     shareCode = Self.generateShareCode()
                 }
+                return shareCode
             }
+
+            let coord = locationService?.currentLocation?.coordinate
+                ?? CLLocationCoordinate2D(latitude: 51.78, longitude: 4.70)
 
             let profile = FriendLocation(
                 userID: uid,
                 displayName: displayName,
-                coordinate: locationService?.currentLocation?.coordinate ?? CLLocationCoordinate2D(),
+                coordinate: coord,
                 heading: 0,
                 lastUpdated: Date(),
                 isSharing: true
             )
 
-            await cloudService.saveProfile(profile, shareCode: shareCode)
+            let saveError = await cloudService.saveProfile(profile, shareCode: code)
             await MainActor.run {
-                isSharing = true
-                isSettingUp = false
+                if let error = saveError {
+                    errorMessage = "Opslaan mislukt: \(error)"
+                    isSettingUp = false
+                } else {
+                    isSharing = true
+                    isSettingUp = false
+                }
             }
         } catch {
+            print("[LocationShare] setupSharing failed: \(error)")
             await MainActor.run {
-                errorMessage = "Log in bij iCloud om locatie te delen"
+                errorMessage = "Log in bij iCloud om locatie te delen: \(error.localizedDescription)"
                 isSettingUp = false
             }
         }

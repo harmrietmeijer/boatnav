@@ -14,21 +14,19 @@ class CloudKitLocationService {
 
     // MARK: - Profile (save/update)
 
-    func saveProfile(_ profile: FriendLocation, shareCode: String) async {
-        // Try to fetch existing record first, then update — avoids serverRecordChanged conflicts
-        let recordID = CKRecord.ID(recordName: profile.userID)
+    /// Saves the user profile to CloudKit. Returns an error string if it fails, nil on success.
+    func saveProfile(_ profile: FriendLocation, shareCode: String) async -> String? {
+        // Use "profile-<userID>" as record name to avoid conflicts with
+        // system record names (CloudKit user IDs start with "_")
+        let recordName = "profile-\(profile.userID)"
+        let recordID = CKRecord.ID(recordName: recordName)
         let record: CKRecord
         do {
             record = try await publicDB.record(for: recordID)
-            #if DEBUG
             print("[LocationShare] Found existing profile, updating")
-            #endif
         } catch {
-            // Record doesn't exist yet — create new
-            record = profile.toCKRecord()
-            #if DEBUG
-            print("[LocationShare] Creating new profile")
-            #endif
+            record = CKRecord(recordType: FriendLocation.recordType, recordID: recordID)
+            print("[LocationShare] Creating new profile record: \(recordName)")
         }
 
         record["userID"] = profile.userID as NSString
@@ -41,19 +39,18 @@ class CloudKitLocationService {
         record["isSharing"] = NSNumber(value: profile.isSharing ? 1 : 0)
 
         do {
-            try await publicDB.save(record)
-            #if DEBUG
-            print("[LocationShare] Saved profile \(profile.displayName) with code \(shareCode)")
-            #endif
+            let saved = try await publicDB.save(record)
+            let storedCode = saved["shareCode"] as? String ?? "NIL"
+            print("[LocationShare] Saved OK — recordName: '\(saved.recordID.recordName)', shareCode: '\(storedCode)', displayName: '\(saved["displayName"] as? String ?? "NIL")'")
+            return nil
         } catch {
-            #if DEBUG
-            print("[LocationShare] Save profile failed: \(error)")
-            #endif
+            print("[LocationShare] Save FAILED: \(error)")
+            return error.localizedDescription
         }
     }
 
     func updateLocation(userID: String, latitude: Double, longitude: Double, heading: Double) async {
-        let recordID = CKRecord.ID(recordName: userID)
+        let recordID = CKRecord.ID(recordName: "profile-\(userID)")
         do {
             let record = try await publicDB.record(for: recordID)
             record["latitude"] = NSNumber(value: latitude)
@@ -73,7 +70,7 @@ class CloudKitLocationService {
     }
 
     func setSharing(userID: String, isSharing: Bool) async {
-        let recordID = CKRecord.ID(recordName: userID)
+        let recordID = CKRecord.ID(recordName: "profile-\(userID)")
         do {
             let record = try await publicDB.record(for: recordID)
             record["isSharing"] = NSNumber(value: isSharing ? 1 : 0)
@@ -95,38 +92,26 @@ class CloudKitLocationService {
 
     func findByShareCode(_ code: String) async throws -> FriendLocation? {
         let upperCode = code.uppercased()
-        #if DEBUG
-        print("[LocationShare] Searching for shareCode: \(upperCode)")
-        #endif
+        print("[LocationShare] Searching for shareCode: '\(upperCode)' in recordType: '\(FriendLocation.recordType)'")
 
         let predicate = NSPredicate(format: "shareCode == %@", upperCode)
         let query = CKQuery(recordType: FriendLocation.recordType, predicate: predicate)
 
         let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
-        #if DEBUG
         print("[LocationShare] Query returned \(results.count) results")
-        #endif
 
         for (_, result) in results {
             switch result {
             case .success(let record):
-                #if DEBUG
-                print("[LocationShare] Record fields: \(record.allKeys())")
-                #endif
+                print("[LocationShare] Record keys: \(record.allKeys()), shareCode='\(record["shareCode"] as? String ?? "NIL")'")
                 if let loc = FriendLocation(from: record) {
-                    #if DEBUG
                     print("[LocationShare] Found user: \(loc.displayName)")
-                    #endif
                     return loc
                 } else {
-                    #if DEBUG
-                    print("[LocationShare] FriendLocation init returned nil for record")
-                    #endif
+                    print("[LocationShare] FriendLocation init returned nil — userID=\(record["userID"] as? String ?? "NIL"), lat=\(record["latitude"] ?? "NIL"), lon=\(record["longitude"] ?? "NIL")")
                 }
             case .failure(let error):
-                #if DEBUG
                 print("[LocationShare] Record decode failed: \(error)")
-                #endif
             }
         }
         return nil
@@ -234,7 +219,7 @@ class CloudKitLocationService {
         var locations: [FriendLocation] = []
         // Fetch each friend's profile by record ID
         for friendID in friendIDs {
-            let recordID = CKRecord.ID(recordName: friendID)
+            let recordID = CKRecord.ID(recordName: "profile-\(friendID)")
             do {
                 let record = try await publicDB.record(for: recordID)
                 if let loc = FriendLocation(from: record), loc.isSharing {
