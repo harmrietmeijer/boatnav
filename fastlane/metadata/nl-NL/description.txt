@@ -21,3 +21,9 @@ DATA
 Kaartdata van PDOK (Rijkswaterstaat binnenwateren) en OpenSeaMap. Realtime weer via Open-Meteo. Meldingen en vriendenlocaties worden versleuteld opgeslagen via Apple CloudKit.
 
 Gebruik BoatNav niet als vervanging voor officiële vaarkaarten.
+
+ABONNEMENTEN
+BoatNav Pro is beschikbaar als jaarabonnement (€29,99/jaar, 7 dagen gratis proberen) of lifetime-aankoop (€79,99 eenmalig). Betaling wordt in rekening gebracht op je Apple ID-account bij bevestiging van aankoop. Abonnementen worden automatisch verlengd tenzij je ten minste 24 uur voor het einde van de huidige periode opzegt via je Apple ID-instellingen.
+
+Privacybeleid: https://boatnav.nl/privacy.html
+Gebruiksvoorwaarden: https://boatnav.nl/terms.html

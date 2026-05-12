@@ -776,7 +776,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -889,7 +889,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
