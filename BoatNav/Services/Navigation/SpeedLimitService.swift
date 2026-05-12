@@ -65,7 +65,7 @@ class SpeedLimitService {
         case "0", "M":
             return 6.0
         case "I":
-            return 9.0
+            return 6.0
         case "II":
             return 9.0
         case "III":
@@ -90,7 +90,7 @@ class SpeedLimitService {
             case 0..<100:
                 return 6.0    // Small recreational waterways
             case 100..<200:
-                return 9.0    // Small canals, harbors
+                return 6.0    // Small canals, harbors
             case 200..<300:
                 return 12.0   // Medium canals
             case 300..<400:
@@ -113,7 +113,7 @@ class SpeedLimitService {
         if cemt.hasPrefix("IV") { return 12.0 }
         if cemt.hasPrefix("III") { return 12.0 }
 
-        return 9.0 // Safe default for unknown codes
+        return 6.0 // Safe default for unknown codes
     }
 
     private func projectPoint(

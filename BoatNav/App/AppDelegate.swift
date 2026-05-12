@@ -23,6 +23,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let weatherViewModel: WeatherViewModel
     let hazardReportViewModel = HazardReportViewModel()
     let locationSharingViewModel = LocationSharingViewModel()
+    let maneuverProximityService = ManeuverProximityService()
 
     override init() {
         self.buoyAnnotationProvider = BuoyAnnotationProvider(pdokClient: pdokClient)
@@ -47,6 +48,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         hazardReportViewModel.startMonitoring(locationService: locationService)
         locationSharingViewModel.startMonitoring(locationService: locationService)
+        maneuverProximityService.startMonitoring(locationService: locationService, navigationViewModel: navigationViewModel)
         locationSharingViewModel.navigationViewModel = navigationViewModel
         locationService.startUpdating()
         SubscriptionManager.shared.configure()

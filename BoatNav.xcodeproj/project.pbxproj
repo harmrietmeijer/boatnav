@@ -84,6 +84,7 @@
 		F2EC4525B4F6CCEA57A02FE1 /* GeoJSONDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A81BDE224C21EAB1C902084 /* GeoJSONDecoder.swift */; };
 		F8934F62F23AF57B55F56998 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0BDA15B6E0E3535202D40A8 /* SettingsViewModel.swift */; };
 		FE730611C4BED2ADE088F861 /* ManeuverGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C1CFCC9420C06AF84A7AC9 /* ManeuverGenerator.swift */; };
+		AA111111AAAA1111AAAA1111 /* ManeuverProximityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA222222AAAA2222AAAA2222 /* ManeuverProximityService.swift */; };
 		FEE760C7B0266A57DD1405C4 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 8EA1DF3016E51A4C9CA1CC60 /* RevenueCat */; };
 /* End PBXBuildFile section */
 
@@ -131,6 +132,7 @@
 		4EA5507A89B9F6734D0CF99E /* HazardReportButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardReportButton.swift; sourceTree = "<group>"; };
 		50C0C571731156E3ECC8D4D5 /* WaterwayGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterwayGraph.swift; sourceTree = "<group>"; };
 		50C1CFCC9420C06AF84A7AC9 /* ManeuverGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManeuverGenerator.swift; sourceTree = "<group>"; };
+		AA222222AAAA2222AAAA2222 /* ManeuverProximityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManeuverProximityService.swift; sourceTree = "<group>"; };
 		5208E2F9231414F01CF18592 /* LocationSharingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSharingViewModel.swift; sourceTree = "<group>"; };
 		576E72B79740DD5DC2BCF0D0 /* HazardReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HazardReportViewModel.swift; sourceTree = "<group>"; };
 		5D4F1EA32D7623142F757C72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 			isa = PBXGroup;
 			children = (
 				50C1CFCC9420C06AF84A7AC9 /* ManeuverGenerator.swift */,
+				AA222222AAAA2222AAAA2222 /* ManeuverProximityService.swift */,
 				6306F6BA2DF6259990541CC0 /* SpeedLimitService.swift */,
 				50C0C571731156E3ECC8D4D5 /* WaterwayGraph.swift */,
 				23AF11146661331ECB4B27F6 /* WaterwayProvider.swift */,
@@ -655,6 +658,7 @@
 				552EB77B2A2FF45ADBA1D40A /* LocationSharingViewModel.swift in Sources */,
 				E0CD77386BBB3DE56EEBBA93 /* Lock.swift in Sources */,
 				FE730611C4BED2ADE088F861 /* ManeuverGenerator.swift in Sources */,
+				AA111111AAAA1111AAAA1111 /* ManeuverProximityService.swift in Sources */,
 				3B26E70DFDF4377B9FE864C6 /* MapButtonCluster.swift in Sources */,
 				8634B1498637A5424E5A81D5 /* MapPreviewView.swift in Sources */,
 				0CE988B981E6D271EFA97423 /* MapSelectionBanner.swift in Sources */,

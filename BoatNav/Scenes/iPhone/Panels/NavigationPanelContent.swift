@@ -3,6 +3,7 @@ import SwiftUI
 struct NavigationPanelContent: View {
     @EnvironmentObject var navigationViewModel: NavigationViewModel
     @EnvironmentObject var speedViewModel: SpeedViewModel
+    @EnvironmentObject var maneuverProximityService: ManeuverProximityService
     @Binding var panelDetent: PanelDetent
     @Binding var activePanel: ActivePanel
     @State private var showSearchField = false
@@ -434,6 +435,31 @@ struct NavigationPanelContent: View {
 
     private func activeNavigationContent(route: WaterwayRoute) -> some View {
         VStack(spacing: 16) {
+            // Upcoming maneuver alert
+            if let maneuver = maneuverProximityService.upcomingManeuver,
+               let distance = maneuverProximityService.distanceToManeuver,
+               distance <= 200 {
+                HStack(spacing: 16) {
+                    maneuverIcon(for: maneuver.type)
+                        .font(.system(size: 28))
+                        .frame(width: 48, height: 48)
+                        .background(Design.Blue.b1, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(maneuver.instruction)
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                        Text(String(format: "Over %.0f m", distance))
+                            .font(.system(size: 22, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Design.Amber.a5)
+                    }
+
+                    Spacer()
+                }
+                .padding(Design.Spacing.lg)
+                .background(Design.Blue.b1.opacity(0.8), in: RoundedRectangle(cornerRadius: Design.Corner.md))
+            }
+
             // Route summary cards
             HStack(spacing: 10) {
                 statCard(value: route.distanceString, label: "Afstand", color: Design.Blue.b5)

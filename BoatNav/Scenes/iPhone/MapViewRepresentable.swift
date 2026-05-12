@@ -174,14 +174,31 @@ struct MapViewRepresentable: UIViewRepresentable {
                 mapView.addOverlay(polyline, level: .aboveLabels)
                 context.coordinator.currentRouteOverlay = polyline
 
-                let rect = polyline.boundingMapRect
-                let insets = UIEdgeInsets(top: 60, left: 40, bottom: 120, right: 40)
-                mapView.setVisibleMapRect(rect, edgePadding: insets, animated: true)
+                if !navigationViewModel.isNavigating {
+                    // Route planning: zoom to fit entire route
+                    let rect = polyline.boundingMapRect
+                    let insets = UIEdgeInsets(top: 60, left: 40, bottom: 120, right: 40)
+                    mapView.setVisibleMapRect(rect, edgePadding: insets, animated: true)
+                }
             }
 
             context.coordinator.lastRouteCount = newCount
             context.coordinator.lastRouteStartLat = routeCoordinates.first?.latitude ?? 0
             context.coordinator.lastRouteStartLon = routeCoordinates.first?.longitude ?? 0
+        }
+
+        // Navigation mode: forward-looking camera like car navigation
+        if navigationViewModel.isNavigating,
+           let userLocation = mapView.userLocation.location,
+           userLocation.horizontalAccuracy >= 0 {
+            let heading = mapView.userLocation.heading?.trueHeading ?? mapView.camera.heading
+            let camera = MKMapCamera(
+                lookingAtCenter: userLocation.coordinate,
+                fromDistance: 800,
+                pitch: 45,
+                heading: heading
+            )
+            mapView.setCamera(camera, animated: true)
         }
     }
 

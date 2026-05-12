@@ -60,6 +60,7 @@ enum PDOKEndpoints {
             URLQueryItem(name: "outputFormat", value: "application/json"),
             URLQueryItem(name: "srsName", value: "EPSG:4326"),
             URLQueryItem(name: "bbox", value: "\(bbox),EPSG:4326"),
+            URLQueryItem(name: "count", value: "1000"),
         ]
         return components.url!
     }
