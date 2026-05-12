@@ -68,7 +68,7 @@ enum PDOKEndpoints {
     // MARK: - PDOK Locatieserver (Geocoding / POI search)
 
     static func locatieserver(query: String, rows: Int = 10) -> URL {
-        var components = URLComponents(string: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/suggest")!
+        var components = URLComponents(string: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free")!
         components.queryItems = [
             URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "rows", value: "\(rows)"),

@@ -65,9 +65,10 @@ struct OverlayPanel<Content: View>: View {
                     ScrollView {
                         content()
                             .padding(.horizontal, 18)
-                            .padding(.bottom, max(geometry.safeAreaInsets.bottom, 20))
+                            .padding(.bottom, max(keyboardHeight, max(geometry.safeAreaInsets.bottom, 20)))
                     }
                     .scrollDismissesKeyboard(.interactively)
+                    .defaultScrollAnchor(.bottom)
                 }
                 .frame(height: currentHeight)
                 .frame(maxWidth: .infinity)

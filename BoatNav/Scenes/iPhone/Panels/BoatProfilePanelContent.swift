@@ -79,6 +79,7 @@ struct BoatProfilePanelContent: View {
                     .submitLabel(.next)
                     .onSubmit { focusedField = .height }
             }
+            .id(Field.name)
 
             // Dimensions
             VStack(alignment: .leading, spacing: 14) {
@@ -141,6 +142,9 @@ struct BoatProfilePanelContent: View {
             Spacer()
         }
         .padding(.horizontal, Design.Spacing.lg)
+        .onChange(of: focusedField) { _, newField in
+            // Handled by OverlayPanel keyboard expansion
+        }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()

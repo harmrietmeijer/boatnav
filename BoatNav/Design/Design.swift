@@ -225,7 +225,7 @@ enum Design {
     // MARK: - Animation
 
     enum Animation {
-        static let panel = SwiftUI.Animation.spring(duration: 0.35, bounce: 0.12)
+        static let panel = SwiftUI.Animation.spring(duration: 0.3, bounce: 0.0)
         static let quick = SwiftUI.Animation.spring(duration: 0.2, bounce: 0.1)
         static let slow  = SwiftUI.Animation.spring(duration: 0.5, bounce: 0.12)
     }
