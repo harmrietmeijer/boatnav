@@ -389,7 +389,7 @@ class NavigationViewModel: ObservableObject {
 
             let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
 
-            let cruisingSpeedMs = 10.0 / 3.6
+            let cruisingSpeedMs = 7.0 / 3.6
             let estimatedTime = result.totalDistance / cruisingSpeedMs
 
             // Generate warnings based on boat profile — Pro only
