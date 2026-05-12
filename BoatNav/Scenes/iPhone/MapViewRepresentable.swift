@@ -59,8 +59,9 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        // Re-center on user location
+        // Re-center on user location (also resets nav camera override)
         if recenterOnUser {
+            context.coordinator.userOverrodeNavCamera = false
             mapView.setUserTrackingMode(.followWithHeading, animated: true)
             DispatchQueue.main.async {
                 mapViewModel.recenterTrigger = false
@@ -188,7 +189,9 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
 
         // Navigation mode: forward-looking camera like car navigation
+        // Disabled when user manually pans/zooms; re-enabled via location button
         if navigationViewModel.isNavigating,
+           !context.coordinator.userOverrodeNavCamera,
            let userLocation = mapView.userLocation.location,
            userLocation.horizontalAccuracy >= 0 {
             let heading = mapView.userLocation.heading?.trueHeading ?? mapView.camera.heading
@@ -227,6 +230,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         var currentMapStyle: MapStyle = .standaard
         var showSeamarks: Bool = true
         var lastBaseWasNL: Bool = true
+        var userOverrodeNavCamera: Bool = false
 
         init(mapViewModel: MapViewModel, navigationViewModel: NavigationViewModel, rwsLockService: RWSLockService) {
             self.mapViewModel = mapViewModel
@@ -257,6 +261,13 @@ struct MapViewRepresentable: UIViewRepresentable {
                 return renderer
             }
             return MKOverlayRenderer(overlay: overlay)
+        }
+
+        func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+            // Detect user-initiated gestures (pinch, pan) vs programmatic changes
+            if navigationViewModel.isNavigating && !animated {
+                userOverrodeNavCamera = true
+            }
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {

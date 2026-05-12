@@ -71,7 +71,9 @@ class WaterwayProvider {
         let fullyInNL = south >= nl.south && north <= nl.north && west >= nl.west && east <= nl.east
         let fullyOutsideNL = north < nl.south || south > nl.north || east < nl.west || west > nl.east
 
-        if fullyInNL { return .pdok }
+        // Always use hybrid in NL — PDOK has official data but misses smaller
+        // waterways. OSM fills the gaps for recreational/small channels.
+        if fullyInNL { return .hybrid }
         if fullyOutsideNL { return .osm }
         return .hybrid
     }
