@@ -26,7 +26,7 @@ class OSMWaterwayClient {
         let query = """
         [out:json][timeout:30];
         (
-          way["waterway"~"^(river|canal|fairway|dock)$"](\(bbox));
+          way["waterway"~"^(river|canal|fairway|dock|stream)$"](\(bbox));
         );
         out body geom;
         """
@@ -41,7 +41,7 @@ class OSMWaterwayClient {
         let query = """
         [out:json][timeout:120];
         (
-          way["waterway"~"^(river|canal|fairway|dock)$"](\(bbox));
+          way["waterway"~"^(river|canal|fairway|dock|stream)$"](\(bbox));
         );
         out body geom;
         """

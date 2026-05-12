@@ -142,10 +142,8 @@ class NavigationViewModel: ObservableObject {
             self.router = WaterwayRouter(graph: graph)
             self.loadedGraphRegion = region
 
-            #if DEBUG
             let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
-            print("[Nav] Loaded \(segments.count) segments (\(source.rawValue)), \(withSpeed) with speed limits")
-            #endif
+            print("[Nav] Loaded \(segments.count) segments (\(source.rawValue)), \(withSpeed) with speed limits, graph: \(graph.nodeCount) nodes, \(graph.edgeCount) edges")
 
             await MainActor.run {
                 self.speedLimitService?.update(segments: segments)
@@ -450,6 +448,8 @@ class NavigationViewModel: ObservableObject {
                 r.warnings = warnings
                 finalRoute = r
             }
+
+            print("[Nav] Route: \(finalRoute.totalDistance / 1000)km, \(Int(finalRoute.estimatedTime / 60))min, \(finalRoute.coordinates.count) coords, \(result.edges.count) edges")
 
             await MainActor.run {
                 self.currentRoute = finalRoute

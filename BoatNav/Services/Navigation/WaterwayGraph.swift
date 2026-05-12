@@ -52,7 +52,7 @@ class WaterwayGraph {
             adjacencyList[endNode, default: []].append(backwardEdge)
         }
 
-        mergeCloseNodes(threshold: 5.0)
+        mergeCloseNodes(threshold: 20.0)
     }
 
     /// Merge graph nodes that are within threshold meters of each other.
