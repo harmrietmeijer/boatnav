@@ -31,11 +31,16 @@ class WaterwayGraph {
     private(set) var segments: [WaterwaySegment] = []
 
     func build(from segments: [WaterwaySegment]) {
-        self.segments = segments
         adjacencyList.removeAll()
         nodes.removeAll()
 
-        for segment in segments {
+        // Phase 1: Split long segments where other segment endpoints are nearby.
+        // This creates junction nodes where a small canal meets a large river mid-segment.
+        let splitSegments = splitAtJunctions(segments, threshold: 30.0)
+        self.segments = splitSegments
+
+        // Phase 2: Build edges from (possibly split) segments
+        for segment in splitSegments {
             guard segment.coordinates.count >= 2 else { continue }
 
             let startNode = Node(coordinate: segment.startNode)
@@ -44,7 +49,6 @@ class WaterwayGraph {
             nodes.insert(startNode)
             nodes.insert(endNode)
 
-            // Bidirectional edges (waterways are navigable in both directions)
             let forwardEdge = Edge(from: startNode, to: endNode, segment: segment, weight: segment.length)
             let backwardEdge = Edge(from: endNode, to: startNode, segment: segment, weight: segment.length)
 
@@ -53,6 +57,119 @@ class WaterwayGraph {
         }
 
         mergeCloseNodes(threshold: 20.0)
+
+        print("[Graph] Built from \(segments.count) segments → \(splitSegments.count) after splitting, \(nodeCount) nodes, \(edgeCount) edges")
+    }
+
+    /// Split segments at points where other segment endpoints come close.
+    /// For example, if a canal endpoint is 10m from the middle of a river segment,
+    /// split the river segment at that point to create a junction node.
+    private func splitAtJunctions(_ segments: [WaterwaySegment], threshold: CLLocationDistance) -> [WaterwaySegment] {
+        // Collect all segment endpoints
+        var endpoints: [CLLocationCoordinate2D] = []
+        for seg in segments where seg.coordinates.count >= 2 {
+            endpoints.append(seg.startNode)
+            endpoints.append(seg.endNode)
+        }
+
+        var result: [WaterwaySegment] = []
+
+        for segment in segments {
+            guard segment.coordinates.count >= 2 else {
+                result.append(segment)
+                continue
+            }
+
+            // Find split points: indices in the coordinate array where an external
+            // endpoint is close to the line between coords[i] and coords[i+1]
+            var splitIndices: Set<Int> = []
+
+            for ep in endpoints {
+                let epLoc = CLLocation(latitude: ep.latitude, longitude: ep.longitude)
+
+                // Skip if this endpoint is near the segment's own start/end
+                let distToStart = epLoc.distance(from: CLLocation(latitude: segment.startNode.latitude, longitude: segment.startNode.longitude))
+                let distToEnd = epLoc.distance(from: CLLocation(latitude: segment.endNode.latitude, longitude: segment.endNode.longitude))
+                if distToStart < threshold || distToEnd < threshold { continue }
+
+                // Check each sub-segment of the line
+                for i in 0..<segment.coordinates.count - 1 {
+                    let a = segment.coordinates[i]
+                    let b = segment.coordinates[i + 1]
+                    let projected = projectPoint(ep, onto: a, b)
+                    let dist = epLoc.distance(from: CLLocation(latitude: projected.latitude, longitude: projected.longitude))
+
+                    if dist < threshold {
+                        // Split after this coordinate index
+                        // Use i+1 as split point (insert the projected point here)
+                        splitIndices.insert(i + 1)
+                        break // One split per endpoint per segment
+                    }
+                }
+            }
+
+            if splitIndices.isEmpty {
+                result.append(segment)
+            } else {
+                // Split the segment at the identified indices
+                let sorted = splitIndices.sorted()
+                var prevIndex = 0
+                for splitIdx in sorted {
+                    if splitIdx > prevIndex && splitIdx < segment.coordinates.count {
+                        let coords = Array(segment.coordinates[prevIndex...splitIdx])
+                        if coords.count >= 2 {
+                            result.append(makeSubSegment(from: segment, coordinates: coords, suffix: "s\(prevIndex)"))
+                        }
+                        prevIndex = splitIdx
+                    }
+                }
+                // Remaining part
+                if prevIndex < segment.coordinates.count - 1 {
+                    let coords = Array(segment.coordinates[prevIndex...])
+                    if coords.count >= 2 {
+                        result.append(makeSubSegment(from: segment, coordinates: coords, suffix: "s\(prevIndex)"))
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+
+    private func makeSubSegment(from parent: WaterwaySegment, coordinates: [CLLocationCoordinate2D], suffix: String) -> WaterwaySegment {
+        var length: Double = 0
+        for i in 1..<coordinates.count {
+            let from = CLLocation(latitude: coordinates[i-1].latitude, longitude: coordinates[i-1].longitude)
+            let to = CLLocation(latitude: coordinates[i].latitude, longitude: coordinates[i].longitude)
+            length += from.distance(from: to)
+        }
+        return WaterwaySegment(
+            id: "\(parent.id)-\(suffix)",
+            name: parent.name,
+            coordinates: coordinates,
+            cemtClass: parent.cemtClass,
+            length: length,
+            maxSpeedKmh: parent.maxSpeedKmh
+        )
+    }
+
+    private func projectPoint(
+        _ point: CLLocationCoordinate2D,
+        onto segStart: CLLocationCoordinate2D,
+        _ segEnd: CLLocationCoordinate2D
+    ) -> CLLocationCoordinate2D {
+        let dx = segEnd.longitude - segStart.longitude
+        let dy = segEnd.latitude - segStart.latitude
+        let lenSq = dx * dx + dy * dy
+        guard lenSq > 0 else { return segStart }
+        let t = max(0, min(1,
+            ((point.longitude - segStart.longitude) * dx +
+             (point.latitude - segStart.latitude) * dy) / lenSq
+        ))
+        return CLLocationCoordinate2D(
+            latitude: segStart.latitude + t * dy,
+            longitude: segStart.longitude + t * dx
+        )
     }
 
     /// Merge graph nodes that are within threshold meters of each other.
