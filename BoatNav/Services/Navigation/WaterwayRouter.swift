@@ -154,8 +154,27 @@ class WaterwayRouter {
             node = entry.node
         }
 
+        // Remove U-turns: if the route goes A→B→A on the same segment, remove the detour
+        var cleanedEdges: [WaterwayGraph.Edge] = []
+        var cleanedPath: [WaterwayGraph.Node] = [path[0]]
+        var cleanedDistance: Double = 0
+        var i = 0
+        while i < edges.count {
+            // Check for U-turn: edge[i] goes A→B and edge[i+1] goes B→A on same segment
+            if i + 1 < edges.count,
+               edges[i].segment.id == edges[i + 1].segment.id {
+                // Skip both edges (the detour)
+                i += 2
+                continue
+            }
+            cleanedEdges.append(edges[i])
+            cleanedPath.append(edges[i].to)
+            cleanedDistance += edges[i].weight
+            i += 1
+        }
+
         return RouteResult(
-            path: path, edges: edges, totalDistance: totalDistance,
+            path: cleanedPath, edges: cleanedEdges, totalDistance: cleanedDistance,
             originSnapPoint: originSnap, destinationSnapPoint: destinationSnap
         )
     }
