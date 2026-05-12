@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var panelDetent: PanelDetent = .half
     @State private var favoriteName = ""
     @State private var favoriteDescription = ""
+    @State private var pendingFavoriteFromMap = false
 
     private var panelTheme: Design.PanelTheme {
         switch activePanel {
@@ -209,9 +210,17 @@ struct ContentView: View {
         .animation(Design.Animation.panel, value: navigationViewModel.isNavigating)
         .onChange(of: navigationViewModel.isSelectingOnMap) { wasSelecting, isSelecting in
             if wasSelecting && !isSelecting {
-                withAnimation(Design.Animation.panel) {
-                    activePanel = .navigation
-                    panelDetent = .half
+                if pendingFavoriteFromMap {
+                    // Return to add-favorite dialog after map selection
+                    pendingFavoriteFromMap = false
+                    withAnimation(Design.Animation.panel) {
+                        navigationViewModel.showAddFavoriteSheet = true
+                    }
+                } else {
+                    withAnimation(Design.Animation.panel) {
+                        activePanel = .navigation
+                        panelDetent = .half
+                    }
                 }
             }
         }
@@ -383,9 +392,17 @@ struct ContentView: View {
         // Auto-open navigation panel after map selection
         .onChange(of: navigationViewModel.isSelectingOnMap) { wasSelecting, isSelecting in
             if wasSelecting && !isSelecting {
-                withAnimation(Design.Animation.panel) {
-                    activePanel = .navigation
-                    panelDetent = .half
+                if pendingFavoriteFromMap {
+                    // Return to add-favorite dialog after map selection
+                    pendingFavoriteFromMap = false
+                    withAnimation(Design.Animation.panel) {
+                        navigationViewModel.showAddFavoriteSheet = true
+                    }
+                } else {
+                    withAnimation(Design.Animation.panel) {
+                        activePanel = .navigation
+                        panelDetent = .half
+                    }
                 }
             }
         }
@@ -596,13 +613,11 @@ struct ContentView: View {
                 Divider().padding(.leading, 56)
 
                 Button {
+                    pendingFavoriteFromMap = true
                     withAnimation(Design.Animation.quick) {
                         navigationViewModel.showAddFavoriteSheet = false
                     }
                     navigationViewModel.startMapSelection(for: .destination)
-                    withAnimation(Design.Animation.panel) {
-                        panelDetent = .collapsed
-                    }
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "mappin.and.ellipse")
