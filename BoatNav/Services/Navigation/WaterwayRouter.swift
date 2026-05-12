@@ -154,51 +154,28 @@ class WaterwayRouter {
             node = entry.node
         }
 
-        // Remove U-turns and loops: detect when route revisits a node close
-        // to a previously visited node (within 50m), indicating a detour
+        // Remove same-segment U-turns (A→B→A on same segment)
         var cleanedEdges: [WaterwayGraph.Edge] = []
         var cleanedPath: [WaterwayGraph.Node] = [path[0]]
         var cleanedDistance: Double = 0
-
-        // First pass: remove same-segment U-turns (A→B→A)
-        var filtered: [(edge: WaterwayGraph.Edge, from: WaterwayGraph.Node)] = []
-        var fi = 0
-        while fi < edges.count {
-            if fi + 1 < edges.count,
-               edges[fi].segment.id == edges[fi + 1].segment.id {
-                fi += 2
+        var i = 0
+        while i < edges.count {
+            if i + 1 < edges.count,
+               edges[i].segment.id == edges[i + 1].segment.id {
+                i += 2
                 continue
             }
-            filtered.append((edges[fi], path[fi]))
-            fi += 1
+            cleanedEdges.append(edges[i])
+            cleanedPath.append(edges[i].to)
+            cleanedDistance += edges[i].weight
+            i += 1
         }
 
-        // Second pass: remove geographic loops (route revisits area within 100m)
-        var i = 0
-        while i < filtered.count {
-            // Look ahead: does any later node return close to this node?
-            var loopEnd = -1
-            let currentCoord = filtered[i].from.coordinate
-            for j in (i + 2)..<min(filtered.count, i + 6) {
-                let futureCoord = filtered[j].from.coordinate
-                let dist = CLLocation(latitude: currentCoord.latitude, longitude: currentCoord.longitude)
-                    .distance(from: CLLocation(latitude: futureCoord.latitude, longitude: futureCoord.longitude))
-                if dist < 100 {
-                    loopEnd = j
-                    break
-                }
-            }
-
-            if loopEnd > 0 {
-                // Skip the loop: jump from i directly to loopEnd
-                i = loopEnd
-                continue
-            }
-
-            cleanedEdges.append(filtered[i].edge)
-            cleanedPath.append(filtered[i].edge.to)
-            cleanedDistance += filtered[i].edge.weight
-            i += 1
+        // Safety: if cleaning removed everything, fall back to original
+        if cleanedEdges.isEmpty && !edges.isEmpty {
+            cleanedEdges = edges
+            cleanedPath = path
+            cleanedDistance = totalDistance
         }
 
         return RouteResult(
