@@ -87,31 +87,12 @@ class WaterwayProvider {
 
     // MARK: - Merging
 
-    /// Merge PDOK and OSM segments, preferring PDOK where they overlap.
-    /// Uses a spatial grid to detect duplicates within ~50m.
+    /// Merge PDOK and OSM segments. Keeps ALL segments from both sources —
+    /// the graph's node merging (20m threshold) handles connectivity.
+    /// Duplicate edges are harmless for routing but missing edges break routes.
     private func mergeSegments(pdok: [WaterwaySegment], osm: [WaterwaySegment]) -> [WaterwaySegment] {
-        // Build a set of PDOK segment midpoints (quantized to ~100m grid)
-        var pdokGrid = Set<String>()
-        for segment in pdok {
-            let mid = segment.coordinates[segment.coordinates.count / 2]
-            let key = "\(Int(mid.latitude * 1000)),\(Int(mid.longitude * 1000))"
-            pdokGrid.insert(key)
-        }
-
-        // Add all PDOK segments, then add OSM segments that don't overlap
-        var result = pdok
-        for segment in osm {
-            let mid = segment.coordinates[segment.coordinates.count / 2]
-            let key = "\(Int(mid.latitude * 1000)),\(Int(mid.longitude * 1000))"
-            if !pdokGrid.contains(key) {
-                result.append(segment)
-            }
-        }
-
-        #if DEBUG
-        print("[WaterwayProvider] Merged: \(pdok.count) PDOK + \(result.count - pdok.count) OSM = \(result.count) total")
-        #endif
-
+        let result = pdok + osm
+        print("[WaterwayProvider] Merged: \(pdok.count) PDOK + \(osm.count) OSM = \(result.count) total")
         return result
     }
 }
