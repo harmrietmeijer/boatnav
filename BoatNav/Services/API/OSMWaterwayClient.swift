@@ -22,11 +22,14 @@ class OSMWaterwayClient {
     func fetchWaterways(for region: MKCoordinateRegion) async throws -> [WaterwaySegment] {
         let bbox = overpassBbox(for: region)
 
-        // Overpass QL query for navigable waterways with geometry
+        // Overpass QL query for navigable waterways AND navigable open water
+        // Open water with boat=yes is needed for delta areas like the Biesbosch
         let query = """
         [out:json][timeout:30];
         (
           way["waterway"~"^(river|canal|fairway|dock|stream)$"](\(bbox));
+          way["natural"="water"]["water"="river"](\(bbox));
+          way["natural"="water"]["boat"="yes"](\(bbox));
         );
         out body geom;
         """
@@ -135,7 +138,7 @@ class OSMWaterwayClient {
             let name = tags["name"]
                 ?? tags["waterway:name"]
                 ?? tags["ref"]
-                ?? waterwayTypeName(tags["waterway"])
+                ?? waterwayTypeName(tags["waterway"] ?? tags["natural"])
 
             // Extract speed limit (various OSM tagging conventions)
             let maxSpeedKmh = parseSpeedLimit(tags)
@@ -194,6 +197,7 @@ class OSMWaterwayClient {
         case "canal": return "Kanaal"
         case "fairway": return "Vaargeul"
         case "dock": return "Dok"
+        case "water": return "Open water"
         default: return "Vaarweg"
         }
     }

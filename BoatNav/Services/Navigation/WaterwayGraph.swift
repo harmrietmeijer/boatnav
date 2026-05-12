@@ -56,8 +56,8 @@ class WaterwayGraph {
             adjacencyList[endNode, default: []].append(backwardEdge)
         }
 
-        mergeCloseNodes(threshold: 20.0)
-        bridgeDisconnectedComponents(maxGap: 300.0)
+        mergeCloseNodes(threshold: 30.0)
+        bridgeDisconnectedComponents(maxGap: 500.0)
 
         print("[Graph] Built from \(segments.count) segments → \(splitSegments.count) after splitting, \(nodeCount) nodes, \(edgeCount) edges")
     }
