@@ -57,6 +57,7 @@ class WaterwayGraph {
         }
 
         mergeCloseNodes(threshold: 20.0)
+        bridgeDisconnectedComponents(maxGap: 300.0)
 
         print("[Graph] Built from \(segments.count) segments → \(splitSegments.count) after splitting, \(nodeCount) nodes, \(edgeCount) edges")
     }
@@ -216,6 +217,83 @@ class WaterwayGraph {
 
         self.adjacencyList = newAdjacency
         self.nodes = newNodes
+    }
+
+    /// Bridge disconnected graph components by connecting the closest nodes
+    /// between different components. Handles gaps where river segments don't
+    /// quite meet (e.g. Beneden-Merwede ↔ Noord at Dordrecht: 260m gap).
+    private func bridgeDisconnectedComponents(maxGap: CLLocationDistance) {
+        // Find connected components via BFS
+        var visited = Set<Node>()
+        var components: [[Node]] = []
+
+        for node in nodes {
+            if visited.contains(node) { continue }
+            var component: [Node] = []
+            var queue: [Node] = [node]
+            while !queue.isEmpty {
+                let current = queue.removeFirst()
+                if visited.contains(current) { continue }
+                visited.insert(current)
+                component.append(current)
+                for edge in adjacencyList[current] ?? [] {
+                    if !visited.contains(edge.to) {
+                        queue.append(edge.to)
+                    }
+                }
+            }
+            components.append(component)
+        }
+
+        guard components.count > 1 else { return }
+
+        // Sort components by size (largest first)
+        components.sort { $0.count > $1.count }
+
+        // Try to connect each smaller component to the largest component
+        let mainComponent = Set(components[0])
+        var bridgeCount = 0
+
+        for i in 1..<components.count {
+            let otherComponent = components[i]
+            var bestDist = Double.infinity
+            var bestPair: (Node, Node)?
+
+            // Find closest node pair between main and this component
+            for otherNode in otherComponent {
+                let otherLoc = CLLocation(latitude: otherNode.coordinate.latitude, longitude: otherNode.coordinate.longitude)
+                for mainNode in mainComponent {
+                    let dist = otherLoc.distance(from: CLLocation(latitude: mainNode.coordinate.latitude, longitude: mainNode.coordinate.longitude))
+                    if dist < bestDist {
+                        bestDist = dist
+                        bestPair = (mainNode, otherNode)
+                    }
+                }
+            }
+
+            if bestDist <= maxGap, let (mainNode, otherNode) = bestPair {
+                // Create a bridge edge (virtual segment connecting the two components)
+                let bridgeSegment = WaterwaySegment(
+                    id: "bridge-\(i)",
+                    name: "Verbinding",
+                    coordinates: [mainNode.coordinate, otherNode.coordinate],
+                    cemtClass: nil,
+                    length: bestDist,
+                    maxSpeedKmh: nil
+                )
+                let fwd = Edge(from: mainNode, to: otherNode, segment: bridgeSegment, weight: bestDist)
+                let bwd = Edge(from: otherNode, to: mainNode, segment: bridgeSegment, weight: bestDist)
+                adjacencyList[mainNode, default: []].append(fwd)
+                adjacencyList[otherNode, default: []].append(bwd)
+                bridgeCount += 1
+
+                print("[Graph] Bridged component \(i) (\(otherComponent.count) nodes) to main, gap: \(Int(bestDist))m")
+            }
+        }
+
+        if bridgeCount > 0 {
+            print("[Graph] Connected \(bridgeCount) disconnected components (max gap \(Int(maxGap))m)")
+        }
     }
 
     /// Maximum snap distance in meters
