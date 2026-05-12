@@ -403,6 +403,7 @@ class PDOKClient {
         let pdok = (try? await pdokResults) ?? []
         let nominatim = (try? await nominatimResults) ?? []
         let overpass = (try? await overpassResults) ?? []
+        print("[Search] '\(query)': PDOK=\(pdok.count) Nominatim=\(nominatim.count) Overpass=\(overpass.count)")
 
         // Merge: Overpass (maritime) first, then Nominatim, then PDOK, deduplicate by proximity
         var merged: [SearchResult] = []
