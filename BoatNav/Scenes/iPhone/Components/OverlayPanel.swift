@@ -37,7 +37,7 @@ struct OverlayPanel<Content: View>: View {
                 Spacer(minLength: 0)
 
                 VStack(spacing: 0) {
-                    // Handle + close
+                    // Handle + close — drag gesture only on handle area
                     HStack {
                         Spacer()
                         RoundedRectangle(cornerRadius: 2)
@@ -60,6 +60,16 @@ struct OverlayPanel<Content: View>: View {
                     }
                     .padding(.top, 12)
                     .padding(.bottom, 10)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture()
+                            .updating($dragOffset) { value, state, _ in
+                                state = value.translation.height
+                            }
+                            .onEnded { value in
+                                handleDragEnd(translation: value.translation.height, velocity: value.predictedEndTranslation.height, maxHeight: screenHeight)
+                            }
+                    )
 
                     // Content
                     ScrollView {
@@ -68,7 +78,6 @@ struct OverlayPanel<Content: View>: View {
                             .padding(.bottom, max(keyboardHeight, max(geometry.safeAreaInsets.bottom, 20)))
                     }
                     .scrollDismissesKeyboard(.interactively)
-                    .defaultScrollAnchor(.bottom)
                 }
                 .frame(height: currentHeight)
                 .frame(maxWidth: .infinity)
@@ -83,15 +92,6 @@ struct OverlayPanel<Content: View>: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .shadow(color: .black.opacity(0.08), radius: 20, y: -4)
                 .environment(\.colorScheme, theme == .standard ? .light : .dark)
-                .simultaneousGesture(
-                    DragGesture()
-                        .updating($dragOffset) { value, state, _ in
-                            state = value.translation.height
-                        }
-                        .onEnded { value in
-                            handleDragEnd(translation: value.translation.height, velocity: value.predictedEndTranslation.height, maxHeight: screenHeight)
-                        }
-                )
 
                 if keyboardHeight > 0 {
                     Color.clear

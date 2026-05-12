@@ -169,11 +169,11 @@ struct NavigationPanelContent: View {
                 .buttonStyle(.routeOutline)
             }
 
-            // Search results
+            // Search results (max 5 visible, scrollable)
             if !navigationViewModel.searchResults.isEmpty {
                 sectionHeader("Zoekresultaten")
                 VStack(spacing: 2) {
-                    ForEach(navigationViewModel.searchResults) { result in
+                    ForEach(Array(navigationViewModel.searchResults.prefix(8))) { result in
                         Button {
                             navigationViewModel.selectSearchResult(result)
                             showSearchField = false

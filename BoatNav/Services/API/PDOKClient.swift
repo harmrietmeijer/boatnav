@@ -497,24 +497,20 @@ class PDOKClient {
     private func searchOverpass(query: String) async throws -> [SearchResult] {
         let searchTerm = query.lowercased()
 
-        // Build Overpass QL query for maritime/water POIs in the Netherlands
+        // Search Overpass for maritime POIs by name in the Netherlands
+        let escapedTerm = searchTerm.replacingOccurrences(of: "\"", with: "")
         let overpassQuery = """
-        [out:json][timeout:10];
+        [out:json][timeout:15];
         area["ISO3166-1"="NL"]->.nl;
         (
-          node["leisure"="marina"](area.nl);
-          way["leisure"="marina"](area.nl);
-          node["harbour"](area.nl);
-          way["harbour"](area.nl);
-          node["leisure"="slipway"](area.nl);
-          node["waterway"="fuel"](area.nl);
-          node["amenity"="fuel"]["boat"="yes"](area.nl);
-          node["mooring"](area.nl);
-          way["mooring"](area.nl);
-          node["seamark:type"="harbour"](area.nl);
-          node["leisure"="yacht_club"](area.nl);
+          nwr["leisure"="marina"]["name"~"\(escapedTerm)",i](area.nl);
+          nwr["harbour"]["name"~"\(escapedTerm)",i](area.nl);
+          nwr["leisure"="slipway"]["name"~"\(escapedTerm)",i](area.nl);
+          nwr["seamark:type"="harbour"]["name"~"\(escapedTerm)",i](area.nl);
+          nwr["leisure"="yacht_club"]["name"~"\(escapedTerm)",i](area.nl);
+          nwr["waterway"="fuel"]["name"~"\(escapedTerm)",i](area.nl);
         );
-        out center tags 100;
+        out center tags 50;
         """
 
         var components = URLComponents(string: "https://overpass-api.de/api/interpreter")!
@@ -540,11 +536,8 @@ class PDOKClient {
             let tags = element["tags"] as? [String: String] ?? [:]
             let name = tags["name"] ?? tags["seamark:name"] ?? tags["description"] ?? ""
 
-            // Filter: name must contain the search query
-            guard !name.isEmpty,
-                  name.lowercased().contains(searchTerm) || searchTerm.contains(name.lowercased().prefix(4)) else {
-                return nil
-            }
+            // Name already filtered by Overpass query regex
+            guard !name.isEmpty else { return nil }
 
             // Get coordinates (center for ways)
             var lat: Double?
