@@ -105,6 +105,7 @@ class SubscriptionManager: ObservableObject {
         KeychainStore.set("1", for: bypassKey)
         KeychainStore.set(deviceID, for: bypassDeviceKey)
         isPro = true
+        UserDefaults.standard.set(true, forKey: proStatusKey)
 
         // Mark this device in RevenueCat subscriber attributes.
         Purchases.shared.attribution.setAttributes([
