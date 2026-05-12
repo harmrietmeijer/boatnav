@@ -40,6 +40,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         self.navigationViewModel = NavigationViewModel(pdokClient: pdokClient)
         self.navigationViewModel.locationService = locationService
         self.navigationViewModel.boatProfileViewModel = boatProfileViewModel
+        self.navigationViewModel.settingsViewModel = settingsViewModel
         self.navigationViewModel.speedLimitService = speedViewModel.speedLimitService
         self.weatherViewModel = WeatherViewModel(locationService: locationService)
         self.mapViewModel.rwsLockService = rwsLockService

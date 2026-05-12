@@ -85,6 +85,7 @@ class NavigationViewModel: ObservableObject {
     let waterwayProvider: WaterwayProvider
     weak var locationService: LocationService?
     weak var boatProfileViewModel: BoatProfileViewModel?
+    weak var settingsViewModel: SettingsViewModel?
     weak var speedLimitService: SpeedLimitService?
     private var waterwayGraph: WaterwayGraph?
     private var router: WaterwayRouter?
@@ -389,7 +390,8 @@ class NavigationViewModel: ObservableObject {
 
             let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
 
-            let cruisingSpeedMs = 7.0 / 3.6
+            let cruisingSpeedKmh = settingsViewModel?.cruisingSpeedKmh ?? 7.0
+            let cruisingSpeedMs = cruisingSpeedKmh / 3.6
             let estimatedTime = result.totalDistance / cruisingSpeedMs
 
             // Generate warnings based on boat profile — Pro only
