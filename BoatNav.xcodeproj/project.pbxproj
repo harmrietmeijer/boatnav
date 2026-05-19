@@ -43,6 +43,7 @@
 		6F6FDB5193B89D6CB3799EDD /* PaywallPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496867366A6AB6138A4614C2 /* PaywallPanelContent.swift */; };
 		701E2D21ACA5D06A053D087F /* LocationSharingPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00804ED3D7B09AC0CC954568 /* LocationSharingPanelContent.swift */; };
 		731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */; };
+		BB333333BBBB3333BBBB3333 /* CloudKitSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */; };
 		7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFDC4FC1273FA957B613F80 /* ContentView.swift */; };
 		7AA8F36364A921EC2D93D4D0 /* TileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC70EBC17375CD538F1056E0 /* TileCache.swift */; };
 		80BABDD4F9311E253FCB0EF7 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE2BDAF4F0B6AB79DE10B7 /* LocationService.swift */; };
@@ -167,6 +168,7 @@
 		B93B160C2D8DFF700B664B6B /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitHazardService.swift; sourceTree = "<group>"; };
+		BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSchema.swift; sourceTree = "<group>"; };
 		C9D8621EC967D5D1182A85E6 /* SeamarkAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamarkAnnotation.swift; sourceTree = "<group>"; };
 		CA92C22118D378A1C6F38F6F /* UnitConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversion.swift; sourceTree = "<group>"; };
 		CF38F51FE5C7EE95AA9D2B6E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -373,6 +375,7 @@
 			isa = PBXGroup;
 			children = (
 				C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */,
+				BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */,
 				1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */,
 			);
 			path = Cloud;
@@ -639,6 +642,7 @@
 				4AC875120D4EF34166B726BB /* CarPlayMapViewController.swift in Sources */,
 				CC1A1BEEAE9F3BD0C180FB3B /* CarPlaySceneDelegate.swift in Sources */,
 				731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */,
+				BB333333BBBB3333BBBB3333 /* CloudKitSchema.swift in Sources */,
 				0073924A5E528D6A76ADAB70 /* CloudKitLocationService.swift in Sources */,
 				7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */,
 				4E944F786FF2DEF928E544E4 /* CoordinateHelpers.swift in Sources */,
@@ -776,7 +780,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 46;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -889,7 +893,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 46;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

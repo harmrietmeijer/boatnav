@@ -2,7 +2,7 @@ import CloudKit
 
 class CloudKitLocationService {
 
-    private let container = CKContainer(identifier: "iCloud.nl.boatnav.app")
+    private let container = CKContainer(identifier: CloudKitSchema.containerID)
     private var publicDB: CKDatabase { container.publicCloudDatabase }
 
     // MARK: - User identity
@@ -120,7 +120,7 @@ class CloudKitLocationService {
     // MARK: - Friend links
 
     func saveFriendLink(ownerID: String, friendID: String, friendName: String) async {
-        let record = CKRecord(recordType: "FriendLink")
+        let record = CKRecord(recordType: CloudKitSchema.RecordTypes.friendLink)
         record["ownerID"] = ownerID as NSString
         record["friendID"] = friendID as NSString
         record["friendName"] = friendName as NSString
@@ -139,7 +139,7 @@ class CloudKitLocationService {
 
     func fetchFriendLinks(ownerID: String) async throws -> [(friendID: String, friendName: String)] {
         let predicate = NSPredicate(format: "ownerID == %@", ownerID)
-        let query = CKQuery(recordType: "FriendLink", predicate: predicate)
+        let query = CKQuery(recordType: CloudKitSchema.RecordTypes.friendLink, predicate: predicate)
 
         let (results, _) = try await publicDB.records(matching: query, resultsLimit: 50)
 
@@ -156,7 +156,7 @@ class CloudKitLocationService {
 
     func removeFriendLink(ownerID: String, friendID: String) async {
         let predicate = NSPredicate(format: "ownerID == %@ AND friendID == %@", ownerID, friendID)
-        let query = CKQuery(recordType: "FriendLink", predicate: predicate)
+        let query = CKQuery(recordType: CloudKitSchema.RecordTypes.friendLink, predicate: predicate)
 
         do {
             let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
@@ -218,11 +218,8 @@ class CloudKitLocationService {
 
         var locations: [FriendLocation] = []
         for friendID in friendIDs {
-            // Try both record name formats (new "profile-" prefix and legacy without)
-            let candidates = [
-                CKRecord.ID(recordName: "profile-\(friendID)"),
-                CKRecord.ID(recordName: friendID)
-            ]
+            // Try both record name formats — see CloudKitSchema.swift
+            let candidates = CloudKitSchema.profileRecordCandidates(for: friendID)
 
             for recordID in candidates {
                 do {

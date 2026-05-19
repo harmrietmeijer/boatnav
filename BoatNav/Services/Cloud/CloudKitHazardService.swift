@@ -76,12 +76,12 @@ class CloudKitHazardService {
         } catch let error as CKError where error.code == .serverRecordChanged {
             // Conflict — re-fetch and merge with higher vote count
             if let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
-                let serverVotes = (serverRecord["removalVotes"] as? Int) ?? 0
+                let serverVotes = (serverRecord["votes"] as? Int) ?? 0
                 let mergedVotes = max(serverVotes, newVotes)
                 if mergedVotes >= 2 {
                     try? await publicDB.deleteRecord(withID: recordID)
                 } else {
-                    serverRecord["removalVotes"] = mergedVotes as CKRecordValue
+                    serverRecord["votes"] = mergedVotes as CKRecordValue
                     try? await publicDB.save(serverRecord)
                 }
             }
