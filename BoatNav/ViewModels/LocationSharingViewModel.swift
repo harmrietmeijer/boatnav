@@ -193,16 +193,36 @@ class LocationSharingViewModel: ObservableObject {
     }
 
     func addFriend(_ friend: FriendLocation) {
-        guard let uid = userID else { return }
-        // Don't add yourself
-        guard friend.userID != uid else { return }
-        // Don't add duplicates
-        guard !friendIDs.contains(where: { $0.id == friend.userID }) else { return }
+        // Resolve userID if not yet available
+        if userID == nil {
+            Task {
+                await resolveUserID()
+                await MainActor.run { addFriendInternal(friend) }
+            }
+        } else {
+            addFriendInternal(friend)
+        }
+    }
+
+    private func addFriendInternal(_ friend: FriendLocation) {
+        guard let uid = userID else {
+            errorMessage = "Log in bij iCloud om vrienden toe te voegen"
+            return
+        }
+        guard friend.userID != uid else {
+            errorMessage = "Je kunt jezelf niet toevoegen"
+            return
+        }
+        guard !friendIDs.contains(where: { $0.id == friend.userID }) else {
+            errorMessage = "\(friend.displayName) is al toegevoegd"
+            return
+        }
 
         friendIDs.append((id: friend.userID, name: friend.displayName))
         saveFriendIDs()
         searchResult = nil
         searchCode = ""
+        errorMessage = nil
 
         Task {
             await cloudService.saveFriendLink(ownerID: uid, friendID: friend.userID, friendName: friend.displayName)

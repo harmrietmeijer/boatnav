@@ -180,7 +180,7 @@ struct LocationSharingPanelContent: View {
                 }
 
                 // Friends list
-                if !locationSharingViewModel.friends.isEmpty || !locationSharingViewModel.friendAnnotations.isEmpty {
+                if !locationSharingViewModel.friends.isEmpty || !friendsFromCache().isEmpty {
                     sectionHeader("Vrienden")
 
                     VStack(spacing: 0) {
@@ -255,8 +255,22 @@ struct LocationSharingPanelContent: View {
     }
 
     private func friendsFromCache() -> [FriendLocation] {
-        // Show cached friend names even if locations haven't loaded yet
-        return []
+        // Show cached friend names even if live locations haven't loaded yet
+        let defaults = UserDefaults.standard
+        guard let data = defaults.data(forKey: "locationSharing_friends"),
+              let cached = try? JSONDecoder().decode([[String]].self, from: data) else {
+            return []
+        }
+        return cached.map { entry in
+            FriendLocation(
+                userID: entry[0],
+                displayName: entry.count > 1 ? entry[1] : "Vriend",
+                coordinate: CLLocationCoordinate2D(),
+                heading: 0,
+                lastUpdated: .distantPast,
+                isSharing: false
+            )
+        }
     }
 
     private func sectionHeader(_ title: String) -> some View {
