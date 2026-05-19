@@ -39,7 +39,7 @@ class LocationSharingViewModel: ObservableObject {
         // Load cached friend IDs
         if let data = defaults.data(forKey: "locationSharing_friends"),
            let cached = try? JSONDecoder().decode([[String]].self, from: data) {
-            friendIDs = cached.map { (id: $0[0], name: $0[1]) }
+            friendIDs = cached.compactMap { $0.count >= 2 ? (id: $0[0], name: $0[1]) : nil }
         }
 
         // Periodic friend location fetch every 30 seconds
@@ -107,7 +107,9 @@ class LocationSharingViewModel: ObservableObject {
                 }
             }
         } catch {
+            #if DEBUG
             print("[LocationShare] setupSharing failed: \(error)")
+            #endif
             await MainActor.run {
                 errorMessage = "Log in bij iCloud om locatie te delen: \(error.localizedDescription)"
                 isSettingUp = false

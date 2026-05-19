@@ -144,7 +144,9 @@ class NavigationViewModel: ObservableObject {
             self.loadedGraphRegion = region
 
             let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
+            #if DEBUG
             print("[Nav] Loaded \(segments.count) segments (\(source.rawValue)), \(withSpeed) with speed limits, graph: \(graph.nodeCount) nodes, \(graph.edgeCount) edges")
+            #endif
 
             await MainActor.run {
                 self.speedLimitService?.update(segments: segments)
@@ -390,7 +392,8 @@ class NavigationViewModel: ObservableObject {
 
             let maneuvers = maneuverGenerator.generate(from: result, bridges: bridges, locks: locks)
 
-            let cruisingSpeedKmh = settingsViewModel?.cruisingSpeedKmh ?? 7.0
+            let rawSpeed = settingsViewModel?.cruisingSpeedKmh ?? 7.0
+            let cruisingSpeedKmh = max(rawSpeed, 1.0) // Minimum 1 km/h
             let cruisingSpeedMs = cruisingSpeedKmh / 3.6
             let estimatedTime = result.totalDistance / cruisingSpeedMs
 
@@ -451,7 +454,9 @@ class NavigationViewModel: ObservableObject {
                 finalRoute = r
             }
 
+            #if DEBUG
             print("[Nav] Route: \(finalRoute.totalDistance / 1000)km, \(Int(finalRoute.estimatedTime / 60))min, \(finalRoute.coordinates.count) coords, \(result.edges.count) edges")
+            #endif
 
             await MainActor.run {
                 self.currentRoute = finalRoute

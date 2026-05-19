@@ -63,13 +63,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             await navigationViewModel.loadWaterwayGraph()
             await rwsLockService.fetchLockMetadata()
 
-            // DEBUG: seed test friend in Biesbosch — remove after testing
+            #if DEBUG
+            // Test friend seeding — only in debug builds
             let cloudService = CloudKitLocationService()
             if let result = await cloudService.seedTestFriend() {
-                #if DEBUG
                 print("[DEBUG] Test friend created — zoek met code: \(result.shareCode)")
-                #endif
             }
+            #endif
         }
     }
 

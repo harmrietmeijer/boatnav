@@ -12,7 +12,7 @@ struct FriendLocation {
     static let recordType = "UserProfile"
 
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: Self.recordType, recordID: CKRecord.ID(recordName: userID))
+        let record = CKRecord(recordType: Self.recordType, recordID: CKRecord.ID(recordName: CloudKitSchema.profileRecordName(for: userID)))
         record["userID"] = userID as NSString
         record["displayName"] = displayName as NSString
         record["latitude"] = NSNumber(value: coordinate.latitude)

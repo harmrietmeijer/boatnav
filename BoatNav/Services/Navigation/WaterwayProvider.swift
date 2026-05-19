@@ -92,7 +92,9 @@ class WaterwayProvider {
     /// Duplicate edges are harmless for routing but missing edges break routes.
     private func mergeSegments(pdok: [WaterwaySegment], osm: [WaterwaySegment]) -> [WaterwaySegment] {
         let result = pdok + osm
+        #if DEBUG
         print("[WaterwayProvider] Merged: \(pdok.count) PDOK + \(osm.count) OSM = \(result.count) total")
+        #endif
         return result
     }
 }

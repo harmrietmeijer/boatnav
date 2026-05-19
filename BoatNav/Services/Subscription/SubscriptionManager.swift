@@ -125,6 +125,8 @@ class SubscriptionManager: ObservableObject {
     func deactivateOwnerBypass() {
         KeychainStore.remove(bypassKey)
         KeychainStore.remove(bypassDeviceKey)
+        UserDefaults.standard.set(false, forKey: proStatusKey)
+        isPro = false
         Task { await checkEntitlement() }
     }
 

@@ -9,11 +9,11 @@ struct WaterwaySegment: Identifiable {
     let maxSpeedKmh: Double? // speed limit in km/h (nil = unknown)
 
     var startNode: CLLocationCoordinate2D {
-        coordinates.first!
+        coordinates.first ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
     }
 
     var endNode: CLLocationCoordinate2D {
-        coordinates.last!
+        coordinates.last ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
     }
 }
 
