@@ -184,9 +184,11 @@ struct LocationSharingPanelContent: View {
                     sectionHeader("Vrienden")
 
                     VStack(spacing: 0) {
-                        let friendList = locationSharingViewModel.friends.isEmpty
-                            ? friendsFromCache()
-                            : locationSharingViewModel.friends
+                        // Merge live locations with cached friends that don't have live data
+                        let live = locationSharingViewModel.friends
+                        let liveIDs = Set(live.map(\.userID))
+                        let cached = friendsFromCache().filter { !liveIDs.contains($0.userID) }
+                        let friendList = live + cached
 
                         ForEach(Array(friendList.enumerated()), id: \.element.userID) { index, friend in
                             if index > 0 {
@@ -225,11 +227,17 @@ struct LocationSharingPanelContent: View {
                     .font(.subheadline.weight(.medium))
                 if friend.isSharing && hasLocation {
                     let age = Date().timeIntervalSince(friend.lastUpdated)
-                    Text(age < 60 ? "Zojuist" : age < 3600 ? "\(Int(age / 60)) min geleden" : "\(Int(age / 3600)) uur geleden")
+                    let timeText: String = {
+                        if age < 60 { return "Zojuist" }
+                        if age < 3600 { return "\(Int(age / 60)) min geleden" }
+                        if age < 86400 { return "\(Int(age / 3600)) uur geleden" }
+                        return "\(Int(age / 86400)) dagen geleden"
+                    }()
+                    Text(timeText)
                         .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(age > 3600 ? .tertiary : .secondary)
                 } else {
-                    Text("Niet actief")
+                    Text(friend.isSharing ? "Locatie laden..." : "Niet actief")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
