@@ -217,19 +217,25 @@ class CloudKitLocationService {
         guard !friendIDs.isEmpty else { return [] }
 
         var locations: [FriendLocation] = []
-        // Fetch each friend's profile by record ID
         for friendID in friendIDs {
-            let recordID = CKRecord.ID(recordName: "profile-\(friendID)")
-            do {
-                let record = try await publicDB.record(for: recordID)
-                if let loc = FriendLocation(from: record), loc.isSharing {
-                    // Only show if shared within last hour
-                    if Date().timeIntervalSince(loc.lastUpdated) < 3600 {
-                        locations.append(loc)
+            // Try both record name formats (new "profile-" prefix and legacy without)
+            let candidates = [
+                CKRecord.ID(recordName: "profile-\(friendID)"),
+                CKRecord.ID(recordName: friendID)
+            ]
+
+            for recordID in candidates {
+                do {
+                    let record = try await publicDB.record(for: recordID)
+                    if let loc = FriendLocation(from: record), loc.isSharing {
+                        if Date().timeIntervalSince(loc.lastUpdated) < 3600 {
+                            locations.append(loc)
+                        }
                     }
+                    break // Found it, skip other candidate
+                } catch {
+                    continue // Try next candidate
                 }
-            } catch {
-                continue // Friend may have deleted their profile
             }
         }
         return locations
