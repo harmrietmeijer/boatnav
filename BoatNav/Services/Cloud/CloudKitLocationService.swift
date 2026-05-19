@@ -244,8 +244,10 @@ class CloudKitLocationService {
             for recordID in candidates {
                 do {
                     let record = try await publicDB.record(for: recordID)
-                    if let loc = FriendLocation(from: record), loc.isSharing {
-                        if Date().timeIntervalSince(loc.lastUpdated) < 3600 {
+                    if let loc = FriendLocation(from: record) {
+                        // Show friend if sharing, regardless of last update time.
+                        // The UI indicates when the location is stale.
+                        if loc.isSharing {
                             locations.append(loc)
                         }
                     }

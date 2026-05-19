@@ -213,32 +213,42 @@ struct LocationSharingPanelContent: View {
     // MARK: - Components
 
     private func friendRow(_ friend: FriendLocation) -> some View {
-        HStack(spacing: 12) {
+        let hasLocation = friend.coordinate.latitude != 0 || friend.coordinate.longitude != 0
+
+        return HStack(spacing: 12) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 28))
-                .foregroundStyle(Design.Green.g4)
+                .foregroundStyle(friend.isSharing ? Design.Green.g4 : .secondary)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(friend.displayName)
                     .font(.subheadline.weight(.medium))
-                let age = Date().timeIntervalSince(friend.lastUpdated)
-                Text(age < 60 ? "Zojuist" : age < 3600 ? "\(Int(age / 60)) min geleden" : "\(Int(age / 3600)) uur geleden")
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                if friend.isSharing && hasLocation {
+                    let age = Date().timeIntervalSince(friend.lastUpdated)
+                    Text(age < 60 ? "Zojuist" : age < 3600 ? "\(Int(age / 60)) min geleden" : "\(Int(age / 3600)) uur geleden")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Niet actief")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
             }
 
             Spacer()
 
-            // Navigate button
-            Button {
-                locationSharingViewModel.navigateToFriend(friend)
-                withAnimation(Design.Animation.panel) {
-                    activePanel = .navigation
+            // Navigate button — only if friend has a valid location
+            if hasLocation {
+                Button {
+                    locationSharingViewModel.navigateToFriend(friend)
+                    withAnimation(Design.Animation.panel) {
+                        activePanel = .navigation
+                    }
+                } label: {
+                    Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Design.Blue.b4)
                 }
-            } label: {
-                Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Design.Blue.b4)
             }
 
             // Delete button
@@ -255,19 +265,21 @@ struct LocationSharingPanelContent: View {
     }
 
     private func friendsFromCache() -> [FriendLocation] {
-        // Show cached friend names even if live locations haven't loaded yet
+        // Show cached friend names when live locations haven't loaded yet.
+        // These are placeholder entries — no coordinate, no live status.
         let defaults = UserDefaults.standard
         guard let data = defaults.data(forKey: "locationSharing_friends"),
               let cached = try? JSONDecoder().decode([[String]].self, from: data) else {
             return []
         }
-        return cached.map { entry in
-            FriendLocation(
+        return cached.compactMap { entry -> FriendLocation? in
+            guard entry.count >= 2 else { return nil }
+            return FriendLocation(
                 userID: entry[0],
-                displayName: entry.count > 1 ? entry[1] : "Vriend",
+                displayName: entry[1],
                 coordinate: CLLocationCoordinate2D(),
                 heading: 0,
-                lastUpdated: .distantPast,
+                lastUpdated: Date(),
                 isSharing: false
             )
         }
