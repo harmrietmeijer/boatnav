@@ -30,9 +30,9 @@ struct ContentView: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    /// iPad landscape or large screen in landscape
+    /// iPad (any orientation) or large screen
     private var isWideLayout: Bool {
-        horizontalSizeClass == .regular
+        UIDevice.current.userInterfaceIdiom == .pad
     }
 
     var body: some View {
