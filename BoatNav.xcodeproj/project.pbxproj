@@ -42,6 +42,7 @@
 		6D5147634CECB7EA29D0818D /* SpeedLimitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6306F6BA2DF6259990541CC0 /* SpeedLimitService.swift */; };
 		6F6FDB5193B89D6CB3799EDD /* PaywallPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496867366A6AB6138A4614C2 /* PaywallPanelContent.swift */; };
 		701E2D21ACA5D06A053D087F /* LocationSharingPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00804ED3D7B09AC0CC954568 /* LocationSharingPanelContent.swift */; };
+		CC555555CCCC5555CCCC5555 /* DashboardOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC666666CCCC6666CCCC6666 /* DashboardOverlay.swift */; };
 		731566ED5E5813F689AA5391 /* CloudKitHazardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */; };
 		BB333333BBBB3333BBBB3333 /* CloudKitSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */; };
 		7819CD6F204BA45BFC59F5A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFDC4FC1273FA957B613F80 /* ContentView.swift */; };
@@ -108,6 +109,7 @@
 
 /* Begin PBXFileReference section */
 		00804ED3D7B09AC0CC954568 /* LocationSharingPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSharingPanelContent.swift; sourceTree = "<group>"; };
+		CC666666CCCC6666CCCC6666 /* DashboardOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardOverlay.swift; sourceTree = "<group>"; };
 		0ADBF9B26026C2CD8B17B8C5 /* BuoyAnnotationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuoyAnnotationProvider.swift; sourceTree = "<group>"; };
 		0EE51B723FBC5E7AFDC58D7C /* MapPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPreviewView.swift; sourceTree = "<group>"; };
 		10BB218BC49F43B77C352F51 /* BoatNav.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BoatNav.entitlements; sourceTree = "<group>"; };
@@ -402,6 +404,7 @@
 			isa = PBXGroup;
 			children = (
 				3BFDC4FC1273FA957B613F80 /* ContentView.swift */,
+				CC666666CCCC6666CCCC6666 /* DashboardOverlay.swift */,
 				0EE51B723FBC5E7AFDC58D7C /* MapPreviewView.swift */,
 				2B5DC361DBE456B5C539B380 /* MapViewRepresentable.swift */,
 				EC242441DD792F47B2BA02BB /* NavigationListView.swift */,
@@ -659,6 +662,7 @@
 				2073832C5D88684B99F99798 /* KeychainStore.swift in Sources */,
 				80BABDD4F9311E253FCB0EF7 /* LocationService.swift in Sources */,
 				701E2D21ACA5D06A053D087F /* LocationSharingPanelContent.swift in Sources */,
+				CC555555CCCC5555CCCC5555 /* DashboardOverlay.swift in Sources */,
 				552EB77B2A2FF45ADBA1D40A /* LocationSharingViewModel.swift in Sources */,
 				E0CD77386BBB3DE56EEBBA93 /* Lock.swift in Sources */,
 				FE730611C4BED2ADE088F861 /* ManeuverGenerator.swift in Sources */,
@@ -780,7 +784,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50;
+				CURRENT_PROJECT_VERSION = 51;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -893,7 +897,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50;
+				CURRENT_PROJECT_VERSION = 51;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

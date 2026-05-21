@@ -46,156 +46,95 @@ struct ContentView: View {
     // MARK: - Wide layout (iPad landscape — CarPlay-style)
 
     private var wideBody: some View {
-        HStack(spacing: 0) {
-            // Left sidebar: data + controls
-            VStack(spacing: 0) {
-                // Speed display
-                VStack(spacing: 4) {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(String(format: "%.1f", speedViewModel.speedKnots))
-                            .font(.system(size: 48, weight: .bold, design: .monospaced))
-                            .monospacedDigit()
-                            .foregroundStyle(speedViewModel.isExceedingLimit ? Design.Red.r4 : .white)
-                        Text("kn")
-                            .font(.system(size: 18, weight: .medium, design: .monospaced))
-                            .foregroundStyle(Design.Blue.b6)
-                    }
-                    Text(String(format: "%.1f km/h", speedViewModel.speedKmh))
-                        .font(.system(size: 16, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Design.Blue.b6)
+        ZStack(alignment: .topLeading) {
+            // Full-screen map
+            mapLayer
+                .ignoresSafeArea()
 
-                    if let limit = speedViewModel.currentSpeedLimit {
-                        HStack(spacing: 8) {
-                            Text(String(format: "%.0f", limit))
-                                .font(.system(size: 16, weight: .bold, design: .monospaced))
-                                .foregroundStyle(Design.Red.r4)
-                                .frame(width: 32, height: 32)
-                                .background(
-                                    Circle()
-                                        .fill(.white)
-                                        .overlay(Circle().stroke(Design.Red.r4, lineWidth: 3))
-                                )
-                            Text("km/h max")
-                                .font(.caption)
-                                .foregroundStyle(Design.Blue.b6)
-                        }
-                        .padding(.top, 4)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Design.Spacing.xl)
+            // Floating dashboard (top-left)
+            if activePanel == .none {
+                DashboardOverlay(
+                    activePanel: $activePanel,
+                    panelDetent: $panelDetent
+                )
+                .padding(.top, 16)
+                .padding(.leading, 16)
+                .transition(.move(edge: .leading).combined(with: .opacity))
+            }
 
-                Divider().overlay(Color.white.opacity(0.1))
-
-                // Navigation info
-                if navigationViewModel.isNavigating, let route = navigationViewModel.currentRoute {
-                    VStack(spacing: 12) {
-                        if let maneuver = route.maneuvers.first {
-                            HStack(spacing: 10) {
-                                Image(systemName: "arrow.turn.up.right")
-                                    .font(.title2)
-                                    .foregroundStyle(Design.Blue.b6)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(maneuver.instruction)
-                                        .font(.subheadline.weight(.medium))
-                                        .foregroundStyle(.white)
-                                        .lineLimit(2)
-                                }
+            // Sidebar panel (when a panel is active)
+            if activePanel != .none {
+                HStack(spacing: 0) {
+                    // Panel sidebar
+                    VStack(spacing: 0) {
+                        HStack {
+                            Spacer()
+                            Button {
+                                withAnimation(Design.Animation.panel) { activePanel = .none }
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 30, height: 30)
+                                    .background(.quaternary, in: Circle())
                             }
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                        .padding(.bottom, 8)
 
-                        HStack(spacing: Design.Spacing.xl) {
-                            VStack(spacing: 2) {
-                                Text(route.distanceString)
-                                    .font(.system(size: 20, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(.white)
-                                Text("Afstand")
-                                    .font(.caption2)
-                                    .foregroundStyle(Design.Blue.b6)
-                            }
-                            VStack(spacing: 2) {
-                                Text(route.timeString)
-                                    .font(.system(size: 20, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(.white)
-                                Text("Tijd")
-                                    .font(.caption2)
-                                    .foregroundStyle(Design.Blue.b6)
-                            }
+                        ScrollView {
+                            panelContent
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 20)
                         }
+                        .scrollDismissesKeyboard(.interactively)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(Design.Spacing.lg)
-                }
+                    .frame(width: 360)
+                    .background(.ultraThickMaterial)
+                    .environment(\.colorScheme, .light)
 
-                // Weather
-                if let w = weatherViewModel.weather {
-                    Divider().overlay(Color.white.opacity(0.1))
-                    HStack(spacing: Design.Spacing.md) {
-                        Image(systemName: w.weatherIcon)
-                            .symbolRenderingMode(.multicolor)
-                        Text(String(format: "%.0f°", w.temperature))
-                            .font(.system(size: 16, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Design.Blue.b6)
-                        Text("Bft \(w.beaufort)")
-                            .font(.system(size: 13, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Design.Blue.b6)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(Design.Spacing.lg)
+                    // Dimmed map area — tap to close
+                    Color.black.opacity(0.2)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(Design.Animation.panel) { activePanel = .none }
+                        }
                 }
+                .transition(.move(edge: .leading))
+            }
 
+            // Map action buttons (bottom-right, always visible)
+            VStack {
                 Spacer()
-
-                // Action buttons
-                VStack(spacing: Design.Spacing.sm) {
-                    sidebarButton(icon: "location.fill", label: "Centreer") {
-                        mapViewModel.recenterTrigger = true
+                HStack {
+                    Spacer()
+                    HazardReportButton()
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 20)
+                }
+            }
+        }
+        .animation(Design.Animation.panel, value: activePanel)
+        .onChange(of: navigationViewModel.isSelectingOnMap) { wasSelecting, isSelecting in
+            if wasSelecting && !isSelecting {
+                if pendingFavoriteFromMap {
+                    pendingFavoriteFromMap = false
+                    withAnimation(Design.Animation.panel) {
+                        navigationViewModel.showAddFavoriteSheet = true
                     }
-                    sidebarButton(icon: "arrow.triangle.turn.up.right.diamond.fill", label: "Navigatie") {
-                        withAnimation(Design.Animation.panel) {
-                            activePanel = .navigation
-                            panelDetent = .half
-                        }
-                    }
-                    sidebarButton(icon: "sailboat.fill", label: "Boot") {
-                        withAnimation(Design.Animation.panel) {
-                            activePanel = .boatProfile
-                            panelDetent = .half
-                        }
-                    }
-                    sidebarButton(icon: "gearshape.fill", label: "Instellingen") {
-                        withAnimation(Design.Animation.panel) {
-                            activePanel = .settings
-                            panelDetent = .half
-                        }
+                } else {
+                    withAnimation(Design.Animation.panel) {
+                        activePanel = .navigation
+                        panelDetent = .half
                     }
                 }
-                .padding(.bottom, Design.Spacing.xl)
-            }
-            .frame(width: 200)
-            .background(Design.Ink.primary)
-
-            // Right: full map + overlays
-            ZStack {
-                mapLayer
-                overlayLayers
             }
         }
-        .ignoresSafeArea()
-    }
-
-    private func sidebarButton(icon: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 18))
-                Text(label)
-                    .font(.system(size: 10, weight: .medium))
-            }
-            .foregroundStyle(Design.Blue.b6)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Design.Spacing.sm)
-        }
+        .overlay { hazardCategoryOverlay }
+        .overlay { addFavoriteOverlay }
+        .overlay { proximityAlertOverlay }
+        .task { await navigationViewModel.loadWaterwayGraph() }
     }
 
     // MARK: - Compact layout (iPhone — original)
