@@ -473,7 +473,7 @@ struct NavigationPanelContent: View {
                         Text(String(format: "%.0f°", w.temperature))
                             .font(.system(size: 13, weight: .bold, design: .monospaced))
                             .foregroundStyle(Design.Nav.dataText)
-                        Text("Bft \(w.beaufort)")
+                        Text("Bft \(w.beaufort) \(w.windDirectionLabel)")
                             .font(.system(size: 11, weight: .bold, design: .monospaced))
                             .foregroundStyle(Design.Nav.labelText)
                     }
