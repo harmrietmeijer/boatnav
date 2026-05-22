@@ -91,8 +91,8 @@ struct ContentView: View {
                         .scrollDismissesKeyboard(.interactively)
                     }
                     .frame(width: 360)
-                    .background(.ultraThickMaterial)
-                    .environment(\.colorScheme, .light)
+                    .background(panelTheme == .navigation ? AnyShapeStyle(Design.Ink.primary) : AnyShapeStyle(.ultraThickMaterial))
+                    .environment(\.colorScheme, panelTheme == .navigation || panelTheme == .flits ? .dark : .light)
 
                     // Dimmed map area — tap to close
                     Color.black.opacity(0.2)
