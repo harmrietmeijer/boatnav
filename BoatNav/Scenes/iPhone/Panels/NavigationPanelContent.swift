@@ -3,6 +3,7 @@ import SwiftUI
 struct NavigationPanelContent: View {
     @EnvironmentObject var navigationViewModel: NavigationViewModel
     @EnvironmentObject var speedViewModel: SpeedViewModel
+    @EnvironmentObject var weatherViewModel: WeatherViewModel
     @EnvironmentObject var maneuverProximityService: ManeuverProximityService
     @Binding var panelDetent: PanelDetent
     @Binding var activePanel: ActivePanel
@@ -435,6 +436,52 @@ struct NavigationPanelContent: View {
 
     private func activeNavigationContent(route: WaterwayRoute) -> some View {
         VStack(spacing: 16) {
+            // Live data strip: speed + limit + weather
+            HStack(spacing: 16) {
+                // Speed
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(String(format: "%.1f", speedViewModel.speedKnots))
+                        .font(.system(size: 28, weight: .bold, design: .monospaced))
+                        .monospacedDigit()
+                        .foregroundStyle(speedViewModel.isExceedingLimit ? Design.Red.r4 : Design.Nav.dataText)
+                    Text("kn")
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundStyle(Design.Nav.labelText)
+                }
+
+                // Speed limit
+                if let limit = speedViewModel.currentSpeedLimit {
+                    Text(String(format: "%.0f", limit))
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Design.Red.r4)
+                        .frame(width: 30, height: 30)
+                        .background(
+                            Circle()
+                                .fill(.white)
+                                .overlay(Circle().stroke(Design.Red.r4, lineWidth: 2.5))
+                        )
+                }
+
+                Spacer()
+
+                // Weather compact
+                if let w = weatherViewModel.weather {
+                    HStack(spacing: 6) {
+                        Image(systemName: w.weatherIcon)
+                            .font(.system(size: 12))
+                            .symbolRenderingMode(.multicolor)
+                        Text(String(format: "%.0f°", w.temperature))
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Design.Nav.dataText)
+                        Text("Bft \(w.beaufort)")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Design.Nav.labelText)
+                    }
+                }
+            }
+            .padding(Design.Spacing.md)
+            .navStatCard()
+
             // Upcoming maneuver alert
             if let maneuver = maneuverProximityService.upcomingManeuver,
                let distance = maneuverProximityService.distanceToManeuver,
