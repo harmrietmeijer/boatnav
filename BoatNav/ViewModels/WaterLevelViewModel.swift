@@ -56,9 +56,18 @@ class WaterLevelViewModel: ObservableObject {
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in
             self?.forceRefresh()
         }
-        // Initial fetch after GPS settles
+        // Retry periodically until we get a GPS fix and first data
+        retryUntilData()
+    }
+
+    private func retryUntilData() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
-            self?.forceRefresh()
+            guard let self else { return }
+            self.forceRefresh()
+            // Keep retrying every 5 seconds until we have data (GPS may not be ready yet)
+            if self.waterLevel == nil {
+                self.retryUntilData()
+            }
         }
     }
 
