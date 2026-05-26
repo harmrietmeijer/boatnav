@@ -262,7 +262,37 @@ class WaterLevelService {
                 points.append((level, time))
             }
         }
-        return points.sorted { $0.time < $1.time }
+        return downsample(points.sorted { $0.time < $1.time }, intervalSeconds: 600)
+    }
+
+    /// Reduce noisy per-minute data to ~1 point per interval by averaging.
+    private func downsample(_ points: [(level: Double, time: Date)], intervalSeconds: Double) -> [(level: Double, time: Date)] {
+        guard !points.isEmpty else { return [] }
+
+        var result: [(level: Double, time: Date)] = []
+        var bucketStart = points[0].time
+        var bucketLevels: [Double] = []
+
+        for point in points {
+            if point.time.timeIntervalSince(bucketStart) < intervalSeconds {
+                bucketLevels.append(point.level)
+            } else {
+                if !bucketLevels.isEmpty {
+                    let avg = bucketLevels.reduce(0, +) / Double(bucketLevels.count)
+                    let midTime = bucketStart.addingTimeInterval(intervalSeconds / 2)
+                    result.append((avg, midTime))
+                }
+                bucketStart = point.time
+                bucketLevels = [point.level]
+            }
+        }
+        // Last bucket
+        if !bucketLevels.isEmpty {
+            let avg = bucketLevels.reduce(0, +) / Double(bucketLevels.count)
+            result.append((avg, bucketStart))
+        }
+
+        return result
     }
 
     // MARK: - Trend / extremes
@@ -280,15 +310,26 @@ class WaterLevelService {
     private func findNextExtremes(predictions: [(level: Double, time: Date)], after: Date) -> (high: WaterLevelData.TideExtreme?, low: WaterLevelData.TideExtreme?) {
         guard predictions.count >= 5 else { return (nil, nil) }
 
+        // Find local maxima/minima with a minimum 2-hour gap between extremes
+        let minGap: TimeInterval = 2 * 3600
+
         var extremes: [WaterLevelData.TideExtreme] = []
         for i in 1..<(predictions.count - 1) {
             let prev = predictions[i - 1].level
             let curr = predictions[i].level
             let next = predictions[i + 1].level
-            if curr > prev && curr > next {
-                extremes.append(.init(time: predictions[i].time, levelCm: curr, type: .high))
-            } else if curr < prev && curr < next {
-                extremes.append(.init(time: predictions[i].time, levelCm: curr, type: .low))
+
+            let isMax = curr > prev && curr >= next
+            let isMin = curr < prev && curr <= next
+
+            if isMax || isMin {
+                let type: WaterLevelData.TideExtreme.ExtremeType = isMax ? .high : .low
+                // Only add if far enough from the last extreme
+                if let last = extremes.last {
+                    let gap = predictions[i].time.timeIntervalSince(last.time)
+                    if gap < minGap { continue }
+                }
+                extremes.append(.init(time: predictions[i].time, levelCm: curr, type: type))
             }
         }
 
