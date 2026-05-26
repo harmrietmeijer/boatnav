@@ -58,6 +58,7 @@ struct MapButton: View {
     let icon: String
     let isActive: Bool
     let action: () -> Void
+    var identifier: String? = nil
 
     var body: some View {
         Button(action: action) {
@@ -78,5 +79,6 @@ struct MapButton: View {
                 )
         }
         .buttonStyle(.boatNav)
+        .accessibilityIdentifier(identifier ?? icon)
     }
 }

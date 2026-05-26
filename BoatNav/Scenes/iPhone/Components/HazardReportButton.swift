@@ -21,6 +21,7 @@ struct HazardReportButton: View {
                 )
         }
         .buttonStyle(.boatNav)
+        .accessibilityIdentifier("hazard_report_button")
     }
 }
 

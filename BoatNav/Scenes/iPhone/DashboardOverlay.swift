@@ -228,6 +228,7 @@ struct DashboardOverlay: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("dashboard_\(label.lowercased())")
     }
 
     private func routeStat(value: String, label: String, color: Color) -> some View {
