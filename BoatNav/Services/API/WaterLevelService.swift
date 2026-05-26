@@ -236,44 +236,64 @@ class WaterLevelService {
         let now = Date()
         let end = now.addingTimeInterval(Double(hours) * 3600)
 
-        let body: [String: Any] = [
-            "AquoPlusWaarnemingMetadata": [
-                "AquoMetadata": [
-                    "Compartiment": ["Code": "OW"],
-                    "Grootheid": ["Code": "WATHTE"],
-                    "Groepering": ["Code": "NVT"]
+        // Try astronomical tide prediction first, then fall back to forecast (verwachting)
+        let attempts: [[String: Any]] = [
+            // Astronomical tide — available for coastal/tidal stations
+            [
+                "AquoPlusWaarnemingMetadata": [
+                    "AquoMetadata": [
+                        "Compartiment": ["Code": "OW"],
+                        "Grootheid": ["Code": "WATHTEASTRO"]
+                    ]
+                ],
+                "Locatie": ["Code": stationCode],
+                "Periode": [
+                    "Begindatumtijd": Self.formatRWSDate(now),
+                    "Einddatumtijd": Self.formatRWSDate(end)
                 ]
             ],
-            "Locatie": ["Code": stationCode],
-            "Periode": [
-                "Begindatumtijd": Self.formatRWSDate(now),
-                "Einddatumtijd": Self.formatRWSDate(end)
+            // Forecast (verwachting) — available for more stations
+            [
+                "AquoPlusWaarnemingMetadata": [
+                    "AquoMetadata": [
+                        "Compartiment": ["Code": "OW"],
+                        "Grootheid": ["Code": "WATHTE"]
+                    ]
+                ],
+                "Locatie": ["Code": stationCode],
+                "Periode": [
+                    "Begindatumtijd": Self.formatRWSDate(now),
+                    "Einddatumtijd": Self.formatRWSDate(end)
+                ]
             ]
         ]
 
-        let result: [String: Any]
-        do {
-            result = try await post(path: "ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen", body: body)
-        } catch {
-            // Predictions not available for this station — not an error
-            return []
+        for body in attempts {
+            guard let result = try? await post(path: "ONLINEWAARNEMINGENSERVICES/OphalenWaarnemingen", body: body),
+                  let list = result["WaarnemingenLijst"] as? [[String: Any]]
+            else { continue }
+
+            // Collect all data points from all entries (there may be multiple series)
+            var points: [(level: Double, time: Date)] = []
+            for entry in list {
+                guard let metingen = entry["MetingenLijst"] as? [[String: Any]] else { continue }
+                for meting in metingen {
+                    guard let waarde = meting["Meetwaarde"] as? [String: Any],
+                          let level = waarde["Waarde_Numeriek"] as? Double,
+                          let tijdStr = meting["Tijdstip"] as? String,
+                          let time = Self.parseRWSDate(tijdStr),
+                          time > now // Only future points
+                    else { continue }
+                    points.append((level, time))
+                }
+            }
+
+            if !points.isEmpty {
+                return points.sorted { $0.time < $1.time }
+            }
         }
 
-        guard let list = result["WaarnemingenLijst"] as? [[String: Any]],
-              let first = list.first,
-              let metingen = first["MetingenLijst"] as? [[String: Any]]
-        else {
-            return []
-        }
-
-        return metingen.compactMap { meting -> (Double, Date)? in
-            guard let waarde = meting["Meetwaarde"] as? [String: Any],
-                  let level = waarde["Waarde_Numeriek"] as? Double,
-                  let tijdStr = meting["Tijdstip"] as? String,
-                  let time = Self.parseRWSDate(tijdStr)
-            else { return nil }
-            return (level, time)
-        }.sorted { $0.1 < $1.1 }
+        return []
     }
 
     // MARK: - Trend / extremes

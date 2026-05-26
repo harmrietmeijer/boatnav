@@ -261,24 +261,50 @@ struct TideGraphView: View {
                 // Grid lines
                 gridLines(width: w, height: h)
 
-                // History line (solid)
+                // History points
                 let historyPts = history.map { pt in
                     pointFor(time: pt.time, level: pt.levelCm, width: w, height: h)
                 }.filter { $0.x >= 0 && $0.x <= w }
 
-                if historyPts.count >= 2 {
-                    smoothPath(points: historyPts)
-                        .stroke(Design.Colors.accent, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
-                }
-
-                // Prediction line (dashed)
+                // Prediction points
                 let predPts = predictions.map { pt in
                     pointFor(time: pt.time, level: pt.levelCm, width: w, height: h)
                 }.filter { $0.x >= 0 && $0.x <= w }
 
+                // Blue gradient fill under history curve
+                if historyPts.count >= 2 {
+                    filledArea(points: historyPts, bottomY: h)
+                        .fill(
+                            LinearGradient(
+                                colors: [Design.Blue.b4.opacity(0.35), Design.Blue.b4.opacity(0.05)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                }
+
+                // Lighter blue fill under prediction curve
+                if predPts.count >= 2 {
+                    filledArea(points: predPts, bottomY: h)
+                        .fill(
+                            LinearGradient(
+                                colors: [Design.Blue.b4.opacity(0.15), Design.Blue.b4.opacity(0.02)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                }
+
+                // History line (solid)
+                if historyPts.count >= 2 {
+                    smoothPath(points: historyPts)
+                        .stroke(Design.Blue.b4, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+                }
+
+                // Prediction line (dashed)
                 if predPts.count >= 2 {
                     smoothPath(points: predPts)
-                        .stroke(Design.Colors.accent.opacity(0.4), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round, dash: [6, 4]))
+                        .stroke(Design.Blue.b4.opacity(0.5), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round, dash: [6, 4]))
                 }
 
                 // "Now" indicator line
@@ -288,13 +314,19 @@ struct TideGraphView: View {
                         p.move(to: CGPoint(x: nowX, y: 0))
                         p.addLine(to: CGPoint(x: nowX, y: h))
                     }
-                    .stroke(Design.Colors.accent.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                    .stroke(Design.Colors.accent.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
 
                     // Current level dot
                     let nowY = yFor(level: currentLevel, height: h)
                     Circle()
                         .fill(Design.Colors.accent)
                         .frame(width: 8, height: 8)
+                        .position(x: nowX, y: nowY)
+
+                    // White glow behind dot
+                    Circle()
+                        .fill(Design.Colors.accent.opacity(0.25))
+                        .frame(width: 16, height: 16)
                         .position(x: nowX, y: nowY)
                 }
 
@@ -343,6 +375,20 @@ struct TideGraphView: View {
 
     private func pointFor(time: Date, level: Double, width: CGFloat, height: CGFloat) -> CGPoint {
         CGPoint(x: xFor(time: time, width: width), y: yFor(level: level, height: height))
+    }
+
+    // MARK: - Filled area under curve
+
+    private func filledArea(points: [CGPoint], bottomY: CGFloat) -> Path {
+        var area = smoothPath(points: points)
+        if let last = points.last {
+            area.addLine(to: CGPoint(x: last.x, y: bottomY))
+        }
+        if let first = points.first {
+            area.addLine(to: CGPoint(x: first.x, y: bottomY))
+        }
+        area.closeSubpath()
+        return area
     }
 
     // MARK: - Smooth curve
