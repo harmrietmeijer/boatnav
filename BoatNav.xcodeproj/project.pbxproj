@@ -69,6 +69,7 @@
 		B0D857CD8CCE570BFF91227A /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */; };
 		B253E60D4C4900BC2F9C71C8 /* SpeedPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBFB10348CFF8BB556240FB /* SpeedPill.swift */; };
 		B50C9976DB65FA115708032B /* WaterwayRouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5E85A8710EB99351B7F062 /* WaterwayRouterTests.swift */; };
+		BAE96FE614A713FBC3533007 /* WaterPanelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A249295943C1E344DA0D9CEA /* WaterPanelTest.swift */; };
 		BB333333BBBB3333BBBB3333 /* CloudKitSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */; };
 		C0823CC225D9165509427E84 /* FeatureGating.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D78AFC4D590B28BC9CC0D2 /* FeatureGating.swift */; };
 		C0EEE732C7A4A1DA016CABCD /* Waterway.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81AE5CAA09B353D86E18C9A6 /* Waterway.swift */; };
@@ -164,6 +165,7 @@
 		91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedViewModel.swift; sourceTree = "<group>"; };
 		920D2BD566A42E49BFD4836F /* SpeedCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedCalculatorTests.swift; sourceTree = "<group>"; };
 		9B5025DDBCE9B0E47CDC1D59 /* BoatProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfileViewModel.swift; sourceTree = "<group>"; };
+		A249295943C1E344DA0D9CEA /* WaterPanelTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterPanelTest.swift; sourceTree = "<group>"; };
 		A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteLocation.swift; sourceTree = "<group>"; };
 		A99C725877AE12F1A8C8515C /* BoatNav.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BoatNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9A2DD7500A16C00D447112F /* WaterLevelService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterLevelService.swift; sourceTree = "<group>"; };
@@ -496,6 +498,7 @@
 				1B72455E4B52C9D4EC432E3B /* BoatNavUITests.swift */,
 				E4356770A7536DDC21ECBADF /* Info.plist */,
 				F49897F46E1433B753532F7B /* SnapshotHelper.swift */,
+				A249295943C1E344DA0D9CEA /* WaterPanelTest.swift */,
 			);
 			path = BoatNavUITests;
 			sourceTree = "<group>";
@@ -725,6 +728,7 @@
 			files = (
 				0ACFED9787A97342DC69E860 /* BoatNavUITests.swift in Sources */,
 				677C864FCE99C16EFC03D731 /* SnapshotHelper.swift in Sources */,
+				BAE96FE614A713FBC3533007 /* WaterPanelTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
