@@ -30,6 +30,13 @@ struct MapButtonCluster: View {
             )
 
             MapButton(
+                icon: "water.waves",
+                isActive: activePanel == .waterLevel,
+                action: { togglePanel(.waterLevel) },
+                identifier: "water_level"
+            )
+
+            MapButton(
                 icon: "person.2.fill",
                 isActive: activePanel == .locationSharing,
                 action: { togglePanel(.locationSharing) }

@@ -14,6 +14,8 @@ class WaterLevelService {
         let nextHighTide: TideExtreme?
         let nextLowTide: TideExtreme?
         let distanceToStation: Double     // meters
+        let history: [DataPoint]          // past measurements (sorted by time)
+        let predictions: [DataPoint]      // future predictions (sorted by time)
 
         enum Trend: String {
             case rising, falling, stable
@@ -25,6 +27,12 @@ class WaterLevelService {
             let type: ExtremeType
 
             enum ExtremeType { case high, low }
+        }
+
+        struct DataPoint: Identifiable {
+            let id = UUID()
+            let time: Date
+            let levelCm: Double
         }
     }
 
@@ -130,10 +138,10 @@ class WaterLevelService {
     // MARK: - Private
 
     private func fetchForStation(_ station: Station, userCoordinate: CLLocationCoordinate2D) async throws -> WaterLevelData {
-        // Fetch current level + recent history (for trend) and upcoming predictions in parallel
+        // Fetch current level + recent history (for trend + graph) and upcoming predictions in parallel
         async let currentTask = fetchLatestObservation(stationCode: station.code)
-        async let historyTask = fetchRecentObservations(stationCode: station.code, hours: 2)
-        async let predictionTask = fetchTidePredictions(stationCode: station.code, hours: 14)
+        async let historyTask = fetchRecentObservations(stationCode: station.code, hours: 6)
+        async let predictionTask = fetchTidePredictions(stationCode: station.code, hours: 8)
 
         let current = try await currentTask
         let history = try await historyTask
@@ -141,6 +149,9 @@ class WaterLevelService {
 
         let trend = determineTrend(current: current.level, history: history)
         let (nextHigh, nextLow) = findNextExtremes(predictions: predictions, after: current.time)
+
+        let historyPoints = history.map { WaterLevelData.DataPoint(time: $0.time, levelCm: $0.level) }
+        let predictionPoints = predictions.map { WaterLevelData.DataPoint(time: $0.time, levelCm: $0.level) }
 
         return WaterLevelData(
             stationName: station.name,
@@ -150,7 +161,9 @@ class WaterLevelService {
             trend: trend,
             nextHighTide: nextHigh,
             nextLowTide: nextLow,
-            distanceToStation: station.distance(to: userCoordinate)
+            distanceToStation: station.distance(to: userCoordinate),
+            history: historyPoints,
+            predictions: predictionPoints
         )
     }
 

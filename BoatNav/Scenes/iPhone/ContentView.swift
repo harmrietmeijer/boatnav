@@ -21,7 +21,7 @@ struct ContentView: View {
             return navigationViewModel.isNavigating ? .navigation : .route
         case .speedDetail:
             return .navigation
-        case .settings, .boatProfile, .paywall, .locationSharing:
+        case .settings, .boatProfile, .paywall, .locationSharing, .waterLevel:
             return .standard
         case .none:
             return .standard
@@ -318,6 +318,8 @@ struct ContentView: View {
                         PaywallPanelContent(activePanel: $activePanel)
                     case .locationSharing:
                         LocationSharingPanelContent(activePanel: $activePanel)
+                    case .waterLevel:
+                        WaterLevelPanelContent(activePanel: $activePanel)
                     case .none:
                         EmptyView()
                     }
@@ -368,6 +370,8 @@ struct ContentView: View {
             PaywallPanelContent(activePanel: $activePanel)
         case .locationSharing:
             LocationSharingPanelContent(activePanel: $activePanel)
+        case .waterLevel:
+            WaterLevelPanelContent(activePanel: $activePanel)
         case .none:
             EmptyView()
         }

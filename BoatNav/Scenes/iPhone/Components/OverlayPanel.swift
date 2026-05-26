@@ -15,6 +15,7 @@ enum ActivePanel: Equatable {
     case boatProfile
     case paywall
     case locationSharing
+    case waterLevel
 }
 
 struct OverlayPanel<Content: View>: View {
