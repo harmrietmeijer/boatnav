@@ -7,6 +7,7 @@ struct DashboardOverlay: View {
     @EnvironmentObject var speedViewModel: SpeedViewModel
     @EnvironmentObject var navigationViewModel: NavigationViewModel
     @EnvironmentObject var weatherViewModel: WeatherViewModel
+    @EnvironmentObject var waterLevelViewModel: WaterLevelViewModel
     @EnvironmentObject var maneuverProximityService: ManeuverProximityService
     @EnvironmentObject var mapViewModel: MapViewModel
 
@@ -29,6 +30,12 @@ struct DashboardOverlay: View {
             // 3. Weather strip
             if let w = weatherViewModel.weather {
                 weatherSection(w)
+                divider
+            }
+
+            // 4. Water level / tide
+            if let wl = waterLevelViewModel.waterLevel {
+                waterLevelSection(wl)
                 divider
             }
 
@@ -174,6 +181,69 @@ struct DashboardOverlay: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
+    }
+
+    // MARK: - Water Level
+
+    private func waterLevelSection(_ wl: WaterLevelService.WaterLevelData) -> some View {
+        VStack(spacing: 8) {
+            // Station + level
+            HStack(spacing: 8) {
+                Image(systemName: "water.waves")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Design.Blue.b4)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(wl.stationName)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
+                    HStack(spacing: 4) {
+                        Text(String(format: "%+.0f cm NAP", wl.waterLevelCm))
+                            .font(.system(size: 15, weight: .bold, design: .monospaced))
+                            .foregroundStyle(.white)
+                        Image(systemName: wl.trend == .rising ? "arrow.up.right" : wl.trend == .falling ? "arrow.down.right" : "arrow.right")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(wl.trend == .rising ? Design.Blue.b4 : wl.trend == .falling ? Design.Red.r4 : Design.Gray.g4)
+                    }
+                }
+
+                Spacer()
+            }
+
+            // Next high/low tide
+            let formatter = tideTimeFormatter
+            HStack(spacing: 12) {
+                if let high = wl.nextHighTide {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.up.to.line")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Design.Blue.b4)
+                        Text("HW \(formatter.string(from: high.time))")
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                }
+                if let low = wl.nextLowTide {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.down.to.line")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Design.Red.r4)
+                        Text("LW \(formatter.string(from: low.time))")
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+    }
+
+    private var tideTimeFormatter: DateFormatter {
+        let f = DateFormatter()
+        f.dateFormat = "HH:mm"
+        return f
     }
 
     // MARK: - Action Buttons

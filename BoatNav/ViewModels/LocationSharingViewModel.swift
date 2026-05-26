@@ -10,7 +10,10 @@ class LocationSharingViewModel: ObservableObject {
         didSet { UserDefaults.standard.set(displayName, forKey: "locationSharing_displayName") }
     }
     @Published var shareCode: String {
-        didSet { UserDefaults.standard.set(shareCode, forKey: "locationSharing_shareCode") }
+        didSet {
+            UserDefaults.standard.set(shareCode, forKey: "locationSharing_shareCode")
+            if !shareCode.isEmpty { KeychainStore.set(shareCode, for: "boatnav.locationSharing.shareCode") }
+        }
     }
     @Published var friends: [FriendLocation] = []
     @Published var friendAnnotations: [FriendAnnotation] = []
@@ -30,11 +33,27 @@ class LocationSharingViewModel: ObservableObject {
     private var lastUploadTime: Date = .distantPast
     private var friendIDs: [(id: String, name: String)] = []
 
+    private let shareCodeKeychainKey = "boatnav.locationSharing.shareCode"
+
     init() {
         let defaults = UserDefaults.standard
         self.isSharing = defaults.bool(forKey: "locationSharing_isSharing")
         self.displayName = defaults.string(forKey: "locationSharing_displayName") ?? ""
-        self.shareCode = defaults.string(forKey: "locationSharing_shareCode") ?? ""
+
+        // Restore share code: UserDefaults first, Keychain as backup
+        let udCode = defaults.string(forKey: "locationSharing_shareCode") ?? ""
+        let kcCode = KeychainStore.get("boatnav.locationSharing.shareCode") ?? ""
+        if !udCode.isEmpty {
+            self.shareCode = udCode
+            // Ensure Keychain backup is in sync
+            if kcCode != udCode { KeychainStore.set(udCode, for: "boatnav.locationSharing.shareCode") }
+        } else if !kcCode.isEmpty {
+            // UserDefaults lost (e.g. after reinstall) — restore from Keychain
+            self.shareCode = kcCode
+            defaults.set(kcCode, forKey: "locationSharing_shareCode")
+        } else {
+            self.shareCode = ""
+        }
 
         // Load cached friend IDs
         if let data = defaults.data(forKey: "locationSharing_friends"),

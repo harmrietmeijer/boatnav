@@ -24,6 +24,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let hazardReportViewModel = HazardReportViewModel()
     let locationSharingViewModel = LocationSharingViewModel()
     let maneuverProximityService = ManeuverProximityService()
+    let waterLevelViewModel: WaterLevelViewModel
 
     override init() {
         self.buoyAnnotationProvider = BuoyAnnotationProvider(pdokClient: pdokClient)
@@ -43,6 +44,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         self.navigationViewModel.settingsViewModel = settingsViewModel
         self.navigationViewModel.speedLimitService = speedViewModel.speedLimitService
         self.weatherViewModel = WeatherViewModel(locationService: locationService)
+        self.waterLevelViewModel = WaterLevelViewModel(locationService: locationService)
         self.mapViewModel.rwsLockService = rwsLockService
 
         super.init()

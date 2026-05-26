@@ -38,7 +38,23 @@ class SubscriptionManager: ObservableObject {
         Purchases.logLevel = .warn
         Purchases.configure(withAPIKey: apiKey)
 
-        Task { await checkEntitlement() }
+        // Restore purchases on first launch after install/reinstall so iPad
+        // picks up a purchase made on iPhone (and vice-versa).
+        let hasRestoredKey = "rc_has_restored_once"
+        if !UserDefaults.standard.bool(forKey: hasRestoredKey) {
+            Task {
+                do {
+                    let info = try await Purchases.shared.restorePurchases()
+                    updateProStatus(from: info)
+                    UserDefaults.standard.set(true, forKey: hasRestoredKey)
+                } catch {
+                    // Restore failed (offline?) — will retry next launch
+                    await checkEntitlement()
+                }
+            }
+        } else {
+            Task { await checkEntitlement() }
+        }
 
         Purchases.shared.delegate = PurchasesDelegateHandler.shared
         PurchasesDelegateHandler.shared.onChange = { [weak self] info in
@@ -51,6 +67,7 @@ class SubscriptionManager: ObservableObject {
     func checkEntitlement() async {
         if isBypassActiveForThisDevice() {
             isPro = true
+            UserDefaults.standard.set(true, forKey: proStatusKey)
             return
         }
         do {
@@ -60,6 +77,7 @@ class SubscriptionManager: ObservableObject {
             #if DEBUG
             print("[Subscription] Error checking entitlement: \(error)")
             #endif
+            // On error, keep cached status — don't overwrite to false
         }
     }
 
@@ -205,6 +223,8 @@ class SubscriptionManager: ObservableObject {
     private func refreshProStatusFromLocal() {
         if isBypassActiveForThisDevice() {
             isPro = true
+            // Ensure UserDefaults cache stays in sync with Keychain bypass
+            UserDefaults.standard.set(true, forKey: proStatusKey)
         } else {
             isPro = UserDefaults.standard.bool(forKey: proStatusKey)
         }

@@ -19,6 +19,7 @@
 		12BC59DDDC9931B5A1352358 /* WaterwayGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C0C571731156E3ECC8D4D5 /* WaterwayGraph.swift */; };
 		1543A4E1793EE821CE8AF902 /* HazardReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89A4934B6FBA7618708FAF0 /* HazardReport.swift */; };
 		2073832C5D88684B99F99798 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93B160C2D8DFF700B664B6B /* KeychainStore.swift */; };
+		20BFFEEBC02F3C61F4DDB45B /* WaterLevelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A2DD7500A16C00D447112F /* WaterLevelService.swift */; };
 		2D0AE24031FD076D4AE0F757 /* WaterwayRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B75D73750CD520D5594321 /* WaterwayRouter.swift */; };
 		338016AFAC5D721BD15A8BBA /* BuoyAnnotationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADBF9B26026C2CD8B17B8C5 /* BuoyAnnotationProvider.swift */; };
 		36EEE65DD39D4C76C8EAB6EF /* BoatProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2815D31CEF65C3EB2715D8 /* BoatProfile.swift */; };
@@ -36,6 +37,7 @@
 		4E944F786FF2DEF928E544E4 /* CoordinateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383B5884879CC14FA7F28C9 /* CoordinateHelpers.swift */; };
 		4EF70EB46BBF863193D79CCF /* MapViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5DC361DBE456B5C539B380 /* MapViewRepresentable.swift */; };
 		5410EC0EAB7E32D39E2383A1 /* PDOKClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C7879367950A876E84519D /* PDOKClient.swift */; };
+		551A5B4FBAB9D094ACE8797E /* WaterLevelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE952FDB9A70CB6E49A91B6 /* WaterLevelViewModel.swift */; };
 		552EB77B2A2FF45ADBA1D40A /* LocationSharingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208E2F9231414F01CF18592 /* LocationSharingViewModel.swift */; };
 		5E9B9887C91A4573A8AEDD1E /* NavigationPanelContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14FF1725F5761952B559A09 /* NavigationPanelContent.swift */; };
 		677C864FCE99C16EFC03D731 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49897F46E1433B753532F7B /* SnapshotHelper.swift */; };
@@ -162,6 +164,7 @@
 		9B5025DDBCE9B0E47CDC1D59 /* BoatProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfileViewModel.swift; sourceTree = "<group>"; };
 		A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteLocation.swift; sourceTree = "<group>"; };
 		A99C725877AE12F1A8C8515C /* BoatNav.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BoatNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9A2DD7500A16C00D447112F /* WaterLevelService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterLevelService.swift; sourceTree = "<group>"; };
 		AA222222AAAA2222AAAA2222 /* ManeuverProximityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManeuverProximityService.swift; sourceTree = "<group>"; };
 		B14FF1725F5761952B559A09 /* NavigationPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPanelContent.swift; sourceTree = "<group>"; };
 		B60CD9D63C58D4ABFE81583D /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
@@ -197,6 +200,7 @@
 		F95B816D19BA5929AF456F49 /* Lock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lock.swift; sourceTree = "<group>"; };
 		F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RWSLockService.swift; sourceTree = "<group>"; };
 		FC2815D31CEF65C3EB2715D8 /* BoatProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfile.swift; sourceTree = "<group>"; };
+		FDE952FDB9A70CB6E49A91B6 /* WaterLevelViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterLevelViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -258,6 +262,7 @@
 				F0BDA15B6E0E3535202D40A8 /* SettingsViewModel.swift */,
 				91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */,
 				B60CD9D63C58D4ABFE81583D /* WeatherViewModel.swift */,
+				FDE952FDB9A70CB6E49A91B6 /* WaterLevelViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -299,6 +304,7 @@
 				D7BE10126150D8CAE76D9E79 /* PDOKEndpoints.swift */,
 				F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */,
 				E0A79F53462CF566579CDC55 /* WeatherService.swift */,
+				A9A2DD7500A16C00D447112F /* WaterLevelService.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -704,6 +710,8 @@
 				D7FBCC805C07D9E3D4BFE826 /* WeatherBarView.swift in Sources */,
 				D463FCC580A52B597650633C /* WeatherService.swift in Sources */,
 				49D51D873782F07162A7AA70 /* WeatherViewModel.swift in Sources */,
+				20BFFEEBC02F3C61F4DDB45B /* WaterLevelService.swift in Sources */,
+				551A5B4FBAB9D094ACE8797E /* WaterLevelViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
