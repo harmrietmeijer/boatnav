@@ -429,6 +429,21 @@ extension ButtonStyle where Self == FlitsButtonStyle {
     static var flits: FlitsButtonStyle { FlitsButtonStyle() }
 }
 
+/// Accent CTA — blue accent background, white text
+struct AccentButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Design.Colors.accent, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
 /// Route CTA — warm dark red-brown (#8B3020), white text
 struct RouteCTAButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -466,6 +481,9 @@ struct RouteOutlineButtonStyle: ButtonStyle {
     }
 }
 
+extension ButtonStyle where Self == AccentButtonStyle {
+    static var accent: AccentButtonStyle { AccentButtonStyle() }
+}
 extension ButtonStyle where Self == RouteCTAButtonStyle {
     static var routeCTA: RouteCTAButtonStyle { RouteCTAButtonStyle() }
 }

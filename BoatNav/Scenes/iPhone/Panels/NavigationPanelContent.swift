@@ -14,10 +14,10 @@ struct NavigationPanelContent: View {
             // Panel header
             HStack(spacing: Design.Spacing.sm) {
                 Image(systemName: "arrow.triangle.turn.up.right.diamond.fill")
-                    .foregroundStyle(navigationViewModel.isNavigating ? .white : Design.Route.wpDot)
+                    .foregroundStyle(Design.Colors.accent)
                 Text("Navigatie")
                     .font(.title3.weight(.regular))
-                    .foregroundStyle(navigationViewModel.isNavigating ? .white : Design.Route.text)
+                    .foregroundStyle(Design.Colors.text)
                 Spacer()
             }
             .padding(.bottom, Design.Spacing.lg)
@@ -41,11 +41,11 @@ struct NavigationPanelContent: View {
                         .foregroundStyle(Design.Amber.a5)
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(Design.Route.text2)
+                        .foregroundStyle(Design.Colors.text2)
                 }
                 .padding(Design.Spacing.md)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .tintedCard(tint: Design.Route.rowTint, border: Design.Route.border, cornerRadius: Design.Corner.sm)
+                .tintedCard(tint: Design.Colors.bg, border: Design.Colors.border, cornerRadius: Design.Corner.sm)
             }
 
             // Start location card
@@ -130,6 +130,13 @@ struct NavigationPanelContent: View {
                     if navigationViewModel.isLoadingRoute {
                         ProgressView()
                             .tint(.white)
+                    } else if !navigationViewModel.isGraphReady {
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .tint(.white)
+                            Text("Vaarwegdata laden...")
+                                .font(.subheadline.weight(.semibold))
+                        }
                     } else {
                         Label("Bereken route", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
                             .font(.subheadline.weight(.semibold))
@@ -137,15 +144,17 @@ struct NavigationPanelContent: View {
                     Spacer()
                 }
             }
-            .buttonStyle(.routeCTA)
+            .buttonStyle(.accent)
             .disabled(
                 navigationViewModel.startSelection == .none
                 || navigationViewModel.destinationSelection == .none
                 || navigationViewModel.isLoadingRoute
+                || !navigationViewModel.isGraphReady
             )
             .opacity(
                 (navigationViewModel.startSelection == .none
-                || navigationViewModel.destinationSelection == .none)
+                || navigationViewModel.destinationSelection == .none
+                || !navigationViewModel.isGraphReady)
                 ? 0.5 : 1
             )
 
@@ -167,7 +176,7 @@ struct NavigationPanelContent: View {
                         }
                     }
                 }
-                .buttonStyle(.routeOutline)
+                .buttonStyle(.outline)
             }
 
             // Search results (max 5 visible, scrollable)
@@ -183,22 +192,22 @@ struct NavigationPanelContent: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(result.displayName)
                                         .font(.subheadline)
-                                        .foregroundStyle(Design.Route.text)
+                                        .foregroundStyle(Design.Colors.text)
                                     Text(result.type)
                                         .font(.caption)
-                                        .foregroundStyle(Design.Route.text3)
+                                        .foregroundStyle(Design.Colors.text3)
                                 }
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.caption2)
-                                    .foregroundStyle(Design.Route.text3)
+                                    .foregroundStyle(Design.Colors.text3)
                             }
                             .padding(.horizontal, 14)
                             .padding(.vertical, 10)
                         }
                     }
                 }
-                .routeCard()
+                .surfaceCard()
             }
 
             // Favorites
@@ -231,16 +240,16 @@ struct NavigationPanelContent: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
                     .font(.caption)
-                    .foregroundStyle(Design.Route.text3)
+                    .foregroundStyle(Design.Colors.text3)
 
                 if selection == .none {
                     Text(placeholder)
                         .font(.subheadline)
-                        .foregroundStyle(Design.Route.text3)
+                        .foregroundStyle(Design.Colors.text3)
                 } else {
                     Text(selection.displayName)
                         .font(.subheadline)
-                        .foregroundStyle(Design.Route.text2)
+                        .foregroundStyle(Design.Colors.text2)
                         .lineLimit(1)
                 }
             }
@@ -252,20 +261,20 @@ struct NavigationPanelContent: View {
             } label: {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Design.Route.text3)
+                    .foregroundStyle(Design.Colors.text3)
                     .frame(width: 32, height: 32)
-                    .background(Design.Route.rowTint, in: Circle())
+                    .background(Design.Colors.bg, in: Circle())
             }
         }
         .padding(Design.Spacing.lg)
-        .routeCard()
+        .surfaceCard()
     }
 
     private var searchField: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(Design.Route.text3)
+                    .foregroundStyle(Design.Colors.text3)
                     .font(.system(size: 14))
 
                 TextField(
@@ -276,7 +285,7 @@ struct NavigationPanelContent: View {
                 )
                 .textFieldStyle(.plain)
                 .font(.subheadline)
-                .foregroundStyle(Design.Route.text2)
+                .foregroundStyle(Design.Colors.text2)
                 .autocorrectionDisabled()
                 .onChange(of: navigationViewModel.searchQuery) { _, _ in
                     navigationViewModel.performSearch()
@@ -289,13 +298,13 @@ struct NavigationPanelContent: View {
                         showSearchField = false
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(Design.Route.text3)
+                            .foregroundStyle(Design.Colors.text3)
                             .font(.system(size: 16))
                     }
                 }
             }
             .padding(Design.Spacing.md)
-            .background(Design.Route.rowTint, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
+            .background(Design.Colors.bg, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
 
             if navigationViewModel.isSearching {
                 ProgressView()
@@ -318,16 +327,16 @@ struct NavigationPanelContent: View {
                 } label: {
                     Image(systemName: navigationViewModel.canAddMoreFavorites ? "plus" : "lock.fill")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Design.Route.text2)
+                        .foregroundStyle(Design.Colors.text2)
                         .frame(width: 28, height: 28)
-                        .background(Design.Route.rowTint, in: Circle())
+                        .background(Design.Colors.bg, in: Circle())
                 }
             }
 
             if navigationViewModel.favorites.isEmpty {
                 Text("Nog geen favorieten")
                     .font(.caption)
-                    .foregroundStyle(Design.Route.text3)
+                    .foregroundStyle(Design.Colors.text3)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 8)
             } else {
@@ -338,17 +347,17 @@ struct NavigationPanelContent: View {
                         } label: {
                             HStack(spacing: 10) {
                                 Image(systemName: "star.fill")
-                                    .foregroundStyle(Design.Route.wpDot)
+                                    .foregroundStyle(Design.Colors.accent)
                                     .font(.system(size: 14))
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(fav.name)
                                         .font(.subheadline.weight(.medium))
-                                        .foregroundStyle(Design.Route.text)
+                                        .foregroundStyle(Design.Colors.text)
                                     if !fav.description.isEmpty {
                                         Text(fav.description)
                                             .font(.caption)
-                                            .foregroundStyle(Design.Route.text3)
+                                            .foregroundStyle(Design.Colors.text3)
                                     }
                                 }
 
@@ -369,7 +378,7 @@ struct NavigationPanelContent: View {
                         }
                     }
                 }
-                .routeCard()
+                .surfaceCard()
             }
         }
     }
@@ -394,10 +403,10 @@ struct NavigationPanelContent: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(route.name)
                                             .font(.subheadline)
-                                            .foregroundStyle(Design.Route.text)
+                                            .foregroundStyle(Design.Colors.text)
                                         Text(route.createdAt, style: .date)
                                             .font(.system(.caption, design: .monospaced).weight(.bold))
-                                            .foregroundStyle(Design.Route.text)
+                                            .foregroundStyle(Design.Colors.text)
                                     }
                                 }
 
@@ -417,7 +426,7 @@ struct NavigationPanelContent: View {
                             .padding(.vertical, 10)
                         }
                     }
-                    .routeCard()
+                    .surfaceCard()
                 }
             }
         }
@@ -426,7 +435,7 @@ struct NavigationPanelContent: View {
     private func sectionHeader(_ title: String, nav: Bool = false) -> some View {
         Text(title)
             .font(.system(.caption, design: .monospaced))
-            .foregroundStyle(nav ? Design.Blue.b6 : Design.Route.text3)
+            .foregroundStyle(Design.Colors.text3)
             .textCase(.uppercase)
             .tracking(1.5)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -443,10 +452,10 @@ struct NavigationPanelContent: View {
                     Text(String(format: "%.1f", speedViewModel.speedKnots))
                         .font(.system(size: 28, weight: .bold, design: .monospaced))
                         .monospacedDigit()
-                        .foregroundStyle(speedViewModel.isExceedingLimit ? Design.Red.r4 : Design.Nav.dataText)
+                        .foregroundStyle(speedViewModel.isExceedingLimit ? Design.Red.r4 : Design.Colors.text)
                     Text("kn")
                         .font(.system(size: 13, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Design.Nav.labelText)
+                        .foregroundStyle(Design.Colors.text2)
                 }
 
                 // Speed limit
@@ -472,15 +481,15 @@ struct NavigationPanelContent: View {
                             .symbolRenderingMode(.multicolor)
                         Text(String(format: "%.0f°", w.temperature))
                             .font(.system(size: 13, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Design.Nav.dataText)
+                            .foregroundStyle(Design.Colors.text)
                         Text("Bft \(w.beaufort) \(w.windDirectionLabel)")
                             .font(.system(size: 11, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Design.Nav.labelText)
+                            .foregroundStyle(Design.Colors.text2)
                     }
                 }
             }
             .padding(Design.Spacing.md)
-            .navStatCard()
+            .surfaceCard(cornerRadius: Design.Corner.sm)
 
             // Upcoming maneuver alert
             if let maneuver = maneuverProximityService.upcomingManeuver,
@@ -490,21 +499,21 @@ struct NavigationPanelContent: View {
                     maneuverIcon(for: maneuver.type)
                         .font(.system(size: 28))
                         .frame(width: 48, height: 48)
-                        .background(Design.Blue.b1, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
+                        .background(Design.Blue.b7, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(maneuver.instruction)
                             .font(.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Design.Colors.text)
                         Text(String(format: "Over %.0f m", distance))
                             .font(.system(size: 22, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Design.Amber.a5)
+                            .foregroundStyle(Design.Colors.accent)
                     }
 
                     Spacer()
                 }
                 .padding(Design.Spacing.lg)
-                .background(Design.Blue.b1.opacity(0.8), in: RoundedRectangle(cornerRadius: Design.Corner.md))
+                .surfaceCard(cornerRadius: Design.Corner.md)
             }
 
             // Route summary cards
@@ -550,7 +559,7 @@ struct NavigationPanelContent: View {
                 .background(
                     speedViewModel.isExceedingLimit
                         ? Design.Red.r4.opacity(0.15)
-                        : Design.Nav.statBg,
+                        : Design.Colors.bg,
                     in: RoundedRectangle(cornerRadius: Design.Corner.md)
                 )
             }
@@ -576,7 +585,7 @@ struct NavigationPanelContent: View {
 
                             Text(warning.message)
                                 .font(.caption)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Design.Colors.text)
 
                             Spacer()
                         }
@@ -584,10 +593,10 @@ struct NavigationPanelContent: View {
                     }
                 }
                 .padding(Design.Spacing.lg)
-                .background(Color(hex: 0x1A1005).opacity(0.8), in: RoundedRectangle(cornerRadius: Design.Corner.md))
+                .background(Design.Amber.a7, in: RoundedRectangle(cornerRadius: Design.Corner.md))
                 .overlay(
                     RoundedRectangle(cornerRadius: Design.Corner.md)
-                        .stroke(Design.Amber.a3, lineWidth: 1)
+                        .stroke(Design.Amber.a5.opacity(0.3), lineWidth: 1)
                 )
             }
 
@@ -600,16 +609,16 @@ struct NavigationPanelContent: View {
                         maneuverIcon(for: maneuver.type)
                             .font(.system(size: 16))
                             .frame(width: 32, height: 32)
-                            .background(Design.Nav.statBg, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
+                            .background(Design.Colors.bg, in: RoundedRectangle(cornerRadius: Design.Corner.sm))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(maneuver.instruction)
                                 .font(.subheadline)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Design.Colors.text)
                             if maneuver.distanceFromPrevious > 0 {
                                 Text(String(format: "%.0f m", maneuver.distanceFromPrevious))
                                     .font(.system(.caption, design: .monospaced))
-                                    .foregroundStyle(Design.Blue.b6)
+                                    .foregroundStyle(Design.Colors.accent)
                             }
                         }
 
@@ -617,7 +626,7 @@ struct NavigationPanelContent: View {
                     }
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Design.Nav.statBg)
+                    .background(Design.Colors.bg)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: Design.Corner.sm))
@@ -639,16 +648,16 @@ struct NavigationPanelContent: View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 16, weight: .bold, design: .monospaced))
-                .foregroundStyle(Design.Nav.dataText)
+                .foregroundStyle(Design.Colors.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(Design.Nav.labelText)
+                .foregroundStyle(Design.Colors.text2)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, Design.Spacing.md)
-        .navStatCard()
+        .surfaceCard(cornerRadius: Design.Corner.sm)
     }
 
     @ViewBuilder

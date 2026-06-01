@@ -9,7 +9,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     private let mapViewModel: MapViewModel
     private let speedViewModel: SpeedViewModel
     private var cancellables = Set<AnyCancellable>()
-    private var routeOverlay: MKPolyline?
+    private var routeOverlays: [MKPolyline] = []
 
     // Default region: Dordrecht / Biesbosch area
     private let defaultRegion = MKCoordinateRegion(
@@ -99,17 +99,24 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     }
 
     func showRoute(_ route: WaterwayRoute) {
-        // Remove existing route overlay
-        if let existing = routeOverlay {
-            mapView.removeOverlay(existing)
+        // Remove existing route overlays
+        for overlay in routeOverlays {
+            mapView.removeOverlay(overlay)
         }
+        routeOverlays.removeAll()
 
-        let polyline = MKPolyline(
-            coordinates: route.coordinates,
-            count: route.coordinates.count
-        )
-        routeOverlay = polyline
-        mapView.addOverlay(polyline, level: .aboveLabels)
+        var boundingRect: MKMapRect?
+        for segment in route.polylines {
+            guard segment.count >= 2 else { continue }
+            let polyline = MKPolyline(coordinates: segment, count: segment.count)
+            mapView.addOverlay(polyline, level: .aboveLabels)
+            routeOverlays.append(polyline)
+            if let existing = boundingRect {
+                boundingRect = existing.union(polyline.boundingMapRect)
+            } else {
+                boundingRect = polyline.boundingMapRect
+            }
+        }
 
         // Add bridge annotations along route
         let bridgeAnnotations = route.bridges.map { bridge -> SeamarkAnnotation in
@@ -123,11 +130,13 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         mapView.addAnnotations(bridgeAnnotations)
 
         // Zoom to fit route
-        mapView.setVisibleMapRect(
-            polyline.boundingMapRect,
-            edgePadding: UIEdgeInsets(top: 60, left: 40, bottom: 60, right: 40),
-            animated: true
-        )
+        if let rect = boundingRect {
+            mapView.setVisibleMapRect(
+                rect,
+                edgePadding: UIEdgeInsets(top: 60, left: 40, bottom: 60, right: 40),
+                animated: true
+            )
+        }
     }
 
     // MARK: - CPMapTemplateDelegate

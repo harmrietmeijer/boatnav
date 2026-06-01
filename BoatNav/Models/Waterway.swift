@@ -36,6 +36,10 @@ struct WaterwayRoute {
     let destination: CLLocationCoordinate2D
     let segments: [WaterwaySegment]
     let coordinates: [CLLocationCoordinate2D]
+    /// Route split into separate polylines at gaps (bridge edges, data gaps).
+    /// Each sub-array is a continuous waterway path that can be drawn without
+    /// crossing land. Use this for map rendering instead of `coordinates`.
+    let polylines: [[CLLocationCoordinate2D]]
     let totalDistance: Double // meters
     let estimatedTime: TimeInterval // seconds
     let bridges: [Bridge]

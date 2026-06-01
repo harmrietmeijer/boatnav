@@ -283,8 +283,11 @@ class WaterwayGraph {
                     length: bestDist,
                     maxSpeedKmh: nil
                 )
-                let fwd = Edge(from: mainNode, to: otherNode, segment: bridgeSegment, weight: bestDist)
-                let bwd = Edge(from: otherNode, to: mainNode, segment: bridgeSegment, weight: bestDist)
+                // Penalize bridge edges so A* prefers real waterway segments.
+                // Without penalty, bridges create shortcuts that give wrong distances.
+                let penalizedWeight = bestDist * 10
+                let fwd = Edge(from: mainNode, to: otherNode, segment: bridgeSegment, weight: penalizedWeight)
+                let bwd = Edge(from: otherNode, to: mainNode, segment: bridgeSegment, weight: penalizedWeight)
                 adjacencyList[mainNode, default: []].append(fwd)
                 adjacencyList[otherNode, default: []].append(bwd)
                 bridgeCount += 1

@@ -87,13 +87,42 @@ class WaterwayProvider {
 
     // MARK: - Merging
 
-    /// Merge PDOK and OSM segments. Keeps ALL segments from both sources —
-    /// the graph's node merging (20m threshold) handles connectivity.
-    /// Duplicate edges are harmless for routing but missing edges break routes.
+    /// Merge PDOK and OSM segments. OSM is the primary geometry source
+    /// (detailed coordinates following actual waterway curves). PDOK segments
+    /// that overlap with OSM are removed to prevent duplicate parallel paths
+    /// that cause triangular/zigzag routes. PDOK-unique segments are kept.
     private func mergeSegments(pdok: [WaterwaySegment], osm: [WaterwaySegment]) -> [WaterwaySegment] {
-        let result = pdok + osm
+        guard !pdok.isEmpty else { return osm }
+        guard !osm.isEmpty else { return pdok }
+
+        // Build spatial grid from OSM coordinates (~50m cells)
+        var osmGrid = Set<Int>()
+        for seg in osm {
+            for coord in seg.coordinates {
+                let key = Int(coord.latitude * 2000) &* 100_000 &+ Int(coord.longitude * 2000)
+                osmGrid.insert(key)
+            }
+        }
+
+        // Keep PDOK segments only where OSM has NO coverage nearby
+        let pdokUnique = pdok.filter { pdokSeg in
+            let midIdx = pdokSeg.coordinates.count / 2
+            let mid = pdokSeg.coordinates[midIdx]
+            let latBase = Int(mid.latitude * 2000)
+            let lonBase = Int(mid.longitude * 2000)
+            for dx in -1...1 {
+                for dy in -1...1 {
+                    if osmGrid.contains((latBase + dx) &* 100_000 &+ (lonBase + dy)) {
+                        return false
+                    }
+                }
+            }
+            return true
+        }
+
+        let result = osm + pdokUnique
         #if DEBUG
-        print("[WaterwayProvider] Merged: \(pdok.count) PDOK + \(osm.count) OSM = \(result.count) total")
+        print("[WaterwayProvider] Merged: \(osm.count) OSM + \(pdokUnique.count)/\(pdok.count) PDOK-unique = \(result.count) total")
         #endif
         return result
     }

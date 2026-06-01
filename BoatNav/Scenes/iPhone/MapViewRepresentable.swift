@@ -9,7 +9,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     let annotations: [SeamarkAnnotation]
     let hazardAnnotations: [HazardAnnotation]
     let friendAnnotations: [FriendAnnotation]
-    let routeCoordinates: [CLLocationCoordinate2D]
+    let routePolylines: [[CLLocationCoordinate2D]]
     let startCoordinate: CLLocationCoordinate2D?
     let destinationCoordinate: CLLocationCoordinate2D?
     let isSelectingOnMap: Bool
@@ -156,36 +156,45 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
 
         // Show route overlay - only update when route changes
-        let newCount = routeCoordinates.count
+        let newCount = routePolylines.reduce(0) { $0 + $1.count }
+        let firstCoord = routePolylines.first?.first
         let routeChanged = newCount != context.coordinator.lastRouteCount
-            || (routeCoordinates.first.map { c in
+            || (firstCoord.map { c in
                 context.coordinator.lastRouteStartLat != c.latitude
                 || context.coordinator.lastRouteStartLon != c.longitude
             } ?? (context.coordinator.lastRouteCount != 0))
 
         if routeChanged {
-            if let old = context.coordinator.currentRouteOverlay {
+            // Remove old polylines
+            for old in context.coordinator.currentRouteOverlays {
                 mapView.removeOverlay(old)
-                context.coordinator.currentRouteOverlay = nil
             }
+            context.coordinator.currentRouteOverlays.removeAll()
 
-            if !routeCoordinates.isEmpty {
-                var coords = routeCoordinates
-                let polyline = MKPolyline(coordinates: &coords, count: coords.count)
-                mapView.addOverlay(polyline, level: .aboveLabels)
-                context.coordinator.currentRouteOverlay = polyline
+            if !routePolylines.isEmpty {
+                var boundingRect: MKMapRect?
+                for segment in routePolylines {
+                    guard segment.count >= 2 else { continue }
+                    var coords = segment
+                    let polyline = MKPolyline(coordinates: &coords, count: coords.count)
+                    mapView.addOverlay(polyline, level: .aboveLabels)
+                    context.coordinator.currentRouteOverlays.append(polyline)
+                    if let existing = boundingRect {
+                        boundingRect = existing.union(polyline.boundingMapRect)
+                    } else {
+                        boundingRect = polyline.boundingMapRect
+                    }
+                }
 
-                if !navigationViewModel.isNavigating {
-                    // Route planning: zoom to fit entire route
-                    let rect = polyline.boundingMapRect
+                if !navigationViewModel.isNavigating, let rect = boundingRect {
                     let insets = UIEdgeInsets(top: 60, left: 40, bottom: 120, right: 40)
                     mapView.setVisibleMapRect(rect, edgePadding: insets, animated: true)
                 }
             }
 
             context.coordinator.lastRouteCount = newCount
-            context.coordinator.lastRouteStartLat = routeCoordinates.first?.latitude ?? 0
-            context.coordinator.lastRouteStartLon = routeCoordinates.first?.longitude ?? 0
+            context.coordinator.lastRouteStartLat = firstCoord?.latitude ?? 0
+            context.coordinator.lastRouteStartLon = firstCoord?.longitude ?? 0
         }
 
         // Navigation mode: forward-looking camera like car navigation
@@ -224,7 +233,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         var lastRouteCount = 0
         var lastRouteStartLat: Double = 0
         var lastRouteStartLon: Double = 0
-        var currentRouteOverlay: MKPolyline?
+        var currentRouteOverlays: [MKPolyline] = []
         var currentBRTOverlay: MKTileOverlay?
         var currentSeamarkOverlay: MKTileOverlay?
         var currentMapStyle: MapStyle = .standaard

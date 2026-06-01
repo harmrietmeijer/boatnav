@@ -60,9 +60,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Keep screen on while app is active — essential for navigation and speed display
         UIApplication.shared.isIdleTimerDisabled = true
 
-        // Load waterway graph for routing and speed limits
+        // Load lock metadata and other startup tasks
+        // (waterway graph is loaded via .task in ContentView)
         Task {
-            await navigationViewModel.loadWaterwayGraph()
+            // navigationViewModel.loadWaterwayGraph() is called from ContentView
             await rwsLockService.fetchLockMetadata()
 
             #if DEBUG

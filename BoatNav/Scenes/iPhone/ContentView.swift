@@ -17,10 +17,8 @@ struct ContentView: View {
 
     private var panelTheme: Design.PanelTheme {
         switch activePanel {
-        case .navigation:
-            return navigationViewModel.isNavigating ? .navigation : .route
-        case .speedDetail:
-            return .navigation
+        case .navigation, .speedDetail:
+            return .standard
         case .settings, .boatProfile, .paywall, .locationSharing, .waterLevel:
             return .standard
         case .none:
@@ -91,8 +89,8 @@ struct ContentView: View {
                         .scrollDismissesKeyboard(.interactively)
                     }
                     .frame(width: 360)
-                    .background(panelTheme == .navigation ? AnyShapeStyle(Design.Ink.primary) : AnyShapeStyle(.ultraThickMaterial))
-                    .environment(\.colorScheme, panelTheme == .navigation || panelTheme == .flits ? .dark : .light)
+                    .background(AnyShapeStyle(.ultraThickMaterial))
+                    .environment(\.colorScheme, panelTheme == .flits ? .dark : .light)
 
                     // Dimmed map area — tap to close
                     Color.black.opacity(0.2)
@@ -178,7 +176,7 @@ struct ContentView: View {
                 annotations: mapViewModel.annotations,
                 hazardAnnotations: hazardReportViewModel.annotations,
                 friendAnnotations: locationSharingViewModel.friendAnnotations,
-                routeCoordinates: navigationViewModel.currentRoute?.coordinates ?? [],
+                routePolylines: navigationViewModel.currentRoute?.polylines ?? [],
                 startCoordinate: navigationViewModel.startSelection.coordinate,
                 destinationCoordinate: navigationViewModel.destinationSelection.coordinate,
                 isSelectingOnMap: navigationViewModel.isSelectingOnMap,
@@ -216,7 +214,6 @@ struct ContentView: View {
         .overlay { hazardCategoryOverlay }
         .overlay { addFavoriteOverlay }
         .overlay { proximityAlertOverlay }
-        .task { await navigationViewModel.loadWaterwayGraph() }
     }
 
     private var compactOverlays: some View {
@@ -350,7 +347,6 @@ struct ContentView: View {
         .overlay { hazardCategoryOverlay }
         .overlay { addFavoriteOverlay }
         .overlay { proximityAlertOverlay }
-        .task { await navigationViewModel.loadWaterwayGraph() }
     }
 
     // MARK: - Panel content (shared)

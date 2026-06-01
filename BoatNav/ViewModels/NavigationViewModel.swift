@@ -13,6 +13,7 @@ class NavigationViewModel: ObservableObject {
     @Published var currentRoute: WaterwayRoute?
     @Published var isLoadingRoute = false
     @Published var errorMessage: String?
+    @Published var isGraphReady = false
 
     // MARK: - Route planning state
 
@@ -151,6 +152,7 @@ class NavigationViewModel: ObservableObject {
             await MainActor.run {
                 self.speedLimitService?.update(segments: segments)
                 self.errorMessage = nil
+                self.isGraphReady = true
             }
         } catch {
             #if DEBUG
@@ -332,16 +334,21 @@ class NavigationViewModel: ObservableObject {
             let allBridges = try await pdokClient.fetchBridges(for: routeRegion)
             let allLocks = try await pdokClient.fetchLocks(for: routeRegion)
 
-            // The route line only follows actual waterways (PDOK data).
-            // Drawing straight connectors from origin/destination to the snap
-            // point would cut across land, because harbours typically are not
-            // covered in PDOK. The start/destination pin markers already show
-            // where the user departs from and where they arrive; the route line
-            // shows only the navigable stretch.
-            var coordinates: [CLLocationCoordinate2D] = [result.originSnapPoint]
+            // Build route polylines from edges. Short bridge edges (< 100m)
+            // are rendered — they represent small data gaps between waterway
+            // segments that are on water. Long bridge edges (≥ 100m) might
+            // cross land and are skipped, creating a gap in the rendered route.
+            var polylines: [[CLLocationCoordinate2D]] = []
+            var currentPolyline: [CLLocationCoordinate2D] = []
+
             for (i, edge) in result.edges.enumerated() {
+                // Skip bridge edges — only render very short ones (< 50m)
+                // that are within node merge distance and on water.
+                let isBridge = edge.segment.id.hasPrefix("bridge-")
+                if isBridge && edge.segment.length >= 50 { continue }
+
                 var segCoords = edge.segment.coordinates
-                // Check if segment needs to be reversed based on path direction
+                // Reverse segment if needed based on path direction
                 if i < result.path.count - 1 {
                     let fromNode = result.path[i]
                     let segStart = WaterwayGraph.Node(coordinate: segCoords.first!)
@@ -350,37 +357,56 @@ class NavigationViewModel: ObservableObject {
                     }
                 }
 
-                // Trim first segment: start from originSnapPoint
+                // Trim first edge to start from originSnapPoint
                 if i == 0 {
                     segCoords = Self.trimSegmentStart(segCoords, to: result.originSnapPoint)
                 }
-                // Trim last segment: end at destinationSnapPoint
+                // Trim last edge to end at destinationSnapPoint
                 if i == result.edges.count - 1 {
                     segCoords = Self.trimSegmentEnd(segCoords, to: result.destinationSnapPoint)
                 }
 
-                // Skip first coord of segment if it's close to the last added coord (avoid duplicates)
-                if let last = coordinates.last, !segCoords.isEmpty {
-                    let dist = CLLocation(latitude: last.latitude, longitude: last.longitude)
+                guard !segCoords.isEmpty else { continue }
+
+                // Check gap from current polyline to this segment
+                if let last = currentPolyline.last {
+                    let gap = CLLocation(latitude: last.latitude, longitude: last.longitude)
                         .distance(from: CLLocation(latitude: segCoords[0].latitude, longitude: segCoords[0].longitude))
-                    if dist < 5 {
-                        segCoords.removeFirst()
+                    if gap < 100 {
+                        // Acceptable gap: connect seamlessly
+                        if gap <= 5 { segCoords.removeFirst() }
+                        currentPolyline.append(contentsOf: segCoords)
+                    } else {
+                        // Large gap: start new polyline
+                        if currentPolyline.count >= 2 {
+                            polylines.append(currentPolyline)
+                        }
+                        currentPolyline = segCoords
                     }
+                } else {
+                    currentPolyline = segCoords
                 }
-                coordinates.append(contentsOf: segCoords)
             }
-            // Ensure route ends exactly at the destination snap point (on water).
-            if let last = coordinates.last {
-                let distToSnap = CLLocation(latitude: last.latitude, longitude: last.longitude)
-                    .distance(from: CLLocation(latitude: result.destinationSnapPoint.latitude,
-                                               longitude: result.destinationSnapPoint.longitude))
-                if distToSnap > 5 {
-                    coordinates.append(result.destinationSnapPoint)
-                }
+            // Flush last polyline
+            if currentPolyline.count >= 2 {
+                polylines.append(currentPolyline)
             }
 
-            // No straight connector from snap point to the actual destination —
-            // see comment above.
+            // Flat coordinates for proximity calculations
+            let coordinates = polylines.flatMap { $0 }
+
+            // Calculate actual waterway distance: sum of all segment lengths
+            // (unpenalized) plus snap distances from origin/destination to the
+            // nearest waterway. This matches the original working calculation.
+            var actualDistance: Double = 0
+            for edge in result.edges {
+                actualDistance += edge.segment.length
+            }
+            // Add snap distances (origin → first waterway point, last → destination)
+            actualDistance += CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+                .distance(from: CLLocation(latitude: result.originSnapPoint.latitude, longitude: result.originSnapPoint.longitude))
+            actualDistance += CLLocation(latitude: dest.latitude, longitude: dest.longitude)
+                .distance(from: CLLocation(latitude: result.destinationSnapPoint.latitude, longitude: result.destinationSnapPoint.longitude))
 
             // Filter to only bridges/locks actually near the route path (within 250m)
             let bridges = allBridges.filter { bridge in
@@ -395,7 +421,7 @@ class NavigationViewModel: ObservableObject {
             let rawSpeed = settingsViewModel?.cruisingSpeedKmh ?? 7.0
             let cruisingSpeedKmh = max(rawSpeed, 1.0) // Minimum 1 km/h
             let cruisingSpeedMs = cruisingSpeedKmh / 3.6
-            let estimatedTime = result.totalDistance / cruisingSpeedMs
+            let estimatedTime = actualDistance / cruisingSpeedMs
 
             // Generate warnings based on boat profile — Pro only
             var warnings: [RouteWarning] = []
@@ -444,7 +470,8 @@ class NavigationViewModel: ObservableObject {
                     destination: dest,
                     segments: result.edges.map(\.segment),
                     coordinates: coordinates,
-                    totalDistance: result.totalDistance,
+                    polylines: polylines,
+                    totalDistance: actualDistance,
                     estimatedTime: estimatedTime,
                     bridges: bridges,
                     locks: locks,
@@ -455,7 +482,11 @@ class NavigationViewModel: ObservableObject {
             }
 
             #if DEBUG
-            print("[Nav] Route: \(finalRoute.totalDistance / 1000)km, \(Int(finalRoute.estimatedTime / 60))min, \(finalRoute.coordinates.count) coords, \(result.edges.count) edges")
+            print("[Nav] Route: \(String(format: "%.2f", finalRoute.totalDistance / 1000))km, \(Int(finalRoute.estimatedTime / 60))min, \(finalRoute.coordinates.count) coords, \(result.edges.count) edges, \(polylines.count) polylines")
+            for (idx, edge) in result.edges.enumerated() {
+                let isBridge = edge.segment.id.hasPrefix("bridge-")
+                print("[Nav]   Edge \(idx): \(edge.segment.name) [\(edge.segment.id)] len=\(Int(edge.segment.length))m weight=\(Int(edge.weight))m coords=\(edge.segment.coordinates.count)\(isBridge ? " ⚠️BRIDGE" : "")")
+            }
             #endif
 
             await MainActor.run {

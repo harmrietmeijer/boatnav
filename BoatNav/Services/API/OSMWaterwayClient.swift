@@ -24,9 +24,9 @@ class OSMWaterwayClient {
 
         // Overpass QL query for navigable waterways
         let query = """
-        [out:json][timeout:30];
+        [out:json][timeout:60];
         (
-          way["waterway"~"^(river|canal|fairway|dock|stream)$"](\(bbox));
+          way["waterway"~"^(river|canal|fairway|dock)$"](\(bbox));
         );
         out body geom;
         """
@@ -41,7 +41,7 @@ class OSMWaterwayClient {
         let query = """
         [out:json][timeout:120];
         (
-          way["waterway"~"^(river|canal|fairway|dock|stream)$"](\(bbox));
+          way["waterway"~"^(river|canal|fairway|dock)$"](\(bbox));
         );
         out body geom;
         """
@@ -65,7 +65,7 @@ class OSMWaterwayClient {
             request.httpMethod = "POST"
             request.httpBody = "data=\(query)".data(using: .utf8)
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.timeoutInterval = 60
+            request.timeoutInterval = 90
 
             do {
                 let (data, response) = try await URLSession.shared.data(for: request)

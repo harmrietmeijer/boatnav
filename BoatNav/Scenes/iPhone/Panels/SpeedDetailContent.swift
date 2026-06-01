@@ -21,7 +21,7 @@ struct SpeedDetailContent: View {
                     .foregroundStyle(Design.Blue.b5)
                 Text("Snelheid")
                     .font(.title3.weight(.regular))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Design.Colors.text)
                 Spacer()
             }
             .padding(.bottom, Design.Spacing.xxl)
@@ -30,7 +30,7 @@ struct SpeedDetailContent: View {
                 // Primary speed - km/h
                 ZStack {
                     Circle()
-                        .stroke(Design.Blue.b1.opacity(0.3), lineWidth: 8)
+                        .stroke(Design.Blue.b7, lineWidth: 8)
                         .frame(width: 190, height: 190)
                     Circle()
                         .trim(from: 0, to: min(speedViewModel.speedKmh / 30.0, 1.0))
@@ -44,7 +44,7 @@ struct SpeedDetailContent: View {
                     VStack(spacing: Design.Spacing.xs) {
                         Text(String(format: "%.1f", speedViewModel.speedKmh))
                             .font(.system(size: 72, weight: .bold, design: .monospaced))
-                            .foregroundStyle(speedViewModel.isValid ? Design.Nav.dataText : .secondary)
+                            .foregroundStyle(speedViewModel.isValid ? Design.Colors.text : .secondary)
                             .contentTransition(.numericText())
                         Text("km/h")
                             .font(.subheadline.weight(.medium))
@@ -72,7 +72,7 @@ struct SpeedDetailContent: View {
                     }
                     .foregroundStyle(Design.Blue.b5)
                     .padding(Design.Spacing.md)
-                    .tintedCard(tint: Design.Nav.statBg, border: Color.white.opacity(0.06))
+                    .surfaceCard()
                 }
 
                 Spacer(minLength: 20)
