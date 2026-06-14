@@ -24,6 +24,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let hazardReportViewModel = HazardReportViewModel()
     let locationSharingViewModel = LocationSharingViewModel()
     let maneuverProximityService = ManeuverProximityService()
+    let voiceGuidanceService = VoiceGuidanceService()
     let waterLevelViewModel: WaterLevelViewModel
 
     override init() {
@@ -51,6 +52,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         hazardReportViewModel.startMonitoring(locationService: locationService)
         locationSharingViewModel.startMonitoring(locationService: locationService)
+        maneuverProximityService.voiceGuidanceService = voiceGuidanceService
         maneuverProximityService.startMonitoring(locationService: locationService, navigationViewModel: navigationViewModel)
         locationSharingViewModel.navigationViewModel = navigationViewModel
         locationService.startUpdating()

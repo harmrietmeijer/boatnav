@@ -1,4 +1,5 @@
 devices([
+  "iPhone 16 Pro",
   "iPad Pro 13-inch (M4)"
 ])
 

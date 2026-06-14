@@ -133,6 +133,17 @@ struct ContentView: View {
         .overlay { addFavoriteOverlay }
         .overlay { proximityAlertOverlay }
         .task { await navigationViewModel.loadWaterwayGraph() }
+        .onAppear {
+            if ProcessInfo.processInfo.arguments.contains("SCREENSHOT_MODE") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    navigationViewModel.loadDemoRoute()
+                    if !ProcessInfo.processInfo.arguments.contains("SCREENSHOT_STRIP") {
+                        activePanel = .navigation
+                        panelDetent = .half
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Compact layout (iPhone — original)
@@ -165,6 +176,17 @@ struct ContentView: View {
         .overlay { addFavoriteOverlay }
         .overlay { proximityAlertOverlay }
         .task { await navigationViewModel.loadWaterwayGraph() }
+        .onAppear {
+            if ProcessInfo.processInfo.arguments.contains("SCREENSHOT_MODE") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    navigationViewModel.loadDemoRoute()
+                    if !ProcessInfo.processInfo.arguments.contains("SCREENSHOT_STRIP") {
+                        activePanel = .navigation
+                        panelDetent = .half
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Shared map layer

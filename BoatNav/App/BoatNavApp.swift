@@ -16,6 +16,7 @@ struct BoatNavApp: App {
                 .environmentObject(appDelegate.hazardReportViewModel)
                 .environmentObject(appDelegate.locationSharingViewModel)
                 .environmentObject(appDelegate.maneuverProximityService)
+                .environmentObject(appDelegate.voiceGuidanceService)
                 .environmentObject(appDelegate.waterLevelViewModel)
         }
     }

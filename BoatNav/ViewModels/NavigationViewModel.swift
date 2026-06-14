@@ -520,6 +520,77 @@ class NavigationViewModel: ObservableObject {
         currentRoute = nil
     }
 
+    /// Loads a demo route for screenshots. Only used when SCREENSHOT_MODE launch argument is set.
+    func loadDemoRoute() {
+        let maneuvers: [RouteManeuver] = [
+            RouteManeuver(
+                instruction: "Vertrek richting Oude Rijn",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1601, longitude: 4.4970),
+                distanceFromPrevious: 0,
+                estimatedTimeFromPrevious: 0,
+                type: .depart
+            ),
+            RouteManeuver(
+                instruction: "Ga linksaf naar Zijl",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1580, longitude: 4.5120),
+                distanceFromPrevious: 1200,
+                estimatedTimeFromPrevious: 432,
+                type: .turn(direction: .left)
+            ),
+            RouteManeuver(
+                instruction: "Brug: Zijlbrug (hoogte: 2.1 m)",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1565, longitude: 4.5180),
+                distanceFromPrevious: 480,
+                estimatedTimeFromPrevious: 173,
+                type: .bridge(clearanceHeight: 2.1)
+            ),
+            RouteManeuver(
+                instruction: "Houd rechts aan naar Heimanswetering",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1520, longitude: 4.5310),
+                distanceFromPrevious: 950,
+                estimatedTimeFromPrevious: 342,
+                type: .turn(direction: .slightRight)
+            ),
+            RouteManeuver(
+                instruction: "Sluis: Leidse Sluis",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1480, longitude: 4.5420),
+                distanceFromPrevious: 800,
+                estimatedTimeFromPrevious: 288,
+                type: .lock(name: "Leidse Sluis")
+            ),
+            RouteManeuver(
+                instruction: "Ga rechtsaf naar Braassemermeer",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1430, longitude: 4.5550),
+                distanceFromPrevious: 1100,
+                estimatedTimeFromPrevious: 396,
+                type: .turn(direction: .right)
+            ),
+            RouteManeuver(
+                instruction: "Aankomst bij bestemming",
+                coordinate: CLLocationCoordinate2D(latitude: 52.1380, longitude: 4.5750),
+                distanceFromPrevious: 1800,
+                estimatedTimeFromPrevious: 648,
+                type: .arrive
+            )
+        ]
+
+        let coords = maneuvers.map { $0.coordinate }
+
+        currentRoute = WaterwayRoute(
+            origin: coords.first!,
+            destination: coords.last!,
+            segments: [],
+            coordinates: coords,
+            polylines: [coords],
+            totalDistance: 6330,
+            estimatedTime: 2279,
+            bridges: [Bridge(id: "demo-bridge", name: "Zijlbrug", coordinate: CLLocationCoordinate2D(latitude: 52.1565, longitude: 4.5180), clearanceHeight: 2.1, width: 8.0, isOperable: true, waterwayName: "Zijl")],
+            locks: [Lock(id: "demo-lock", name: "Leidse Sluis", coordinate: CLLocationCoordinate2D(latitude: 52.1480, longitude: 4.5420), length: 40, width: 6, depth: 2.5, waterwayName: "Heimanswetering", openingHours: nil, vhfChannel: "22", phone: nil, operatorName: nil, passageTime: "15")],
+            maneuvers: maneuvers
+        )
+        isNavigating = true
+    }
+
     func setDestinationFromFriend(name: String, coordinate: CLLocationCoordinate2D) {
         startSelection = .currentLocation
         destinationSelection = .search(name: name, coordinate: coordinate)

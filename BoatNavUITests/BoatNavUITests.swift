@@ -7,69 +7,65 @@ final class BoatNavUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        setupSnapshot(app)
-        app.launch()
     }
 
-    // MARK: - iPad Screenshots
+    // MARK: - Standard Screenshots
 
     func testScreenshots() throws {
-        // 1. Kaart — default map view
-        sleep(3)
-        snapshot("01_iPad_Pro_129_kaart")
+        setupSnapshot(app)
+        app.launch()
 
-        // 2. Navigatie — route panel
-        let routeButton = app.buttons["dashboard_route"]
+        sleep(3)
+        snapshot("01_kaart")
+
+        let routeButton = app.buttons["arrow.triangle.turn.up.right.diamond.fill"]
         if routeButton.waitForExistence(timeout: 5) {
             routeButton.tap()
             sleep(1)
-            snapshot("02_iPad_Pro_129_navigatie")
-            // Close panel
-            app.buttons.matching(identifier: "xmark").firstMatch.tap()
-            sleep(1)
+            snapshot("02_navigatie")
         }
 
-        // 3. Snelheid — dashboard with speed visible
-        snapshot("03_iPad_Pro_129_snelheid")
+        snapshot("03_snelheid")
 
-        // 4. Instellingen — settings panel
-        let settingsButton = app.buttons["dashboard_meer"]
+        let settingsButton = app.buttons["gearshape.fill"]
         if settingsButton.waitForExistence(timeout: 5) {
             settingsButton.tap()
             sleep(1)
-            snapshot("04_iPad_Pro_129_instellingen")
-            app.buttons.matching(identifier: "xmark").firstMatch.tap()
-            sleep(1)
+            snapshot("04_instellingen")
         }
+    }
 
-        // 5. Meldingen — hazard report dialog
-        let hazardButton = app.buttons["hazard_report_button"]
-        if hazardButton.waitForExistence(timeout: 5) {
-            hazardButton.tap()
-            sleep(1)
-            snapshot("05_iPad_Pro_129_meldingen")
-            app.buttons.matching(identifier: "xmark").firstMatch.tap()
-            sleep(1)
-        }
+    // MARK: - Turn-by-Turn Navigation Screenshots (for Apple CarPlay review)
 
-        // 6. Vrienden — location sharing panel
-        let friendsButton = app.buttons["dashboard_delen"]
-        if friendsButton.waitForExistence(timeout: 5) {
-            friendsButton.tap()
-            sleep(1)
-            snapshot("06_iPad_Pro_129_vrienden")
-            app.buttons.matching(identifier: "xmark").firstMatch.tap()
-            sleep(1)
-        }
+    func testNavigationScreenshots() throws {
+        app.launchArguments += ["SCREENSHOT_MODE", "-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
+        setupSnapshot(app)
+        app.launch()
 
-        // 7. Meldingen kaart — map view
+        // Wait for demo route to load and navigation panel to appear
+        sleep(5)
+
+        // 1. Navigation panel with route instructions
+        let attachment1 = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment1.name = "nav_01_route_instructies"
+        attachment1.lifetime = .keepAlways
+        add(attachment1)
+        snapshot("nav_01_route_instructies")
+
+        // 2. Scroll down to show more maneuvers
+        app.swipeUp()
         sleep(1)
-        snapshot("07_iPad_Pro_129_meldingen_kaart")
+        let attachment2 = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment2.name = "nav_02_route_details"
+        attachment2.lifetime = .keepAlways
+        add(attachment2)
+        snapshot("nav_02_route_details")
     }
 
     // MARK: - Basic test
 
     func testAppLaunches() throws {
+        app.launch()
         XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
     }
 }

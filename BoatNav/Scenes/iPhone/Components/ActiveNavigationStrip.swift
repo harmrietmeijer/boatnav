@@ -3,6 +3,11 @@ import SwiftUI
 struct ActiveNavigationStrip: View {
     let route: WaterwayRoute
     let onTap: () -> Void
+    @EnvironmentObject var maneuverProximityService: ManeuverProximityService
+
+    private var currentManeuver: RouteManeuver? {
+        maneuverProximityService.upcomingManeuver ?? route.maneuvers.first
+    }
 
     var body: some View {
         Button {
@@ -10,8 +15,8 @@ struct ActiveNavigationStrip: View {
             onTap()
         } label: {
             HStack(spacing: Design.Spacing.md) {
-                if let first = route.maneuvers.first {
-                    maneuverIcon(for: first.type)
+                if let maneuver = currentManeuver {
+                    maneuverIcon(for: maneuver.type)
                         .font(.system(size: 18, weight: .semibold))
                         .frame(width: 36, height: 36)
                         .tintedCard(
@@ -22,15 +27,21 @@ struct ActiveNavigationStrip: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    if let first = route.maneuvers.first {
-                        Text(first.instruction)
+                    if let maneuver = currentManeuver {
+                        Text(maneuver.instruction)
                             .font(.subheadline.weight(.medium))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                     }
-                    Text(route.distanceString + " · " + route.timeString)
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(Design.Blue.b6)
+                    if let distance = maneuverProximityService.distanceToManeuver {
+                        Text("Over \(String(format: "%.0f", distance)) m · " + route.timeString)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(Design.Blue.b6)
+                    } else {
+                        Text(route.distanceString + " · " + route.timeString)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(Design.Blue.b6)
+                    }
                 }
 
                 Spacer()

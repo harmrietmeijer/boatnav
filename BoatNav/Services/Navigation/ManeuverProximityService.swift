@@ -9,6 +9,7 @@ class ManeuverProximityService: ObservableObject {
 
     private weak var locationService: LocationService?
     private weak var navigationViewModel: NavigationViewModel?
+    var voiceGuidanceService: VoiceGuidanceService?
     private var cancellables = Set<AnyCancellable>()
     private var currentManeuverIndex: Int = 0
     private var lastCheckTime: Date = .distantPast
@@ -76,12 +77,18 @@ class ManeuverProximityService: ObservableObject {
                     lastAlertedIndex = i
                     Haptics.medium()
                 }
+
+                // Voice announcement
+                voiceGuidanceService?.update(maneuverIndex: i, maneuver: maneuver, distance: distance)
                 return
             }
 
             // Found the next unfinished maneuver but not yet in range
             upcomingManeuver = maneuver
             distanceToManeuver = distance
+
+            // Voice warning for distant maneuvers (500m range)
+            voiceGuidanceService?.update(maneuverIndex: i, maneuver: maneuver, distance: distance)
             return
         }
 
@@ -95,5 +102,6 @@ class ManeuverProximityService: ObservableObject {
         lastAlertedIndex = -1
         upcomingManeuver = nil
         distanceToManeuver = nil
+        voiceGuidanceService?.reset()
     }
 }

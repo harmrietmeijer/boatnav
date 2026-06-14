@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsPanelContent: View {
     @EnvironmentObject var settingsViewModel: SettingsViewModel
+    @EnvironmentObject var voiceGuidanceService: VoiceGuidanceService
     @Binding var activePanel: ActivePanel
 
     var body: some View {
@@ -82,6 +83,19 @@ struct SettingsPanelContent: View {
                         iconColor: Design.Blue.b4,
                         label: "Zeemerken (OpenSeaMap)",
                         isOn: $settingsViewModel.showSeamarks
+                    )
+                }
+                .surfaceCard()
+
+                // Navigation section
+                sectionHeader("Navigatie")
+
+                VStack(spacing: 0) {
+                    settingsToggle(
+                        icon: "speaker.wave.2.fill",
+                        iconColor: Design.Blue.b4,
+                        label: "Spraakbegeleiding",
+                        isOn: $voiceGuidanceService.isEnabled
                     )
                 }
                 .surfaceCard()

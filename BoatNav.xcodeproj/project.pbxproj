@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0073924A5E528D6A76ADAB70 /* CloudKitLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */; };
+		A1B2C3D4E5F60718A9B0C1D2 /* VoiceGuidanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */; };
 		011E65980143FB97F0F1F450 /* OverlayPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267E45C70DC65B3F19E92EA6 /* OverlayPanel.swift */; };
 		06027A739DADED675D5872F7 /* RWSLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */; };
 		0963EEB4EB3556C59869D8B6 /* SpeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */; };
@@ -176,6 +177,7 @@
 		B88F4559ED2A241123D65E49 /* ActiveNavigationStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveNavigationStrip.swift; sourceTree = "<group>"; };
 		B93B160C2D8DFF700B664B6B /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceGuidanceService.swift; sourceTree = "<group>"; };
 		BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSchema.swift; sourceTree = "<group>"; };
 		C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitHazardService.swift; sourceTree = "<group>"; };
 		C9D8621EC967D5D1182A85E6 /* SeamarkAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamarkAnnotation.swift; sourceTree = "<group>"; };
@@ -358,6 +360,7 @@
 			isa = PBXGroup;
 			children = (
 				BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */,
+				A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -687,6 +690,7 @@
 				5E9B9887C91A4573A8AEDD1E /* NavigationPanelContent.swift in Sources */,
 				D7D54D6C2B008865A99BD78E /* NavigationViewModel.swift in Sources */,
 				B0D857CD8CCE570BFF91227A /* NowPlayingService.swift in Sources */,
+				A1B2C3D4E5F60718A9B0C1D2 /* VoiceGuidanceService.swift in Sources */,
 				3C5B6ADED6B12536D69D1B64 /* OSMWaterwayClient.swift in Sources */,
 				011E65980143FB97F0F1F450 /* OverlayPanel.swift in Sources */,
 				5410EC0EAB7E32D39E2383A1 /* PDOKClient.swift in Sources */,
@@ -800,7 +804,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 94;
+				CURRENT_PROJECT_VERSION = 97;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -913,7 +917,7 @@
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 94;
+				CURRENT_PROJECT_VERSION = 97;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
