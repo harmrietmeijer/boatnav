@@ -79,7 +79,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
         let mapVC = CarPlayMapViewController(
             mapViewModel: appDelegate.mapViewModel,
-            speedViewModel: appDelegate.speedViewModel
+            speedViewModel: appDelegate.speedViewModel,
+            settingsViewModel: appDelegate.settingsViewModel,
+            weatherViewModel: appDelegate.weatherViewModel,
+            waterLevelViewModel: appDelegate.waterLevelViewModel,
+            navigationViewModel: appDelegate.navigationViewModel,
+            maneuverProximityService: appDelegate.maneuverProximityService
         )
         self.mapViewController = mapVC
         carWindow.rootViewController = mapVC
@@ -87,17 +92,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         let mapTemplate = CPMapTemplate()
         mapTemplate.mapDelegate = mapVC
 
-        // Zoom controls in nav bar
-        let zoomInBar = CPBarButton(image: UIImage(systemName: "plus.magnifyingglass")!) { [weak mapVC] _ in
-            mapVC?.zoomIn()
-        }
-        let zoomOutBar = CPBarButton(image: UIImage(systemName: "minus.magnifyingglass")!) { [weak mapVC] _ in
-            mapVC?.zoomOut()
-        }
-        mapTemplate.leadingNavigationBarButtons = [zoomInBar, zoomOutBar]
+        // Nav bar — clean, zoom via touch gestures on CarPlay screen
+        mapTemplate.leadingNavigationBarButtons = []
         mapTemplate.trailingNavigationBarButtons = []
         mapTemplate.automaticallyHidesNavigationBar = true
-        mapTemplate.hidesButtonsWithNavigationBar = false
 
         // Map control buttons
         // Map buttons (max 4)

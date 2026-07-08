@@ -8,30 +8,59 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     private let mapView = MKMapView()
     private let mapViewModel: MapViewModel
     private let speedViewModel: SpeedViewModel
+    private let settingsViewModel: SettingsViewModel
+    private let weatherViewModel: WeatherViewModel
+    private let waterLevelViewModel: WaterLevelViewModel
+    private let navigationViewModel: NavigationViewModel
+    private let maneuverProximityService: ManeuverProximityService
     private var cancellables = Set<AnyCancellable>()
     private var routeOverlays: [MKPolyline] = []
     private var isUserInteracting = false
+    private var currentBRTOverlay: MKTileOverlay?
+    private var currentSeamarkOverlay: MKTileOverlay?
 
-    // Speed overlay
-    private let speedContainer = UIView()
+    // UI colors (Design system)
+    private let inkColor = UIColor(red: 0x0B/255.0, green: 0x19/255.0, blue: 0x29/255.0, alpha: 0.85)
+    private let blueB5 = UIColor(red: 0x85/255.0, green: 0xB7/255.0, blue: 0xEB/255.0, alpha: 1)
+    private let blueB4 = UIColor(red: 0x37/255.0, green: 0x8A/255.0, blue: 0xDD/255.0, alpha: 1)
+    private let amberA5 = UIColor(red: 0xEF/255.0, green: 0x9F/255.0, blue: 0x27/255.0, alpha: 1)
+    private let redR4 = UIColor(red: 0xE2/255.0, green: 0x4B/255.0, blue: 0x4A/255.0, alpha: 1)
+
+    // Top info bar (horizontal pill — mirrors iPhone WeatherBarView)
+    private let infoBar = UIView()
+    private let infoBarStack = UIStackView()
+
+    // Speed pill (bottom-left, separate)
+    private let speedPill = UIView()
     private let speedLabel = UILabel()
     private let speedUnitLabel = UILabel()
-    private let limitContainer = UIView()
-    private let limitLabel = UILabel()
+    private let limitBadge = UIView()
     private let limitValueLabel = UILabel()
 
-    // Default region: Dordrecht / Biesbosch area
+    // Navigation instruction (above speed, appears during nav)
+    private let navBanner = UIView()
+    private let navInstructionLabel = UILabel()
+    private let navDistanceLabel = UILabel()
+
+    // Default region
     private let defaultRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 51.8, longitude: 4.67),
         span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)
     )
 
-    // Small annotation size for CarPlay's low-res display
-    private let annotationSize = CGSize(width: 12, height: 12)
+    private let annotationSize = CGSize(width: 8, height: 8)
 
-    init(mapViewModel: MapViewModel, speedViewModel: SpeedViewModel) {
+    init(mapViewModel: MapViewModel, speedViewModel: SpeedViewModel,
+         settingsViewModel: SettingsViewModel, weatherViewModel: WeatherViewModel,
+         waterLevelViewModel: WaterLevelViewModel, navigationViewModel: NavigationViewModel,
+         maneuverProximityService: ManeuverProximityService) {
         self.mapViewModel = mapViewModel
         self.speedViewModel = speedViewModel
+        self.settingsViewModel = settingsViewModel
+        self.weatherViewModel = weatherViewModel
+        self.waterLevelViewModel = waterLevelViewModel
+        self.navigationViewModel = navigationViewModel
+        self.maneuverProximityService = maneuverProximityService
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -42,7 +71,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupMapView()
-        setupSpeedOverlay()
+        setupInfoPanel()
         bindViewModel()
     }
 
@@ -53,7 +82,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         }
     }
 
-    // MARK: - Setup
+    // MARK: - Map Setup
 
     private func setupMapView() {
         mapView.translatesAutoresizingMaskIntoConstraints = false
@@ -73,94 +102,236 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     }
 
     private func setupOverlays() {
-        let brtOverlay = mapViewModel.tileOverlayProvider.createBRTOverlay()
+        let style = settingsViewModel.mapStyle
+        let brtOverlay = mapViewModel.tileOverlayProvider.createBRTOverlay(style: style)
+        currentBRTOverlay = brtOverlay
         mapView.addOverlay(brtOverlay, level: .aboveLabels)
 
-        let seamarkOverlay = mapViewModel.tileOverlayProvider.createOpenSeaMapOverlay()
-        mapView.addOverlay(seamarkOverlay, level: .aboveLabels)
+        if settingsViewModel.showSeamarks {
+            let seamarkOverlay = mapViewModel.tileOverlayProvider.createOpenSeaMapOverlay()
+            currentSeamarkOverlay = seamarkOverlay
+            mapView.addOverlay(seamarkOverlay, level: .aboveLabels)
+        }
     }
 
-    private func setupSpeedOverlay() {
-        // Ink.primary background with rounded corners
-        let inkColor = UIColor(red: 0x0B/255.0, green: 0x19/255.0, blue: 0x29/255.0, alpha: 0.85)
-        let blueB5 = UIColor(red: 0x85/255.0, green: 0xB7/255.0, blue: 0xEB/255.0, alpha: 1)
-        let blueB4 = UIColor(red: 0x37/255.0, green: 0x8A/255.0, blue: 0xDD/255.0, alpha: 1)
+    // MARK: - Info Bar (horizontal pill at top, like iPhone WeatherBarView)
 
-        // Speed container
-        speedContainer.backgroundColor = inkColor
-        speedContainer.layer.cornerRadius = 12
-        speedContainer.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(speedContainer)
+    private func setupInfoPanel() {
+        setupInfoBar()
+        setupSpeedPill()
+        setupNavBanner()
+    }
 
-        // Speed value
+    private func setupInfoBar() {
+        // Horizontal pill at top — mirrors iPhone WeatherBarView exactly
+        // Ink.secondary bg with subtle white border, pill shape
+        infoBar.backgroundColor = UIColor(red: 0x0D/255.0, green: 0x21/255.0, blue: 0x35/255.0, alpha: 0.92)
+        infoBar.layer.cornerRadius = 20
+        infoBar.layer.borderWidth = 0.5
+        infoBar.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+        infoBar.clipsToBounds = true
+        infoBar.translatesAutoresizingMaskIntoConstraints = false
+        infoBar.isHidden = true
+        view.addSubview(infoBar)
+
+        infoBarStack.axis = .horizontal
+        infoBarStack.spacing = 10
+        infoBarStack.alignment = .center
+        infoBarStack.translatesAutoresizingMaskIntoConstraints = false
+        infoBar.addSubview(infoBarStack)
+
+        NSLayoutConstraint.activate([
+            infoBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            infoBar.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            infoBarStack.topAnchor.constraint(equalTo: infoBar.topAnchor, constant: 8),
+            infoBarStack.leadingAnchor.constraint(equalTo: infoBar.leadingAnchor, constant: 14),
+            infoBarStack.trailingAnchor.constraint(equalTo: infoBar.trailingAnchor, constant: -14),
+            infoBarStack.bottomAnchor.constraint(equalTo: infoBar.bottomAnchor, constant: -8),
+        ])
+    }
+
+    private func makeBarDivider() -> UIView {
+        let d = UIView()
+        d.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        d.translatesAutoresizingMaskIntoConstraints = false
+        d.widthAnchor.constraint(equalToConstant: 1).isActive = true
+        d.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        return d
+    }
+
+    private func rebuildInfoBar(weather: WeatherService.WeatherData?, waterLevel: WaterLevelService.WaterLevelData?) {
+        // Remove all existing items
+        infoBarStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        let hasWeather = weather != nil
+        let hasWater = waterLevel != nil
+        infoBar.isHidden = !hasWeather && !hasWater
+
+        guard hasWeather || hasWater else { return }
+
+        let grayG4 = UIColor(red: 0x88/255.0, green: 0x87/255.0, blue: 0x80/255.0, alpha: 1)
+        let grayG5 = UIColor(red: 0xB4/255.0, green: 0xB2/255.0, blue: 0xA9/255.0, alpha: 1)
+
+        if let w = weather {
+            // Temperature + icon
+            let tempLabel = UILabel()
+            tempLabel.text = String(format: "%.0f°", w.temperature)
+            tempLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .bold)
+            tempLabel.textColor = blueB5
+            infoBarStack.addArrangedSubview(tempLabel)
+
+            infoBarStack.addArrangedSubview(makeBarDivider())
+
+            // Wind: Bft + direction
+            let windLabel = UILabel()
+            windLabel.text = "Bft \(w.beaufort) \(w.windDirectionLabel)"
+            windLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .bold)
+            windLabel.textColor = blueB5
+            infoBarStack.addArrangedSubview(windLabel)
+
+            infoBarStack.addArrangedSubview(makeBarDivider())
+
+            // Precipitation
+            let precipLabel = UILabel()
+            if w.precipitation > 0 {
+                precipLabel.text = String(format: "%.1f mm", w.precipitation)
+                precipLabel.textColor = blueB5
+            } else {
+                precipLabel.text = "Droog"
+                precipLabel.textColor = grayG4
+            }
+            precipLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .medium)
+            infoBarStack.addArrangedSubview(precipLabel)
+        }
+
+        if let wl = waterLevel {
+            if hasWeather { infoBarStack.addArrangedSubview(makeBarDivider()) }
+
+            // Water level: value + cm + trend + next extreme
+            let trendIcon: String
+            let trendColor: UIColor
+            switch wl.trend {
+            case .rising:  trendIcon = "↗"; trendColor = blueB4
+            case .falling: trendIcon = "↘"; trendColor = redR4
+            case .stable:  trendIcon = "→"; trendColor = grayG4
+            }
+
+            var waterText = String(format: "%+.0f cm %@", wl.waterLevelCm, trendIcon)
+
+            // Next tide extreme
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm"
+            if let high = wl.nextHighTide, let low = wl.nextLowTide {
+                let next = high.time < low.time
+                    ? "HW \(formatter.string(from: high.time))"
+                    : "LW \(formatter.string(from: low.time))"
+                waterText += " \(next)"
+            } else if let high = wl.nextHighTide {
+                waterText += " HW \(formatter.string(from: high.time))"
+            } else if let low = wl.nextLowTide {
+                waterText += " LW \(formatter.string(from: low.time))"
+            }
+
+            let waterLabel = UILabel()
+            waterLabel.text = waterText
+            waterLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .bold)
+            waterLabel.textColor = blueB5
+            infoBarStack.addArrangedSubview(waterLabel)
+        }
+    }
+
+    private func setupSpeedPill() {
+        // Speed pill — bottom-left, separate from info bar
+        speedPill.backgroundColor = inkColor
+        speedPill.layer.cornerRadius = 14
+        speedPill.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(speedPill)
+
         speedLabel.text = "--"
         speedLabel.font = .monospacedDigitSystemFont(ofSize: 32, weight: .bold)
         speedLabel.textColor = .white
         speedLabel.textAlignment = .center
         speedLabel.translatesAutoresizingMaskIntoConstraints = false
-        speedContainer.addSubview(speedLabel)
+        speedPill.addSubview(speedLabel)
 
-        // Speed unit
         speedUnitLabel.text = "km/h"
-        speedUnitLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        speedUnitLabel.font = .systemFont(ofSize: 11, weight: .medium)
         speedUnitLabel.textColor = blueB5
         speedUnitLabel.textAlignment = .center
         speedUnitLabel.translatesAutoresizingMaskIntoConstraints = false
-        speedContainer.addSubview(speedUnitLabel)
+        speedPill.addSubview(speedUnitLabel)
 
-        // Speed limit container (red border circle style)
-        limitContainer.backgroundColor = inkColor
-        limitContainer.layer.cornerRadius = 12
-        limitContainer.translatesAutoresizingMaskIntoConstraints = false
-        limitContainer.isHidden = true
-        view.addSubview(limitContainer)
+        // Speed limit badge — red circle, positioned to the right of speed
+        limitBadge.isHidden = true
+        limitBadge.backgroundColor = .white
+        limitBadge.layer.cornerRadius = 18
+        limitBadge.layer.borderWidth = 3
+        limitBadge.layer.borderColor = redR4.cgColor
+        limitBadge.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(limitBadge)
 
-        // Limit label
-        limitLabel.text = "MAX"
-        limitLabel.font = .systemFont(ofSize: 10, weight: .bold)
-        limitLabel.textColor = blueB5
-        limitLabel.textAlignment = .center
-        limitLabel.translatesAutoresizingMaskIntoConstraints = false
-        limitContainer.addSubview(limitLabel)
-
-        // Limit value
         limitValueLabel.text = "--"
-        limitValueLabel.font = .monospacedDigitSystemFont(ofSize: 20, weight: .bold)
-        limitValueLabel.textColor = blueB4
+        limitValueLabel.font = .monospacedDigitSystemFont(ofSize: 16, weight: .bold)
+        limitValueLabel.textColor = redR4
         limitValueLabel.textAlignment = .center
         limitValueLabel.translatesAutoresizingMaskIntoConstraints = false
-        limitContainer.addSubview(limitValueLabel)
+        limitBadge.addSubview(limitValueLabel)
 
         NSLayoutConstraint.activate([
-            // Speed container: bottom-left (safe area to avoid CarPlay chrome)
-            speedContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            speedContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
-            speedContainer.widthAnchor.constraint(equalToConstant: 80),
+            speedPill.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
+            speedPill.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            speedPill.widthAnchor.constraint(equalToConstant: 80),
 
-            speedLabel.topAnchor.constraint(equalTo: speedContainer.topAnchor, constant: 8),
-            speedLabel.leadingAnchor.constraint(equalTo: speedContainer.leadingAnchor, constant: 8),
-            speedLabel.trailingAnchor.constraint(equalTo: speedContainer.trailingAnchor, constant: -8),
+            speedLabel.topAnchor.constraint(equalTo: speedPill.topAnchor, constant: 6),
+            speedLabel.centerXAnchor.constraint(equalTo: speedPill.centerXAnchor),
+            speedUnitLabel.topAnchor.constraint(equalTo: speedLabel.bottomAnchor, constant: -2),
+            speedUnitLabel.centerXAnchor.constraint(equalTo: speedPill.centerXAnchor),
+            speedUnitLabel.bottomAnchor.constraint(equalTo: speedPill.bottomAnchor, constant: -6),
 
-            speedUnitLabel.topAnchor.constraint(equalTo: speedLabel.bottomAnchor, constant: 0),
-            speedUnitLabel.leadingAnchor.constraint(equalTo: speedContainer.leadingAnchor, constant: 8),
-            speedUnitLabel.trailingAnchor.constraint(equalTo: speedContainer.trailingAnchor, constant: -8),
-            speedUnitLabel.bottomAnchor.constraint(equalTo: speedContainer.bottomAnchor, constant: -8),
-
-            // Limit container: above speed
-            limitContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            limitContainer.bottomAnchor.constraint(equalTo: speedContainer.topAnchor, constant: -8),
-            limitContainer.widthAnchor.constraint(equalToConstant: 80),
-
-            limitLabel.topAnchor.constraint(equalTo: limitContainer.topAnchor, constant: 6),
-            limitLabel.leadingAnchor.constraint(equalTo: limitContainer.leadingAnchor, constant: 8),
-            limitLabel.trailingAnchor.constraint(equalTo: limitContainer.trailingAnchor, constant: -8),
-
-            limitValueLabel.topAnchor.constraint(equalTo: limitLabel.bottomAnchor, constant: 0),
-            limitValueLabel.leadingAnchor.constraint(equalTo: limitContainer.leadingAnchor, constant: 8),
-            limitValueLabel.trailingAnchor.constraint(equalTo: limitContainer.trailingAnchor, constant: -8),
-            limitValueLabel.bottomAnchor.constraint(equalTo: limitContainer.bottomAnchor, constant: -6),
+            // Limit badge to the right of speed pill
+            limitBadge.leadingAnchor.constraint(equalTo: speedPill.trailingAnchor, constant: 6),
+            limitBadge.centerYAnchor.constraint(equalTo: speedPill.centerYAnchor),
+            limitBadge.widthAnchor.constraint(equalToConstant: 36),
+            limitBadge.heightAnchor.constraint(equalToConstant: 36),
+            limitValueLabel.centerXAnchor.constraint(equalTo: limitBadge.centerXAnchor),
+            limitValueLabel.centerYAnchor.constraint(equalTo: limitBadge.centerYAnchor),
         ])
     }
+
+    private func setupNavBanner() {
+        // Navigation instruction — above speed pill, appears during active navigation
+        navBanner.backgroundColor = UIColor(red: 0x0B/255.0, green: 0x19/255.0, blue: 0x29/255.0, alpha: 0.92)
+        navBanner.layer.cornerRadius = 12
+        navBanner.translatesAutoresizingMaskIntoConstraints = false
+        navBanner.isHidden = true
+        view.addSubview(navBanner)
+
+        navInstructionLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        navInstructionLabel.textColor = .white
+        navInstructionLabel.numberOfLines = 2
+        navInstructionLabel.translatesAutoresizingMaskIntoConstraints = false
+        navBanner.addSubview(navInstructionLabel)
+
+        navDistanceLabel.font = .monospacedDigitSystemFont(ofSize: 18, weight: .bold)
+        navDistanceLabel.textColor = amberA5
+        navDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
+        navBanner.addSubview(navDistanceLabel)
+
+        NSLayoutConstraint.activate([
+            navBanner.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
+            navBanner.bottomAnchor.constraint(equalTo: speedPill.topAnchor, constant: -8),
+            navBanner.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
+
+            navDistanceLabel.topAnchor.constraint(equalTo: navBanner.topAnchor, constant: 8),
+            navDistanceLabel.leadingAnchor.constraint(equalTo: navBanner.leadingAnchor, constant: 10),
+            navInstructionLabel.topAnchor.constraint(equalTo: navDistanceLabel.bottomAnchor, constant: 2),
+            navInstructionLabel.leadingAnchor.constraint(equalTo: navBanner.leadingAnchor, constant: 10),
+            navInstructionLabel.trailingAnchor.constraint(equalTo: navBanner.trailingAnchor, constant: -10),
+            navInstructionLabel.bottomAnchor.constraint(equalTo: navBanner.bottomAnchor, constant: -8),
+        ])
+    }
+
+    // MARK: - Bindings
 
     private func bindViewModel() {
         // Annotations
@@ -179,45 +350,114 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] kmh in
                 guard let self else { return }
-                if self.speedViewModel.isValid {
-                    self.speedLabel.text = String(format: "%.0f", kmh)
-                } else {
-                    self.speedLabel.text = "--"
-                }
+                self.speedLabel.text = self.speedViewModel.isValid ? String(format: "%.0f", kmh) : "--"
             }
             .store(in: &cancellables)
 
-        // Speed exceeding limit — turn red
         speedViewModel.$isExceedingLimit
             .receive(on: DispatchQueue.main)
             .sink { [weak self] exceeding in
-                let redR4 = UIColor(red: 0xE2/255.0, green: 0x4B/255.0, blue: 0x4A/255.0, alpha: 1)
-                self?.speedLabel.textColor = exceeding ? redR4 : .white
+                guard let self else { return }
+                self.speedLabel.textColor = exceeding ? self.redR4 : .white
             }
             .store(in: &cancellables)
 
-        // Speed limit
         speedViewModel.$currentSpeedLimit
             .receive(on: DispatchQueue.main)
             .sink { [weak self] limit in
                 guard let self else { return }
                 if let limit {
-                    self.limitContainer.isHidden = false
+                    self.limitBadge.isHidden = false
                     self.limitValueLabel.text = String(format: "%.0f", limit)
                 } else {
-                    self.limitContainer.isHidden = true
+                    self.limitBadge.isHidden = true
                 }
             }
             .store(in: &cancellables)
+
+        // Weather + water level → rebuild info bar (mirrors iPhone WeatherBarView)
+        weatherViewModel.$weather
+            .combineLatest(waterLevelViewModel.$waterLevel)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] weather, wl in
+                self?.rebuildInfoBar(weather: weather, waterLevel: wl)
+            }
+            .store(in: &cancellables)
+
+        // Navigation instruction
+        maneuverProximityService.$upcomingManeuver
+            .combineLatest(maneuverProximityService.$distanceToManeuver)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] maneuver, distance in
+                guard let self else { return }
+                if let maneuver, let distance, distance <= 500 {
+                    self.navBanner.isHidden = false
+                    self.navInstructionLabel.text = maneuver.instruction
+                    self.navDistanceLabel.text = String(format: "%.0f m", distance)
+                } else {
+                    self.navBanner.isHidden = true
+                }
+            }
+            .store(in: &cancellables)
+
+        // Settings: map style change
+        settingsViewModel.$mapStyle
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newStyle in
+                self?.updateMapStyle(newStyle)
+            }
+            .store(in: &cancellables)
+
+        // Settings: seamark overlay toggle
+        settingsViewModel.$showSeamarks
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] show in
+                guard let self else { return }
+                if show && self.currentSeamarkOverlay == nil {
+                    let overlay = self.mapViewModel.tileOverlayProvider.createOpenSeaMapOverlay()
+                    self.currentSeamarkOverlay = overlay
+                    self.mapView.addOverlay(overlay, level: .aboveLabels)
+                } else if !show, let overlay = self.currentSeamarkOverlay {
+                    self.mapView.removeOverlay(overlay)
+                    self.currentSeamarkOverlay = nil
+                }
+            }
+            .store(in: &cancellables)
+
+        // Settings: annotation visibility changes → refresh annotations
+        Publishers.CombineLatest3(
+            settingsViewModel.$showBuoys,
+            settingsViewModel.$showBridges,
+            settingsViewModel.$showRestaurants
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _, _, _ in
+            guard let self else { return }
+            let existing = self.mapView.annotations.filter { $0 is SeamarkAnnotation }
+            self.mapView.removeAnnotations(existing)
+            self.mapView.addAnnotations(self.mapViewModel.annotations)
+        }
+        .store(in: &cancellables)
+    }
+
+    // MARK: - Settings Sync
+
+    private func updateMapStyle(_ style: MapStyle) {
+        // Remove current BRT overlay and add new one
+        if let old = currentBRTOverlay {
+            mapView.removeOverlay(old)
+        }
+        let newOverlay = mapViewModel.tileOverlayProvider.createBRTOverlay(style: style)
+        currentBRTOverlay = newOverlay
+        // Insert at bottom so seamark overlay stays on top
+        mapView.insertOverlay(newOverlay, at: 0, level: .aboveLabels)
     }
 
     // MARK: - Map Controls
 
     func zoomIn() {
-        // Disable tracking so the zoom doesn't snap back
         mapView.userTrackingMode = .none
         isUserInteracting = true
-
         var region = mapView.region
         region.span.latitudeDelta /= 2
         region.span.longitudeDelta /= 2
@@ -227,7 +467,6 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     func zoomOut() {
         mapView.userTrackingMode = .none
         isUserInteracting = true
-
         var region = mapView.region
         region.span.latitudeDelta = min(region.span.latitudeDelta * 2, 10)
         region.span.longitudeDelta = min(region.span.longitudeDelta * 2, 10)
@@ -240,9 +479,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     }
 
     func showRoute(_ route: WaterwayRoute) {
-        for overlay in routeOverlays {
-            mapView.removeOverlay(overlay)
-        }
+        for overlay in routeOverlays { mapView.removeOverlay(overlay) }
         routeOverlays.removeAll()
 
         var boundingRect: MKMapRect?
@@ -269,11 +506,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         mapView.addAnnotations(bridgeAnnotations)
 
         if let rect = boundingRect {
-            mapView.setVisibleMapRect(
-                rect,
-                edgePadding: UIEdgeInsets(top: 60, left: 40, bottom: 60, right: 40),
-                animated: true
-            )
+            mapView.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 60, left: 40, bottom: 60, right: 40), animated: true)
         }
     }
 
@@ -283,8 +516,6 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         let config = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
         let image = UIImage(systemName: systemName, withConfiguration: config)?
             .withTintColor(color, renderingMode: .alwaysOriginal)
-
-        // Render at fixed small size for CarPlay
         let renderer = UIGraphicsImageRenderer(size: annotationSize)
         return renderer.image { _ in
             image?.draw(in: CGRect(origin: .zero, size: annotationSize))
@@ -311,15 +542,12 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     func mapTemplate(_ mapTemplate: CPMapTemplate, panWith direction: CPMapTemplate.PanDirection) {
         mapView.userTrackingMode = .none
         isUserInteracting = true
-
         let offset: CLLocationDegrees = mapView.region.span.latitudeDelta * 0.25
         var center = mapView.centerCoordinate
-
         if direction.contains(.up) { center.latitude += offset }
         if direction.contains(.down) { center.latitude -= offset }
         if direction.contains(.left) { center.longitude -= offset }
         if direction.contains(.right) { center.longitude += offset }
-
         mapView.setCenter(center, animated: true)
     }
 
@@ -340,42 +568,52 @@ extension CarPlayMapViewController: MKMapViewDelegate {
         if let tileOverlay = overlay as? MKTileOverlay {
             return MKTileOverlayRenderer(overlay: tileOverlay)
         }
-
         if let polyline = overlay as? MKPolyline {
             let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = UIColor(red: 0x37/255.0, green: 0x8A/255.0, blue: 0xDD/255.0, alpha: 1)
+            renderer.strokeColor = blueB4
             renderer.lineWidth = 5
             return renderer
         }
-
         return MKOverlayRenderer(overlay: overlay)
     }
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         guard let seamark = annotation as? SeamarkAnnotation else { return nil }
-
         let identifier = "CarPlaySeamark"
         let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
             ?? MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-
         view.annotation = annotation
-        view.canShowCallout = false // No callouts on CarPlay
+        view.canShowCallout = false
 
         switch seamark.type {
         case .buoy:
-            view.image = makeAnnotationImage(systemName: "circle.fill", color: .systemRed)
+            view.image = settingsViewModel.showBuoys
+                ? makeAnnotationImage(systemName: "circle.fill", color: .systemRed) : nil
         case .beacon:
-            view.image = makeAnnotationImage(systemName: "triangle.fill", color: .systemGreen)
+            view.image = settingsViewModel.showBuoys
+                ? makeAnnotationImage(systemName: "circle.fill", color: .systemGreen) : nil
         case .bridge:
-            view.image = makeAnnotationImage(systemName: "arrow.up.and.down.square.fill", color: .systemOrange)
+            view.image = settingsViewModel.showBridges
+                ? makeAnnotationImage(systemName: "square.fill", color: .systemOrange) : nil
         case .lock:
-            view.image = makeAnnotationImage(systemName: "door.left.hand.closed", color: .systemPurple)
+            view.image = settingsViewModel.showBridges
+                ? makeAnnotationImage(systemName: "square.fill", color: .systemPurple) : nil
         case .restaurant:
-            // Don't show restaurants on CarPlay — too much clutter
-            view.image = nil
+            view.image = settingsViewModel.showRestaurants
+                ? makeAnnotationImage(systemName: "circle.fill", color: .systemBrown) : nil
         }
-
         return view
+    }
+
+    func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+        // Detect user-initiated gestures (pinch, pan) and disable tracking
+        if let gestureRecognizers = mapView.subviews.first?.gestureRecognizers {
+            for gr in gestureRecognizers where gr.state == .began || gr.state == .changed {
+                mapView.userTrackingMode = .none
+                isUserInteracting = true
+                return
+            }
+        }
     }
 
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
