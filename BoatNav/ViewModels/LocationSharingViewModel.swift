@@ -126,9 +126,6 @@ class LocationSharingViewModel: ObservableObject {
                 }
             }
         } catch {
-            #if DEBUG
-            print("[LocationShare] setupSharing failed: \(error)")
-            #endif
             await MainActor.run {
                 errorMessage = "Log in bij iCloud om locatie te delen: \(error.localizedDescription)"
                 isSettingUp = false
@@ -203,9 +200,6 @@ class LocationSharingViewModel: ObservableObject {
                 isSearching = false
             }
         } catch {
-            #if DEBUG
-            print("[LocationShare] Search failed: \(error)")
-            #endif
             await MainActor.run {
                 errorMessage = "Zoeken mislukt: \(error.localizedDescription)"
                 isSearching = false
@@ -277,11 +271,7 @@ class LocationSharingViewModel: ObservableObject {
                 friends = locations
                 rebuildAnnotations()
             }
-        } catch {
-            #if DEBUG
-            print("[LocationShare] Fetch friends failed: \(error.localizedDescription)")
-            #endif
-        }
+        } catch { }
     }
 
     // MARK: - Private
@@ -289,11 +279,7 @@ class LocationSharingViewModel: ObservableObject {
     private func resolveUserID() async {
         do {
             userID = try await cloudService.fetchCurrentUserID()
-        } catch {
-            #if DEBUG
-            print("[LocationShare] Could not resolve user ID: \(error.localizedDescription)")
-            #endif
-        }
+        } catch { }
     }
 
     private func rebuildAnnotations() {

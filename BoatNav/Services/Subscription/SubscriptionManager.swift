@@ -74,9 +74,6 @@ class SubscriptionManager: ObservableObject {
             let info = try await Purchases.shared.customerInfo()
             updateProStatus(from: info)
         } catch {
-            #if DEBUG
-            print("[Subscription] Error checking entitlement: \(error)")
-            #endif
             // On error, keep cached status — don't overwrite to false
         }
     }
@@ -85,11 +82,7 @@ class SubscriptionManager: ObservableObject {
         isLoading = true
         do {
             offerings = try await Purchases.shared.offerings()
-        } catch {
-            #if DEBUG
-            print("[Subscription] Error loading offerings: \(error)")
-            #endif
-        }
+        } catch { }
         isLoading = false
     }
 
@@ -113,9 +106,6 @@ class SubscriptionManager: ObservableObject {
     /// Triggered by a hidden 5x-tap gesture on the sailboat icon.
     func activateOwnerBypass() {
         guard let deviceID = UIDevice.current.identifierForVendor?.uuidString else {
-            #if DEBUG
-            print("[Subscription] No IDFV available; cannot bind bypass")
-            #endif
             return
         }
         let timestamp = ISO8601DateFormatter().string(from: Date())
@@ -133,10 +123,6 @@ class SubscriptionManager: ObservableObject {
 
         // Log to CloudKit so we can see who activated and remotely deactivate
         saveBypassToCloud(deviceID: deviceID, timestamp: timestamp)
-
-        #if DEBUG
-        print("[Subscription] Owner bypass activated for device \(deviceID)")
-        #endif
     }
 
     /// Clears the bypass on this device.
@@ -171,16 +157,9 @@ class SubscriptionManager: ObservableObject {
                         await MainActor.run {
                             deactivateOwnerBypass()
                         }
-                        #if DEBUG
-                        print("[Subscription] Bypass remotely deactivated for \(deviceID)")
-                        #endif
                     }
                 }
-            } catch {
-                #if DEBUG
-                print("[Subscription] CloudKit bypass sync failed: \(error.localizedDescription)")
-                #endif
-            }
+            } catch { }
         }
     }
 
@@ -197,14 +176,7 @@ class SubscriptionManager: ObservableObject {
         Task {
             do {
                 try await db.save(record)
-                #if DEBUG
-                print("[Subscription] Bypass logged to CloudKit")
-                #endif
-            } catch {
-                #if DEBUG
-                print("[Subscription] CloudKit save failed: \(error.localizedDescription)")
-                #endif
-            }
+            } catch { }
         }
     }
 

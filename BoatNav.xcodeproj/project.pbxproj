@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0073924A5E528D6A76ADAB70 /* CloudKitLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D66BBDC1173F2CFF7AC268D /* CloudKitLocationService.swift */; };
-		A1B2C3D4E5F60718A9B0C1D2 /* VoiceGuidanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */; };
 		011E65980143FB97F0F1F450 /* OverlayPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267E45C70DC65B3F19E92EA6 /* OverlayPanel.swift */; };
 		06027A739DADED675D5872F7 /* RWSLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F2F935D07B5F71DFB22101 /* RWSLockService.swift */; };
 		0963EEB4EB3556C59869D8B6 /* SpeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */; };
@@ -63,6 +62,7 @@
 		9B9C63939691C570207AC7CA /* NavigationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242441DD792F47B2BA02BB /* NavigationListView.swift */; };
 		9E6E55A1BE29187DB59AC775 /* SavedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8463A6F18E68F97F176A8B99 /* SavedRoute.swift */; };
 		9FDD089A997D21CCF8254A14 /* FriendLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBFFBBEF581AE6C0F4D0D37 /* FriendLocation.swift */; };
+		A1B2C3D4E5F60718A9B0C1D2 /* VoiceGuidanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */; };
 		A2D983DAF2F34786A0836788 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BA3D6C83C2782CC2EE64E5 /* SettingsView.swift */; };
 		A4EF4D4E84E21C155311FFA6 /* BoatNavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 391E0290E1CE82F689DAFE87 /* BoatNavApp.swift */; };
 		AA111111AAAA1111AAAA1111 /* ManeuverProximityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA222222AAAA2222AAAA2222 /* ManeuverProximityService.swift */; };
@@ -84,6 +84,7 @@
 		D7FBCC805C07D9E3D4BFE826 /* WeatherBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB99E0DA8E36FAFE7551ADC /* WeatherBarView.swift */; };
 		D8162423F5B295FCE81CE4AE /* HazardAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AE699C9930D8664C0FB153 /* HazardAnnotation.swift */; };
 		D9EB25036AECCA4DD8F30FAE /* PDOKEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7BE10126150D8CAE76D9E79 /* PDOKEndpoints.swift */; };
+		DD111111DD111111DD111111 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD222222DD222222DD222222 /* SceneDelegate.swift */; };
 		E0CD77386BBB3DE56EEBBA93 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95B816D19BA5929AF456F49 /* Lock.swift */; };
 		E28526D1E130975630BCC386 /* SpeedDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278832E55517ED80A2D5D484 /* SpeedDashboardView.swift */; };
 		EC383080FED750E6E1A9BB0D /* FavoriteLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */; };
@@ -130,7 +131,7 @@
 		278832E55517ED80A2D5D484 /* SpeedDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedDashboardView.swift; sourceTree = "<group>"; };
 		2AB99E0DA8E36FAFE7551ADC /* WeatherBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherBarView.swift; sourceTree = "<group>"; };
 		2B5DC361DBE456B5C539B380 /* MapViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewRepresentable.swift; sourceTree = "<group>"; };
-		2C31AD460A298D67D4229542 /* BoatNavTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BoatNavTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C31AD460A298D67D4229542 /* BoatNavTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoatNavTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		391E0290E1CE82F689DAFE87 /* BoatNavApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatNavApp.swift; sourceTree = "<group>"; };
 		3BFDC4FC1273FA957B613F80 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3D33D240C0C6656C68D1A283 /* SpeedCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedCalculator.swift; sourceTree = "<group>"; };
@@ -160,15 +161,16 @@
 		810670ADDFC902E4A8F00BC5 /* WaterLevelPanelContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterLevelPanelContent.swift; sourceTree = "<group>"; };
 		81AE5CAA09B353D86E18C9A6 /* Waterway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Waterway.swift; sourceTree = "<group>"; };
 		8463A6F18E68F97F176A8B99 /* SavedRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoute.swift; sourceTree = "<group>"; };
-		8B4131598D679662DF618FC1 /* BoatNavUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BoatNavUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B4131598D679662DF618FC1 /* BoatNavUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoatNavUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BBFB10348CFF8BB556240FB /* SpeedPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedPill.swift; sourceTree = "<group>"; };
 		8CD40DADCCF99C7B83F1D94A /* CarPlaySceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlaySceneDelegate.swift; sourceTree = "<group>"; };
 		91A6188221AC1995EF46DE92 /* SpeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedViewModel.swift; sourceTree = "<group>"; };
 		920D2BD566A42E49BFD4836F /* SpeedCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedCalculatorTests.swift; sourceTree = "<group>"; };
 		9B5025DDBCE9B0E47CDC1D59 /* BoatProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoatProfileViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceGuidanceService.swift; sourceTree = "<group>"; };
 		A249295943C1E344DA0D9CEA /* WaterPanelTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterPanelTest.swift; sourceTree = "<group>"; };
 		A93BDFC7EA8E00451B2A9CF8 /* FavoriteLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteLocation.swift; sourceTree = "<group>"; };
-		A99C725877AE12F1A8C8515C /* BoatNav.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BoatNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A99C725877AE12F1A8C8515C /* BoatNav.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoatNav.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9A2DD7500A16C00D447112F /* WaterLevelService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterLevelService.swift; sourceTree = "<group>"; };
 		AA222222AAAA2222AAAA2222 /* ManeuverProximityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManeuverProximityService.swift; sourceTree = "<group>"; };
 		B14FF1725F5761952B559A09 /* NavigationPanelContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPanelContent.swift; sourceTree = "<group>"; };
@@ -177,7 +179,6 @@
 		B88F4559ED2A241123D65E49 /* ActiveNavigationStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveNavigationStrip.swift; sourceTree = "<group>"; };
 		B93B160C2D8DFF700B664B6B /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		BA12F74C4F5CD9D711E91F93 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718A9B0C1D3 /* VoiceGuidanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceGuidanceService.swift; sourceTree = "<group>"; };
 		BB444444BBBB4444BBBB4444 /* CloudKitSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSchema.swift; sourceTree = "<group>"; };
 		C9299F404648A5D86DA4E071 /* CloudKitHazardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitHazardService.swift; sourceTree = "<group>"; };
 		C9D8621EC967D5D1182A85E6 /* SeamarkAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamarkAnnotation.swift; sourceTree = "<group>"; };
@@ -187,9 +188,10 @@
 		D5B56D6ABA9EDBD5A3B7BFC9 /* MapSelectionBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSelectionBanner.swift; sourceTree = "<group>"; };
 		D7BE10126150D8CAE76D9E79 /* PDOKEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDOKEndpoints.swift; sourceTree = "<group>"; };
 		DA5E85A8710EB99351B7F062 /* WaterwayRouterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterwayRouterTests.swift; sourceTree = "<group>"; };
+		DD222222DD222222DD222222 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		E0A79F53462CF566579CDC55 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		E4356770A7536DDC21ECBADF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		E496BDF633D708648FADE61B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E496BDF633D708648FADE61B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E4D78AFC4D590B28BC9CC0D2 /* FeatureGating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureGating.swift; sourceTree = "<group>"; };
 		E7DE2BDAF4F0B6AB79DE10B7 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		E9EAD99A6F4AE739812A4E89 /* UnitConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionTests.swift; sourceTree = "<group>"; };
@@ -491,6 +493,7 @@
 			children = (
 				706CE6177AF3F586318EE2AB /* AppDelegate.swift */,
 				391E0290E1CE82F689DAFE87 /* BoatNavApp.swift */,
+				DD222222DD222222DD222222 /* SceneDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -590,7 +593,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					64207F97BA7D218E5E0F7C2F = {
 						DevelopmentTeam = 3TZFTAC2SR;
@@ -598,10 +601,6 @@
 					};
 					A0733E46F21F7348B3695AA1 = {
 						DevelopmentTeam = 3TZFTAC2SR;
-					};
-					E990E8A522C2C1D7A6F11A0B = {
-						DevelopmentTeam = 3TZFTAC2SR;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -649,6 +648,7 @@
 				4C3EF803421EC607D71496C1 /* ActiveNavigationStrip.swift in Sources */,
 				389D047F413DE40D20D6193B /* AppDelegate.swift in Sources */,
 				A4EF4D4E84E21C155311FFA6 /* BoatNavApp.swift in Sources */,
+				DD111111DD111111DD111111 /* SceneDelegate.swift in Sources */,
 				36EEE65DD39D4C76C8EAB6EF /* BoatProfile.swift in Sources */,
 				889B7E0815EE95576670B7E6 /* BoatProfilePanelContent.swift in Sources */,
 				D41C9AFC3A9EF5DCE92C1F89 /* BoatProfileViewModel.swift in Sources */,
@@ -802,9 +802,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 97;
+				CURRENT_PROJECT_VERSION = 99;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -813,6 +813,7 @@
 				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nl.boatnav.app;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -857,6 +858,7 @@
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -870,6 +872,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
@@ -915,9 +918,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BoatNav/Resources/BoatNav.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 97;
+				CURRENT_PROJECT_VERSION = 99;
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				INFOPLIST_FILE = BoatNav/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -926,6 +929,7 @@
 				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nl.boatnav.app;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -970,6 +974,7 @@
 				DEVELOPMENT_TEAM = 3TZFTAC2SR;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -990,6 +995,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;

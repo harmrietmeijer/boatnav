@@ -38,9 +38,6 @@ class WaterLevelViewModel: ObservableObject {
                     self.isLoading = false
                 }
             } catch {
-                #if DEBUG
-                print("[WaterLevel] Fetch failed: \(error.localizedDescription)")
-                #endif
                 await MainActor.run { self.isLoading = false }
             }
         }

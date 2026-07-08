@@ -18,10 +18,6 @@ class WaterwayProvider {
     func fetchWaterways(for region: MKCoordinateRegion) async throws -> [WaterwaySegment] {
         let source = bestSource(for: region)
 
-        #if DEBUG
-        print("[WaterwayProvider] Using \(source) for region center \(region.center.latitude), \(region.center.longitude)")
-        #endif
-
         switch source {
         case .pdok:
             return try await pdokClient.fetchWaterways(for: region)
@@ -121,9 +117,6 @@ class WaterwayProvider {
         }
 
         let result = osm + pdokUnique
-        #if DEBUG
-        print("[WaterwayProvider] Merged: \(osm.count) OSM + \(pdokUnique.count)/\(pdok.count) PDOK-unique = \(result.count) total")
-        #endif
         return result
     }
 }

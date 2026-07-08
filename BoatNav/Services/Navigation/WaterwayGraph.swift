@@ -58,10 +58,6 @@ class WaterwayGraph {
 
         mergeCloseNodes(threshold: 25.0)
         bridgeDisconnectedComponents(maxGap: 300.0)
-
-        #if DEBUG
-        print("[Graph] Built from \(segments.count) segments → \(splitSegments.count) after splitting, \(nodeCount) nodes, \(edgeCount) edges")
-        #endif
     }
 
     /// Split segments at points where other segment endpoints come close.
@@ -291,17 +287,7 @@ class WaterwayGraph {
                 adjacencyList[mainNode, default: []].append(fwd)
                 adjacencyList[otherNode, default: []].append(bwd)
                 bridgeCount += 1
-
-                #if DEBUG
-                print("[Graph] Bridged component \(i) (\(otherComponent.count) nodes) to main, gap: \(Int(bestDist))m")
-                #endif
             }
-        }
-
-        if bridgeCount > 0 {
-            #if DEBUG
-            print("[Graph] Connected \(bridgeCount) disconnected components (max gap \(Int(maxGap))m)")
-            #endif
         }
     }
 

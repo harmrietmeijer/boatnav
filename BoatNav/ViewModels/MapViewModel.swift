@@ -32,9 +32,6 @@ class MapViewModel: ObservableObject {
     }
 
     func regionDidChange(to region: MKCoordinateRegion) {
-        #if DEBUG
-        print("[MapVM] regionDidChange: lat=\(region.center.latitude), lon=\(region.center.longitude), span=\(region.span.latitudeDelta)")
-        #endif
         DispatchQueue.main.async { [weak self] in
             self?.currentRegion = region
         }
@@ -53,10 +50,6 @@ class MapViewModel: ObservableObject {
     }
 
     private func loadAnnotations(for region: MKCoordinateRegion) {
-        #if DEBUG
-        print("[MapVM] loadAnnotations called")
-        #endif
-
         // 1. Buoys: fast PDOK fetch, safe to cancel on pan
         fetchTask?.cancel()
         fetchTask = Task { [weak self] in
@@ -64,9 +57,6 @@ class MapViewModel: ObservableObject {
             await MainActor.run { self.isLoadingAnnotations = true }
 
             let buoys = (try? await buoyAnnotationProvider.fetchAnnotations(for: region)) ?? []
-            #if DEBUG
-            print("[MapVM] Loaded \(buoys.count) buoys")
-            #endif
 
             await MainActor.run {
                 self.mergeAnnotations(buoys: buoys)
@@ -79,9 +69,6 @@ class MapViewModel: ObservableObject {
             bridgeTask = Task { [weak self] in
                 guard let self else { return }
                 let bridges = (try? await buoyAnnotationProvider.fetchBridgeAnnotations(for: region)) ?? []
-                #if DEBUG
-                print("[MapVM] Loaded \(bridges.count) bridges/locks")
-                #endif
                 await MainActor.run {
                     self.cachedBridgeAnnotations = bridges
                     self.mergeAnnotations()
@@ -95,9 +82,6 @@ class MapViewModel: ObservableObject {
             restaurantTask = Task { [weak self] in
                 guard let self else { return }
                 let restaurants = (try? await buoyAnnotationProvider.fetchRestaurantAnnotations(for: region)) ?? []
-                #if DEBUG
-                print("[MapVM] Loaded \(restaurants.count) restaurants")
-                #endif
                 await MainActor.run {
                     self.cachedRestaurantAnnotations = restaurants
                     self.mergeAnnotations()

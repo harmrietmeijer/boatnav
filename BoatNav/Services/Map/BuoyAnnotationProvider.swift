@@ -23,9 +23,6 @@ class BuoyAnnotationProvider {
         lastBuoyRegion = region
 
         let buoys = try await pdokClient.fetchBuoys(for: region)
-        #if DEBUG
-        print("[BuoyProvider] Fetched \(buoys.count) buoys from PDOK")
-        #endif
 
         let annotations = buoys.map { buoy in
             let color: SeamarkAnnotation.BuoyColor = {
@@ -63,9 +60,6 @@ class BuoyAnnotationProvider {
         let result = try await pdokClient.fetchBridgesAndLocks(for: region)
         let bridges = result.bridges
         let locks = result.locks
-        #if DEBUG
-        print("[BuoyProvider] Fetched \(bridges.count) bridges, \(locks.count) locks from Overpass")
-        #endif
 
         var annotations: [SeamarkAnnotation] = []
 
@@ -129,9 +123,6 @@ class BuoyAnnotationProvider {
         lastRestaurantRegion = region
 
         let restaurants = try await pdokClient.fetchWatersideRestaurants(for: region)
-        #if DEBUG
-        print("[BuoyProvider] Fetched \(restaurants.count) waterside restaurants")
-        #endif
 
         let annotations = restaurants.map { restaurant in
             let subtitle = [restaurant.cuisine, restaurant.phone]

@@ -23,14 +23,8 @@ class CloudKitLocationService {
         let record: CKRecord
         do {
             record = try await publicDB.record(for: recordID)
-            #if DEBUG
-            print("[LocationShare] Found existing profile, updating")
-            #endif
         } catch {
             record = CKRecord(recordType: FriendLocation.recordType, recordID: recordID)
-            #if DEBUG
-            print("[LocationShare] Creating new profile record: \(recordName)")
-            #endif
         }
 
         record["userID"] = profile.userID as NSString
@@ -43,16 +37,9 @@ class CloudKitLocationService {
         record["isSharing"] = NSNumber(value: profile.isSharing ? 1 : 0)
 
         do {
-            let saved = try await publicDB.save(record)
-            let storedCode = saved["shareCode"] as? String ?? "NIL"
-            #if DEBUG
-            print("[LocationShare] Saved OK — recordName: '\(saved.recordID.recordName)', shareCode: '\(storedCode)', displayName: '\(saved["displayName"] as? String ?? "NIL")'")
-            #endif
+            try await publicDB.save(record)
             return nil
         } catch {
-            #if DEBUG
-            print("[LocationShare] Save FAILED: \(error)")
-            #endif
             return error.localizedDescription
         }
     }
@@ -66,15 +53,7 @@ class CloudKitLocationService {
             record["heading"] = NSNumber(value: heading)
             record["lastUpdated"] = Date() as NSDate
             try await publicDB.save(record)
-        } catch let error as CKError where error.code == .unknownItem {
-            #if DEBUG
-            print("[LocationShare] Profile not found for location update")
-            #endif
-        } catch {
-            #if DEBUG
-            print("[LocationShare] Location update failed: \(error.localizedDescription)")
-            #endif
-        }
+        } catch { }
     }
 
     func setSharing(userID: String, isSharing: Bool) async {
@@ -86,52 +65,27 @@ class CloudKitLocationService {
                 record["lastUpdated"] = Date() as NSDate
             }
             try await publicDB.save(record)
-            #if DEBUG
-            print("[LocationShare] Sharing set to \(isSharing)")
-            #endif
-        } catch {
-            #if DEBUG
-            print("[LocationShare] Set sharing failed: \(error.localizedDescription)")
-            #endif
-        }
+        } catch { }
     }
 
     // MARK: - Find by share code
 
     func findByShareCode(_ code: String) async throws -> FriendLocation? {
         let upperCode = code.uppercased()
-        #if DEBUG
-        print("[LocationShare] Searching for shareCode: '\(upperCode)' in recordType: '\(FriendLocation.recordType)'")
-        #endif
 
         let predicate = NSPredicate(format: "shareCode == %@", upperCode)
         let query = CKQuery(recordType: FriendLocation.recordType, predicate: predicate)
 
         let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
-        #if DEBUG
-        print("[LocationShare] Query returned \(results.count) results")
-        #endif
 
         for (_, result) in results {
             switch result {
             case .success(let record):
-                #if DEBUG
-                print("[LocationShare] Record keys: \(record.allKeys()), shareCode='\(record["shareCode"] as? String ?? "NIL")'")
-                #endif
                 if let loc = FriendLocation(from: record) {
-                    #if DEBUG
-                    print("[LocationShare] Found user: \(loc.displayName)")
-                    #endif
                     return loc
-                } else {
-                    #if DEBUG
-                    print("[LocationShare] FriendLocation init returned nil — userID=\(record["userID"] as? String ?? "NIL"), lat=\(record["latitude"] ?? "NIL"), lon=\(record["longitude"] ?? "NIL")")
-                    #endif
                 }
-            case .failure(let error):
-                #if DEBUG
-                print("[LocationShare] Record decode failed: \(error)")
-                #endif
+            case .failure:
+                break
             }
         }
         return nil
@@ -147,14 +101,7 @@ class CloudKitLocationService {
         record["createdAt"] = Date() as NSDate
         do {
             try await publicDB.save(record)
-            #if DEBUG
-            print("[LocationShare] Added friend \(friendName)")
-            #endif
-        } catch {
-            #if DEBUG
-            print("[LocationShare] Save friend link failed: \(error.localizedDescription)")
-            #endif
-        }
+        } catch { }
     }
 
     func fetchFriendLinks(ownerID: String) async throws -> [(friendID: String, friendName: String)] {
@@ -182,15 +129,8 @@ class CloudKitLocationService {
             let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
             for (recordID, _) in results {
                 try await publicDB.deleteRecord(withID: recordID)
-                #if DEBUG
-                print("[LocationShare] Removed friend link \(friendID)")
-                #endif
             }
-        } catch {
-            #if DEBUG
-            print("[LocationShare] Remove friend link failed: \(error.localizedDescription)")
-            #endif
-        }
+        } catch { }
     }
 
     // MARK: - Debug: seed test friend
@@ -219,14 +159,8 @@ class CloudKitLocationService {
                 saveRecord["longitude"] = NSNumber(value: 4.7850)
             }
             try await publicDB.save(saveRecord)
-            #if DEBUG
-            print("[LocationShare] Test friend 'Schipper Jan' created with code \(testCode)")
-            #endif
             return (testCode, testID)
         } catch {
-            #if DEBUG
-            print("[LocationShare] Seed test friend failed: \(error)")
-            #endif
             return nil
         }
     }

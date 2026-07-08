@@ -76,9 +76,6 @@ class WaterLevelService {
             do {
                 return try await fetchForStation(station, userCoordinate: coordinate)
             } catch {
-                #if DEBUG
-                print("[WaterLevel] \(station.code) (\(station.name)): \(error.localizedDescription)")
-                #endif
                 continue
             }
         }
@@ -116,10 +113,6 @@ class WaterLevelService {
             else { continue }
             stations.append(Station(code: code, name: name, lat: lat, lon: lon))
         }
-
-        #if DEBUG
-        print("[WaterLevel] Catalog: \(stations.count) locations with coordinates")
-        #endif
 
         cachedLocations = stations
         return stations

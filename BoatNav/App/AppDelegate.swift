@@ -3,6 +3,9 @@ import CarPlay
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 
+    /// Set during init so CarPlay (and others) can access it without casting UIApplication.shared.delegate
+    nonisolated(unsafe) static private(set) var shared: AppDelegate!
+
     // MARK: - Shared Services
 
     let locationService = LocationService()
@@ -49,6 +52,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         self.mapViewModel.rwsLockService = rwsLockService
 
         super.init()
+        AppDelegate.shared = self
 
         hazardReportViewModel.startMonitoring(locationService: locationService)
         locationSharingViewModel.startMonitoring(locationService: locationService)
@@ -68,13 +72,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             // navigationViewModel.loadWaterwayGraph() is called from ContentView
             await rwsLockService.fetchLockMetadata()
 
-            #if DEBUG
-            // Test friend seeding — only in debug builds
-            let cloudService = CloudKitLocationService()
-            if let result = await cloudService.seedTestFriend() {
-                print("[DEBUG] Test friend created — zoek met code: \(result.shareCode)")
-            }
-            #endif
         }
     }
 
@@ -83,8 +80,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
+        print("[AppDelegate] configurationForConnecting called, role: \(connectingSceneSession.role.rawValue)")
 
         if connectingSceneSession.role == .carTemplateApplication {
+            print("[AppDelegate] Returning CarPlay configuration")
             let config = UISceneConfiguration(
                 name: "CarPlay",
                 sessionRole: connectingSceneSession.role

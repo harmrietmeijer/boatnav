@@ -131,10 +131,6 @@ class NavigationViewModel: ObservableObject {
     func loadWaterwayGraph(for region: MKCoordinateRegion) async {
         let source = waterwayProvider.bestSource(for: region)
 
-        #if DEBUG
-        print("[Nav] loadWaterwayGraph for \(region.center.latitude),\(region.center.longitude) via \(source.rawValue)")
-        #endif
-
         do {
             let segments = try await waterwayProvider.fetchWaterways(for: region)
 
@@ -144,20 +140,12 @@ class NavigationViewModel: ObservableObject {
             self.router = WaterwayRouter(graph: graph)
             self.loadedGraphRegion = region
 
-            let withSpeed = segments.filter { $0.maxSpeedKmh != nil }.count
-            #if DEBUG
-            print("[Nav] Loaded \(segments.count) segments (\(source.rawValue)), \(withSpeed) with speed limits, graph: \(graph.nodeCount) nodes, \(graph.edgeCount) edges")
-            #endif
-
             await MainActor.run {
                 self.speedLimitService?.update(segments: segments)
                 self.errorMessage = nil
                 self.isGraphReady = true
             }
         } catch {
-            #if DEBUG
-            print("[Nav] loadWaterwayGraph FAILED: \(error.localizedDescription)")
-            #endif
             await MainActor.run {
                 self.errorMessage = "Kan vaarwegdata niet laden: \(error.localizedDescription)"
             }
@@ -480,14 +468,6 @@ class NavigationViewModel: ObservableObject {
                 r.warnings = warnings
                 finalRoute = r
             }
-
-            #if DEBUG
-            print("[Nav] Route: \(String(format: "%.2f", finalRoute.totalDistance / 1000))km, \(Int(finalRoute.estimatedTime / 60))min, \(finalRoute.coordinates.count) coords, \(result.edges.count) edges, \(polylines.count) polylines")
-            for (idx, edge) in result.edges.enumerated() {
-                let isBridge = edge.segment.id.hasPrefix("bridge-")
-                print("[Nav]   Edge \(idx): \(edge.segment.name) [\(edge.segment.id)] len=\(Int(edge.segment.length))m weight=\(Int(edge.weight))m coords=\(edge.segment.coordinates.count)\(isBridge ? " ⚠️BRIDGE" : "")")
-            }
-            #endif
 
             await MainActor.run {
                 self.currentRoute = finalRoute
