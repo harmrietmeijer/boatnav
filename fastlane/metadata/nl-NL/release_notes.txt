@@ -1,1 +1,7 @@
-Eerste release van BoatNav. Navigeer op Nederlandse binnenwateren met actuele waterkaarten, brughoogtes en snelheidslimieten.
+CarPlay navigatie verbeterd!
+
+• Bewaarde routes en favorieten nu direct te starten vanuit CarPlay
+• Turn-by-turn navigatie op je CarPlay scherm met richtingsaanwijzingen
+• Weer, wind en waterstand met iconen op de CarPlay kaart
+• Loading-animatie tijdens route berekenen
+• Diverse bugfixes en stabiliteitverbeteringen
