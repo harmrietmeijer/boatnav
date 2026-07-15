@@ -278,7 +278,10 @@ class NavigationViewModel: ObservableObject {
     // MARK: - Route calculation
 
     func calculateRoute() async {
-        // Ensure graph covers the destination area
+        // Ensure graph covers both start and destination areas
+        if let start = startSelection.coordinate, case .search = startSelection {
+            await reloadGraphIfNeeded(for: start)
+        }
         if let dest = destinationSelection.coordinate {
             await reloadGraphIfNeeded(for: dest)
         }

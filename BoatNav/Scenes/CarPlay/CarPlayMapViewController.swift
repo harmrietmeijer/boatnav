@@ -42,6 +42,13 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     private let navInstructionLabel = UILabel()
     private let navDistanceLabel = UILabel()
 
+    // Loading overlay
+    private let loadingOverlay = UIView()
+    private let loadingSpinner = UIActivityIndicatorView(style: .medium)
+
+    /// Called when user taps "Start navigatie" in trip preview
+    var onTripStarted: ((_ trip: CPTrip, _ routeChoice: CPRouteChoice) -> Void)?
+
     // Default region
     private let defaultRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 51.8, longitude: 4.67),
@@ -72,6 +79,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         super.viewDidLoad()
         setupMapView()
         setupInfoPanel()
+        setupLoadingOverlay()
         bindViewModel()
     }
 
@@ -159,6 +167,15 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         return d
     }
 
+    private func makeBarIcon(_ systemName: String, color: UIColor) -> UIImageView {
+        let config = UIImage.SymbolConfiguration(pointSize: 11, weight: .medium)
+        let iv = UIImageView(image: UIImage(systemName: systemName, withConfiguration: config))
+        iv.tintColor = color
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.setContentHuggingPriority(.required, for: .horizontal)
+        return iv
+    }
+
     private func rebuildInfoBar(weather: WeatherService.WeatherData?, waterLevel: WaterLevelService.WaterLevelData?) {
         // Remove all existing items
         infoBarStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -173,7 +190,10 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         let grayG5 = UIColor(red: 0xB4/255.0, green: 0xB2/255.0, blue: 0xA9/255.0, alpha: 1)
 
         if let w = weather {
-            // Temperature + icon
+            // Weather condition icon + temperature
+            let weatherIcon = makeBarIcon(w.weatherIcon, color: blueB5)
+            infoBarStack.addArrangedSubview(weatherIcon)
+
             let tempLabel = UILabel()
             tempLabel.text = String(format: "%.0f°", w.temperature)
             tempLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .bold)
@@ -182,7 +202,10 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
 
             infoBarStack.addArrangedSubview(makeBarDivider())
 
-            // Wind: Bft + direction
+            // Wind
+            let windIcon = makeBarIcon("wind", color: blueB4)
+            infoBarStack.addArrangedSubview(windIcon)
+
             let windLabel = UILabel()
             windLabel.text = "Bft \(w.beaufort) \(w.windDirectionLabel)"
             windLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .bold)
@@ -192,6 +215,10 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
             infoBarStack.addArrangedSubview(makeBarDivider())
 
             // Precipitation
+            let dropIcon = makeBarIcon(w.precipitation > 0 ? "drop.fill" : "drop",
+                                       color: w.precipitation > 0 ? blueB4 : grayG4)
+            infoBarStack.addArrangedSubview(dropIcon)
+
             let precipLabel = UILabel()
             if w.precipitation > 0 {
                 precipLabel.text = String(format: "%.1f mm", w.precipitation)
@@ -207,13 +234,16 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
         if let wl = waterLevel {
             if hasWeather { infoBarStack.addArrangedSubview(makeBarDivider()) }
 
+            // Water level icon
+            let wavesIcon = makeBarIcon("water.waves", color: blueB4)
+            infoBarStack.addArrangedSubview(wavesIcon)
+
             // Water level: value + cm + trend + next extreme
             let trendIcon: String
-            let trendColor: UIColor
             switch wl.trend {
-            case .rising:  trendIcon = "↗"; trendColor = blueB4
-            case .falling: trendIcon = "↘"; trendColor = redR4
-            case .stable:  trendIcon = "→"; trendColor = grayG4
+            case .rising:  trendIcon = "↗"
+            case .falling: trendIcon = "↘"
+            case .stable:  trendIcon = "→"
             }
 
             var waterText = String(format: "%+.0f cm %@", wl.waterLevelCm, trendIcon)
@@ -299,36 +329,94 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     }
 
     private func setupNavBanner() {
-        // Navigation instruction — above speed pill, appears during active navigation
-        navBanner.backgroundColor = UIColor(red: 0x0B/255.0, green: 0x19/255.0, blue: 0x29/255.0, alpha: 0.92)
+        // Navigation instruction — compact single-row pill, same style as infoBar
+        navBanner.backgroundColor = UIColor(red: 0x0D/255.0, green: 0x21/255.0, blue: 0x35/255.0, alpha: 0.92)
         navBanner.layer.cornerRadius = 12
+        navBanner.layer.borderWidth = 0.5
+        navBanner.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+        navBanner.clipsToBounds = true
         navBanner.translatesAutoresizingMaskIntoConstraints = false
         navBanner.isHidden = true
         view.addSubview(navBanner)
 
-        navInstructionLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        navDistanceLabel.font = .monospacedDigitSystemFont(ofSize: 11, weight: .bold)
+        navDistanceLabel.textColor = blueB5
+        navDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
+        navDistanceLabel.setContentHuggingPriority(.required, for: .horizontal)
+        navDistanceLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        navBanner.addSubview(navDistanceLabel)
+
+        navInstructionLabel.font = .systemFont(ofSize: 10, weight: .medium)
         navInstructionLabel.textColor = .white
-        navInstructionLabel.numberOfLines = 2
+        navInstructionLabel.numberOfLines = 1
+        navInstructionLabel.lineBreakMode = .byTruncatingTail
         navInstructionLabel.translatesAutoresizingMaskIntoConstraints = false
         navBanner.addSubview(navInstructionLabel)
 
-        navDistanceLabel.font = .monospacedDigitSystemFont(ofSize: 18, weight: .bold)
-        navDistanceLabel.textColor = amberA5
-        navDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
-        navBanner.addSubview(navDistanceLabel)
-
         NSLayoutConstraint.activate([
             navBanner.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            navBanner.bottomAnchor.constraint(equalTo: speedPill.topAnchor, constant: -8),
-            navBanner.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
+            navBanner.bottomAnchor.constraint(equalTo: speedPill.topAnchor, constant: -4),
+            navBanner.widthAnchor.constraint(lessThanOrEqualToConstant: 180),
 
-            navDistanceLabel.topAnchor.constraint(equalTo: navBanner.topAnchor, constant: 8),
-            navDistanceLabel.leadingAnchor.constraint(equalTo: navBanner.leadingAnchor, constant: 10),
-            navInstructionLabel.topAnchor.constraint(equalTo: navDistanceLabel.bottomAnchor, constant: 2),
-            navInstructionLabel.leadingAnchor.constraint(equalTo: navBanner.leadingAnchor, constant: 10),
-            navInstructionLabel.trailingAnchor.constraint(equalTo: navBanner.trailingAnchor, constant: -10),
-            navInstructionLabel.bottomAnchor.constraint(equalTo: navBanner.bottomAnchor, constant: -8),
+            navDistanceLabel.leadingAnchor.constraint(equalTo: navBanner.leadingAnchor, constant: 8),
+            navDistanceLabel.centerYAnchor.constraint(equalTo: navBanner.centerYAnchor),
+            navDistanceLabel.topAnchor.constraint(equalTo: navBanner.topAnchor, constant: 4),
+            navDistanceLabel.bottomAnchor.constraint(equalTo: navBanner.bottomAnchor, constant: -4),
+
+            navInstructionLabel.leadingAnchor.constraint(equalTo: navDistanceLabel.trailingAnchor, constant: 4),
+            navInstructionLabel.trailingAnchor.constraint(equalTo: navBanner.trailingAnchor, constant: -8),
+            navInstructionLabel.centerYAnchor.constraint(equalTo: navBanner.centerYAnchor),
         ])
+    }
+
+    private func setupLoadingOverlay() {
+        loadingOverlay.backgroundColor = UIColor(red: 0x0D/255.0, green: 0x21/255.0, blue: 0x35/255.0, alpha: 0.92)
+        loadingOverlay.layer.cornerRadius = 12
+        loadingOverlay.layer.borderWidth = 0.5
+        loadingOverlay.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
+        loadingOverlay.clipsToBounds = true
+        loadingOverlay.translatesAutoresizingMaskIntoConstraints = false
+        loadingOverlay.isHidden = true
+        view.addSubview(loadingOverlay)
+
+        loadingSpinner.color = blueB5
+        loadingSpinner.translatesAutoresizingMaskIntoConstraints = false
+        loadingOverlay.addSubview(loadingSpinner)
+
+        let label = UILabel()
+        label.text = "Route berekenen…"
+        label.font = .systemFont(ofSize: 11, weight: .medium)
+        label.textColor = blueB5
+        label.translatesAutoresizingMaskIntoConstraints = false
+        loadingOverlay.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            loadingOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingOverlay.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
+            loadingSpinner.leadingAnchor.constraint(equalTo: loadingOverlay.leadingAnchor, constant: 12),
+            loadingSpinner.centerYAnchor.constraint(equalTo: loadingOverlay.centerYAnchor),
+            loadingSpinner.topAnchor.constraint(equalTo: loadingOverlay.topAnchor, constant: 10),
+            loadingSpinner.bottomAnchor.constraint(equalTo: loadingOverlay.bottomAnchor, constant: -10),
+
+            label.leadingAnchor.constraint(equalTo: loadingSpinner.trailingAnchor, constant: 8),
+            label.trailingAnchor.constraint(equalTo: loadingOverlay.trailingAnchor, constant: -14),
+            label.centerYAnchor.constraint(equalTo: loadingOverlay.centerYAnchor),
+        ])
+    }
+
+    func showLoading() {
+        loadingOverlay.isHidden = false
+        loadingSpinner.startAnimating()
+    }
+
+    func hideLoading() {
+        loadingOverlay.isHidden = true
+        loadingSpinner.stopAnimating()
+    }
+
+    func setInfoBarHidden(_ hidden: Bool) {
+        infoBar.isHidden = hidden
     }
 
     // MARK: - Bindings
@@ -527,6 +615,7 @@ class CarPlayMapViewController: UIViewController, CPMapTemplateDelegate {
     func mapTemplate(_ mapTemplate: CPMapTemplate, startedTrip trip: CPTrip, using routeChoice: CPRouteChoice) {
         print("[CarPlay] Trip started")
         mapTemplate.hideTripPreviews()
+        onTripStarted?(trip, routeChoice)
     }
 
     func mapTemplateDidShowPanningInterface(_ mapTemplate: CPMapTemplate) {

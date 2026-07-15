@@ -12,6 +12,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     private var isShowingPaywall = false
     private var currentTrip: CPTrip?
     private var currentRoute: WaterwayRoute?
+    private var navigationSession: CPNavigationSession?
+    private var sessionCancellables = Set<AnyCancellable>()
 
     // MARK: - CPTemplateApplicationSceneDelegate
 
@@ -325,24 +327,31 @@ extension CarPlaySceneDelegate {
 
     func handleSavedRouteSelected(_ savedRoute: SavedRoute) {
         guard let appDelegate = AppDelegate.shared else { return }
-        print("[CarPlay] Navigating to saved route: \(savedRoute.name)")
+        print("[CarPlay] Navigating saved route: \(savedRoute.name)")
 
-        let destination = Waypoint(
-            id: UUID().uuidString,
+        // Use the saved route's original start and destination
+        appDelegate.navigationViewModel.startSelection = .search(
+            name: savedRoute.startName,
+            coordinate: savedRoute.startCoordinate
+        )
+        appDelegate.navigationViewModel.destinationSelection = .search(
             name: savedRoute.destinationName,
-            description: "",
             coordinate: savedRoute.destinationCoordinate
         )
 
+        mapViewController?.showLoading()
+        interfaceController?.popToRootTemplate(animated: true, completion: nil)
+
         Task {
-            do {
-                let route = try await appDelegate.navigationViewModel.calculateRoute(to: destination)
-                print("[CarPlay] Route calculated: \(route.summary)")
-                await MainActor.run {
-                    startNavigation(with: route, destinationName: savedRoute.destinationName)
+            await appDelegate.navigationViewModel.calculateRoute()
+            await MainActor.run {
+                self.mapViewController?.hideLoading()
+                if let route = appDelegate.navigationViewModel.currentRoute {
+                    print("[CarPlay] Route calculated: \(route.summary)")
+                    self.startNavigation(with: route, destinationName: savedRoute.destinationName)
+                } else {
+                    print("[CarPlay] Route calculation failed")
                 }
-            } catch {
-                print("[CarPlay] Route calculation failed: \(error)")
             }
         }
     }
@@ -355,20 +364,21 @@ extension CarPlaySceneDelegate {
         print("[CarPlay] Navigating to favorite: \(fav.name)")
         let waypoint = Waypoint(id: fav.id, name: fav.name, description: fav.description, coordinate: fav.coordinate)
 
+        mapViewController?.showLoading()
+        interfaceController?.popToRootTemplate(animated: true, completion: nil)
+
         Task {
             do {
                 let route = try await appDelegate.navigationViewModel.calculateRoute(to: waypoint)
                 print("[CarPlay] Route calculated: \(route.summary)")
                 await MainActor.run {
-                    // Pop back to map, then show trip preview
-                    self.interfaceController?.popToRootTemplate(animated: true) { _, _ in
-                        self.startNavigation(with: route, destinationName: fav.name)
-                    }
+                    self.mapViewController?.hideLoading()
+                    self.startNavigation(with: route, destinationName: fav.name)
                 }
             } catch {
                 print("[CarPlay] Route calculation failed: \(error)")
                 await MainActor.run {
-                    self.interfaceController?.popToRootTemplate(animated: true, completion: nil)
+                    self.mapViewController?.hideLoading()
                 }
             }
         }
@@ -376,6 +386,12 @@ extension CarPlaySceneDelegate {
 
     private func startNavigation(with route: WaterwayRoute, destinationName: String) {
         guard let mapTemplate, let appDelegate = AppDelegate.shared else { return }
+
+        // Clean up any previous navigation session
+        if navigationSession != nil {
+            endNavigationSession()
+            mapTemplate.hideTripPreviews()
+        }
 
         // Show route on map
         mapViewController?.showRoute(route)
@@ -409,16 +425,109 @@ extension CarPlaySceneDelegate {
 
         mapTemplate.showTripPreviews([trip], textConfiguration: textConfig)
 
-        // Start navigation when user taps "Start navigatie"
-        mapTemplate.mapDelegate = mapViewController
+        // When user taps "Start navigatie", begin CPNavigationSession
+        mapViewController?.onTripStarted = { [weak self] trip, _ in
+            self?.beginNavigationSession(for: trip)
+        }
 
-        // Also start if they selected from the list already
         appDelegate.navigationViewModel.isNavigating = true
+    }
+
+    private func beginNavigationSession(for trip: CPTrip) {
+        guard let mapTemplate, let appDelegate = AppDelegate.shared,
+              let route = currentRoute else { return }
+
+        let session = mapTemplate.startNavigationSession(for: trip)
+        self.navigationSession = session
+
+        // Hide info bar during navigation to avoid overlap
+        mapViewController?.setInfoBarHidden(true)
+
+        // Build CPManeuvers from route maneuvers
+        let cpManeuvers: [CPManeuver] = route.maneuvers.compactMap { maneuver in
+            let m = CPManeuver()
+            m.instructionVariants = [maneuver.instruction]
+            m.initialTravelEstimates = CPTravelEstimates(
+                distanceRemaining: Measurement(value: max(maneuver.distanceFromPrevious, 0), unit: .meters),
+                timeRemaining: max(maneuver.estimatedTimeFromPrevious, 0)
+            )
+            if let symbolName = Self.symbolName(for: maneuver.type),
+               let img = UIImage(systemName: symbolName) {
+                m.symbolImage = img
+            }
+            return m
+        }
+        if !cpManeuvers.isEmpty {
+            session.upcomingManeuvers = cpManeuvers
+        }
+
+        // Subscribe to proximity service for live distance updates
+        sessionCancellables.removeAll()
+        appDelegate.maneuverProximityService.$upcomingManeuver
+            .combineLatest(appDelegate.maneuverProximityService.$distanceToManeuver)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak session] maneuver, distance in
+                guard let session, let maneuver, let distance else { return }
+                let estimates = CPTravelEstimates(
+                    distanceRemaining: Measurement(value: distance, unit: .meters),
+                    timeRemaining: max(distance / 3.0, 0)
+                )
+                if let cpManeuver = session.upcomingManeuvers.first(where: {
+                    $0.instructionVariants.first == maneuver.instruction
+                }) {
+                    session.updateEstimates(estimates, for: cpManeuver)
+                }
+            }
+            .store(in: &sessionCancellables)
+
+        // End session when navigation stops
+        appDelegate.navigationViewModel.$isNavigating
+            .dropFirst()
+            .filter { !$0 }
+            .first()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.endNavigationSession()
+            }
+            .store(in: &sessionCancellables)
+
+        print("[CarPlay] Navigation session started with \(cpManeuvers.count) maneuvers")
+    }
+
+    private func endNavigationSession() {
+        navigationSession?.finishTrip()
+        navigationSession = nil
+        sessionCancellables.removeAll()
+        // Show info bar again
+        mapViewController?.setInfoBarHidden(false)
+        print("[CarPlay] Navigation session ended")
+    }
+
+    private static func symbolName(for type: RouteManeuver.ManeuverType) -> String? {
+        switch type {
+        case .depart:
+            return "location.fill"
+        case .turn(let dir):
+            switch dir {
+            case .left: return "arrow.turn.up.left"
+            case .right: return "arrow.turn.up.right"
+            case .slightLeft: return "arrow.up.left"
+            case .slightRight: return "arrow.up.right"
+            case .straight: return "arrow.up"
+            }
+        case .bridge:
+            return "arrow.up.and.down"
+        case .lock:
+            return "rectangle.split.3x1"
+        case .arrive:
+            return "flag.fill"
+        }
     }
 
     func cancelNavigation() {
         guard let mapTemplate, let appDelegate = AppDelegate.shared else { return }
         mapTemplate.hideTripPreviews()
+        endNavigationSession()
         appDelegate.navigationViewModel.stopNavigation()
         mapViewController?.recenterOnUser()
     }
